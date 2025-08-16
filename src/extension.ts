@@ -4,6 +4,7 @@ import { IssuesPanelProvider } from './ui/IssuesPanelProvider';
 import { ReviewHistoryProvider } from './ui/ReviewHistoryProvider';
 import { InlineAnnotationsProvider } from './ui/InlineAnnotationsProvider';
 import { AIProviderManager } from './ai/AIProviderManager';
+import { ExternalAIManager } from './ai/ExternalAIManager';
 import { ChangeDetector } from './core/ChangeDetector';
 import { StorageManager } from './core/StorageManager';
 
@@ -12,6 +13,7 @@ let issuesPanelProvider: IssuesPanelProvider;
 let reviewHistoryProvider: ReviewHistoryProvider;
 let inlineAnnotationsProvider: InlineAnnotationsProvider;
 let aiProviderManager: AIProviderManager;
+let externalAIManager: ExternalAIManager;
 let changeDetector: ChangeDetector;
 let storageManager: StorageManager;
 let statusBarItem: vscode.StatusBarItem;
@@ -22,7 +24,9 @@ export function activate(context: vscode.ExtensionContext) {
     // Initialize core components
     storageManager = new StorageManager(context.globalState);
     aiProviderManager = new AIProviderManager();
+    externalAIManager = ExternalAIManager.getInstance(storageManager);
     changeDetector = new ChangeDetector();
+    externalAIManager.setChangeDetector(changeDetector);
     codeReviewManager = new CodeReviewManager(aiProviderManager, changeDetector, storageManager);
 
     // Initialize UI components
@@ -185,8 +189,73 @@ export function activate(context: vscode.ExtensionContext) {
             // Update the cached provider
             await aiProviderManager.setCachedProvider(selected.value);
             vscode.window.showInformationMessage(`AI provider changed to: ${provider?.name}`);
+        }),
+        
+        // External AI commands
+        vscode.commands.registerCommand('aiCodeReview.copyPrompt', async () => {
+            try {
+                const request = await codeReviewManager.createReviewRequest();
+                if (request) {
+                    await externalAIManager.copyPromptToClipboard(request);
+                }
+            } catch (error) {
+                vscode.window.showErrorMessage(`Failed to copy prompt: ${error}`);
+            }
+        }),
+        vscode.commands.registerCommand('aiCodeReview.copyQuickPrompt', async () => {
+            try {
+                const request = await codeReviewManager.createReviewRequest();
+                if (request) {
+                    await externalAIManager.showQuickPrompt(request);
+                }
+            } catch (error) {
+                vscode.window.showErrorMessage(`Failed to copy quick prompt: ${error}`);
+            }
+        }),
+        vscode.commands.registerCommand('aiCodeReview.pasteResponse', async () => {
+            try {
+                const request = await codeReviewManager.createReviewRequestWithLastChangeType();
+                if (request) {
+                    const result = await externalAIManager.pasteAndProcessResponse(request);
+                    if (result) {
+                        issuesPanelProvider.refresh();
+                        reviewHistoryProvider.refresh();
+                    }
+                }
+            } catch (error) {
+                vscode.window.showErrorMessage(`Failed to process response: ${error}`);
+            }
+        }),
+        vscode.commands.registerCommand('aiCodeReview.pasteResponseWebview', async () => {
+            try {
+                const request = await codeReviewManager.createReviewRequestWithLastChangeType();
+                if (request) {
+                    const result = await externalAIManager.showResponseInputWebview(request);
+                    if (result) {
+                        issuesPanelProvider.refresh();
+                        reviewHistoryProvider.refresh();
+                    }
+                }
+            } catch (error) {
+                vscode.window.showErrorMessage(`Failed to process response: ${error}`);
+            }
+        }),
+        vscode.commands.registerCommand('aiCodeReview.showFormatExamples', async () => {
+             await externalAIManager.showFormatExamples();
+         }),
+        vscode.commands.registerCommand('aiCodeReview.checkReviewResult', async () => {
+            try {
+                const result = await externalAIManager.checkReviewResultFromFile();
+                if (result) {
+                    issuesPanelProvider.refresh();
+                    reviewHistoryProvider.refresh();
+                    vscode.window.showInformationMessage('Code review result processed successfully!');
+                }
+            } catch (error) {
+                vscode.window.showErrorMessage(`Failed to process review result: ${error}`);
+            }
         })
-    ];
+     ];
 
     // Register webview view providers
     context.subscriptions.push(

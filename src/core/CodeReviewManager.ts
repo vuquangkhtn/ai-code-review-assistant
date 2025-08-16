@@ -19,6 +19,7 @@ export class CodeReviewManager {
     private currentWorkspace?: vscode.WorkspaceFolder;
     private userPreferences: UserPreferences;
     private reviewResults: ReviewResult[] = [];
+    private lastUsedChangeType?: ChangeType;
 
     constructor(
         aiProviderManager: AIProviderManager,
@@ -533,6 +534,69 @@ Focus on:
     public async updateUserPreferences(preferences: Partial<UserPreferences>): Promise<void> {
         this.userPreferences = { ...this.userPreferences, ...preferences };
         await this.storageManager.saveUserPreferences(this.userPreferences);
+    }
+
+    public async createReviewRequest(changeType?: ChangeType): Promise<ReviewRequest | undefined> {
+        let changeInfo: ChangeInfo;
+        
+        if (changeType) {
+            // Store the change type for future use
+            this.lastUsedChangeType = changeType;
+            
+            switch (changeType) {
+                case ChangeType.LOCAL: {
+                    changeInfo = await this.changeDetector.detectLocalChanges();
+                    break;
+                }
+                case ChangeType.COMMIT: {
+                    const commitHash = await this.showCommitSelector();
+                    if (!commitHash) return undefined;
+                    changeInfo = await this.changeDetector.detectCommitChanges(commitHash);
+                    break;
+                }
+                case ChangeType.BRANCH: {
+                    const branchSelection = await this.showBranchSelector();
+                    if (!branchSelection) return undefined;
+                    changeInfo = await this.changeDetector.detectBranchChanges(branchSelection.sourceBranch, branchSelection.targetBranch);
+                    break;
+                }
+                case ChangeType.ALL_FILES: {
+                    changeInfo = await this.changeDetector.getAllRepositoryFiles();
+                    break;
+                }
+                default:
+                    throw new Error(`Unsupported change type: ${changeType}`);
+            }
+        } else {
+            const selectedChangeType = await this.showChangeTypeSelector();
+            if (!selectedChangeType) return undefined;
+            this.lastUsedChangeType = selectedChangeType;
+            return this.createReviewRequest(selectedChangeType);
+        }
+
+        const aiProvider = await this.selectAIProvider();
+        if (!aiProvider) return undefined;
+
+        const reviewOptions = await this.getReviewOptions();
+        
+        return {
+            changeInfo,
+            aiProvider,
+            options: reviewOptions
+        };
+    }
+
+    /**
+     * Creates a review request using the last used change type
+     * This is useful for paste operations to avoid re-asking for change type
+     */
+    public async createReviewRequestWithLastChangeType(): Promise<ReviewRequest | undefined> {
+        if (!this.lastUsedChangeType) {
+            vscode.window.showWarningMessage('No previous change type found. Please copy a prompt first.');
+            return undefined;
+        }
+        
+        return this.createReviewRequest(this.lastUsedChangeType);
     }
 
     private async showInstallationGuidance(providerId: string): Promise<void> {

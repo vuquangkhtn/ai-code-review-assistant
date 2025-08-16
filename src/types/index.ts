@@ -53,7 +53,7 @@ export interface ChangeInfo {
 
 export interface ChangedFile {
     path: string;
-    status: 'modified' | 'added' | 'deleted' | 'renamed';
+    status: 'modified' | 'added' | 'deleted' | 'renamed' | 'indexed' | 'summary';
     additions?: number;
     deletions?: number;
     diff?: string;
@@ -127,5 +127,6 @@ export enum AIProviderType {
     COPILOT = 'copilot',
     AMAZON_Q = 'amazon-q',
     CURSOR_AI = 'cursor-ai',
-    CHATGPT = 'chatgpt'
+    CHATGPT = 'chatgpt',
+    EXTERNAL_AI = 'external-ai'
 }

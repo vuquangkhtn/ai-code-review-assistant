@@ -14,7 +14,7 @@ export class ChatGPTProvider extends AbstractAIProvider {
             const prompt = this.formatPrompt(request);
             
             // Simulate ChatGPT response
-            const response = await this.simulateChatGPTResponse(prompt);
+            const response = await this.simulateChatGPTResponse(prompt, request);
             
             const issues = this.parseAIResponse(response);
             
@@ -30,7 +30,7 @@ export class ChatGPTProvider extends AbstractAIProvider {
                         description: s,
                         explanation: s
                     })),
-                    filePath: request.changeInfo.files[0]?.path || '',
+                    filePath: issue.filePath || request.changeInfo.files[0]?.path || '',
                     lineNumber: 1,
                     timestamp: new Date()
                 })),
@@ -80,39 +80,161 @@ export class ChatGPTProvider extends AbstractAIProvider {
         };
     }
 
-    private async simulateChatGPTResponse(_prompt: string): Promise<string> {
-        // This simulates what ChatGPT would return
-        // In practice, you'd make an actual API call to ChatGPT
+    private async simulateChatGPTResponse(prompt: string, request: ReviewRequest): Promise<string> {
+        // This performs actual code analysis based on the provided code changes
+        // In a real implementation, you'd make an API call to ChatGPT
+        
+        console.log('ChatGPTProvider: Analyzing code changes...');
+        console.log('ChatGPTProvider: Prompt length:', prompt.length);
         
         // Simulate processing time
-        await new Promise(resolve => setTimeout(resolve, 600));
+        await new Promise(resolve => setTimeout(resolve, 800));
         
-        return `Issue Level: Medium
-Issue: The function is too long and handles multiple responsibilities, making it difficult to test and maintain. This violates the Single Responsibility Principle.
-
-Suggestions:
-- Break down the function into smaller, focused functions
-- Extract common logic into utility functions
-- Consider using a class to group related functionality
-- Add unit tests for each smaller function
-
-Issue Level: Low
-Issue: Magic numbers are used throughout the code without explanation, making it hard to understand the business logic.
-
-Suggestions:
-- Define constants with descriptive names
-- Use enums for related constants
-- Add comments explaining the significance of numbers
-- Consider using configuration files for configurable values
-
-Issue Level: High
-Issue: No error handling for edge cases, which could cause the application to crash in unexpected scenarios.
-
-Suggestions:
-- Add try-catch blocks around risky operations
-- Validate input parameters at the beginning of functions
-- Handle edge cases explicitly
-- Add logging for debugging purposes`;
+        // Perform basic static analysis on the code changes
+        const issues = this.analyzeCodeChanges(prompt, request);
+        
+        // Format the analysis results as ChatGPT would
+        return this.formatAnalysisResults(issues);
+    }
+    
+    private analyzeCodeChanges(prompt: string, request: ReviewRequest): Array<{level: string, issue: string, suggestions: string[], filePath?: string}> {
+        const issues: Array<{level: string, issue: string, suggestions: string[], filePath?: string}> = [];
+        
+        // Debug: Log prompt structure for troubleshooting
+        // console.log('=== PROMPT DEBUG ===');
+        // console.log('Full prompt:', prompt);
+        // console.log('===================');
+        
+        // Extract file paths and their corresponding diffs from the prompt
+        // Pattern matches: filename.ext (status)
+        const filePathMatches = prompt.match(/^([^\n]+) \([^)]+\)$/gm) || [];
+        const diffMatches = prompt.match(/```diff\n([\s\S]*?)\n```/g) || [];
+        const codeContent = diffMatches.join('\n');
+        
+        // Extract the actual file path from the first match if available
+        let detectedFilePath = '';
+        if (filePathMatches.length > 0) {
+            const match = filePathMatches[0]?.match(/^([^\n]+) \([^)]+\)$/);
+            if (match && match[1]) {
+                detectedFilePath = match[1].trim();
+            }
+        } else {
+            // Try alternative patterns
+            const altMatches = prompt.match(/([^\s]+\.[^\s]+) \([^)]+\)/g) || [];
+            if (altMatches.length > 0) {
+                const altMatch = altMatches[0]?.match(/([^\s]+\.[^\s]+) \([^)]+\)/);
+                if (altMatch && altMatch[1]) {
+                    detectedFilePath = altMatch[1].trim();
+                }
+            }
+        }
+        
+        // Fallback: Use the first file from request if no path detected from prompt
+        if (!detectedFilePath && request.changeInfo.files.length > 0) {
+            detectedFilePath = request.changeInfo.files[0].path;
+        }
+        
+        // Basic static analysis patterns
+        if (codeContent.includes('console.log') || codeContent.includes('console.error')) {
+            issues.push({
+                level: 'Medium',
+                issue: 'Console statements found in code - these should be removed or replaced with proper logging in production',
+                suggestions: [
+                    'Replace console.log with a proper logging framework',
+                    'Remove debug console statements before production deployment',
+                    'Use conditional logging based on environment'
+                ],
+                filePath: detectedFilePath
+            });
+        }
+        
+        if (codeContent.includes('TODO') || codeContent.includes('FIXME') || codeContent.includes('HACK')) {
+            issues.push({
+                level: 'Low',
+                issue: 'TODO/FIXME comments found - incomplete implementation detected',
+                suggestions: [
+                    'Complete the TODO items before merging',
+                    'Create proper issue tickets for pending work',
+                    'Remove FIXME comments by implementing proper solutions'
+                ],
+                filePath: detectedFilePath
+            });
+        }
+        
+        if (codeContent.includes('any') && codeContent.includes('typescript')) {
+            issues.push({
+                level: 'Medium',
+                issue: 'Usage of "any" type detected - this reduces type safety',
+                suggestions: [
+                    'Replace "any" with specific type definitions',
+                    'Use union types or generics for flexible typing',
+                    'Enable strict TypeScript compiler options'
+                ],
+                filePath: detectedFilePath
+            });
+        }
+        
+        if (codeContent.match(/function\s+\w+\s*\([^)]*\)\s*{[\s\S]{200,}/)) {
+            issues.push({
+                level: 'Medium',
+                issue: 'Large function detected - consider breaking down for better maintainability',
+                suggestions: [
+                    'Extract smaller, focused functions',
+                    'Apply Single Responsibility Principle',
+                    'Consider using classes to group related functionality'
+                ],
+                filePath: detectedFilePath
+            });
+        }
+        
+        if (codeContent.includes('password') || codeContent.includes('secret') || codeContent.includes('token')) {
+            issues.push({
+                level: 'High',
+                issue: 'Potential sensitive data in code - security risk detected',
+                suggestions: [
+                    'Move sensitive data to environment variables',
+                    'Use secure configuration management',
+                    'Never commit secrets to version control'
+                ],
+                filePath: detectedFilePath
+            });
+        }
+        
+        if (!codeContent.includes('try') && codeContent.includes('await')) {
+            issues.push({
+                level: 'Medium',
+                issue: 'Async operations without error handling detected',
+                suggestions: [
+                    'Wrap async operations in try-catch blocks',
+                    'Handle promise rejections appropriately',
+                    'Add proper error logging and user feedback'
+                ],
+                filePath: detectedFilePath
+            });
+        }
+        
+        // If no specific issues found, provide general feedback
+        if (issues.length === 0) {
+            issues.push({
+                level: 'Low',
+                issue: 'Code changes look good overall, but consider these general improvements',
+                suggestions: [
+                    'Add unit tests for new functionality',
+                    'Ensure proper documentation is updated',
+                    'Consider performance implications of changes',
+                    'Verify accessibility and user experience'
+                ]
+            });
+        }
+        
+        return issues;
+    }
+    
+    private formatAnalysisResults(issues: Array<{level: string, issue: string, suggestions: string[]}>): string {
+        return issues.map(issue => {
+            const suggestionText = issue.suggestions.map(s => `- ${s}`).join('\n');
+            return `Issue Level: ${issue.level}\nIssue: ${issue.issue}\n\nSuggestions:\n${suggestionText}`;
+        }).join('\n\n');
     }
 
     private generateIssueId(): string {

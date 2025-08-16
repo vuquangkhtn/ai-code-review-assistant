@@ -12,3 +12,6 @@ yarn-error.log*
 .env.development.local
 .env.test.local
 .env.production.local
+
+# AI Code Review temporary files
+.ai-code-review/

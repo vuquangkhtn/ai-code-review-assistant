@@ -33,6 +33,12 @@
     "onCommand:aiCodeReview.reviewFilesByType",
     "onCommand:aiCodeReview.reviewFilesByDirectory",
     "onCommand:aiCodeReview.reviewAllFilesIncludingSkipped",
+    "onCommand:aiCodeReview.copyPrompt",
+    "onCommand:aiCodeReview.copyQuickPrompt",
+    "onCommand:aiCodeReview.pasteResponse",
+    "onCommand:aiCodeReview.pasteResponseWebview",
+    "onCommand:aiCodeReview.showFormatExamples",
+    "onCommand:aiCodeReview.checkReviewResult",
     "onView:aiCodeReview.issuesPanel"
   ],
   "contributes": {
@@ -77,61 +83,91 @@
         "title": "AI Code Review: Review All Files (Including Skipped)",
         "category": "AI Code Review"
       },
-              {
-            "command": "aiCodeReview.refreshIssues",
-            "title": "AI Code Review: Refresh Issues",
-            "category": "AI Code Review"
-        },
-        {
-            "command": "aiCodeReview.test",
-            "title": "AI Code Review: Test Extension",
-            "category": "AI Code Review"
-        },
-        {
-            "command": "aiCodeReview.showProviders",
-            "title": "AI Code Review: Show AI Providers",
-            "category": "AI Code Review"
-        },
-        {
-            "command": "aiCodeReview.refreshProviders",
-            "title": "AI Code Review: Refresh AI Providers",
-            "category": "AI Code Review"
-        },
-        {
-            "command": "aiCodeReview.debugProviders",
-            "title": "AI Code Review: Debug AI Providers",
-            "category": "AI Code Review"
-        },
-        {
-            "command": "aiCodeReview.refreshHistory",
-            "title": "AI Code Review: Refresh History",
-            "category": "AI Code Review"
-        },
-        {
-            "command": "aiCodeReview.clearHistory",
-            "title": "AI Code Review: Clear History",
-            "category": "AI Code Review"
-        },
-        {
-            "command": "aiCodeReview.exportHistory",
-            "title": "AI Code Review: Export History",
-            "category": "AI Code Review"
-        },
-        {
-            "command": "aiCodeReview.debugStorage",
-            "title": "AI Code Review: Debug Storage",
-            "category": "AI Code Review"
-        },
-        {
-            "command": "aiCodeReview.showView",
-            "title": "AI Code Review: Show View",
-            "category": "AI Code Review"
-        },
-        {
-            "command": "aiCodeReview.selectAIProvider",
-            "title": "AI Code Review: Select AI Provider",
-            "category": "AI Code Review"
-        }
+      {
+        "command": "aiCodeReview.refreshIssues",
+        "title": "AI Code Review: Refresh Issues",
+        "category": "AI Code Review"
+      },
+      {
+        "command": "aiCodeReview.test",
+        "title": "AI Code Review: Test Extension",
+        "category": "AI Code Review"
+      },
+      {
+        "command": "aiCodeReview.showProviders",
+        "title": "AI Code Review: Show AI Providers",
+        "category": "AI Code Review"
+      },
+      {
+        "command": "aiCodeReview.refreshProviders",
+        "title": "AI Code Review: Refresh AI Providers",
+        "category": "AI Code Review"
+      },
+      {
+        "command": "aiCodeReview.debugProviders",
+        "title": "AI Code Review: Debug AI Providers",
+        "category": "AI Code Review"
+      },
+      {
+        "command": "aiCodeReview.refreshHistory",
+        "title": "AI Code Review: Refresh History",
+        "category": "AI Code Review"
+      },
+      {
+        "command": "aiCodeReview.clearHistory",
+        "title": "AI Code Review: Clear History",
+        "category": "AI Code Review"
+      },
+      {
+        "command": "aiCodeReview.exportHistory",
+        "title": "AI Code Review: Export History",
+        "category": "AI Code Review"
+      },
+      {
+        "command": "aiCodeReview.debugStorage",
+        "title": "AI Code Review: Debug Storage",
+        "category": "AI Code Review"
+      },
+      {
+        "command": "aiCodeReview.showView",
+        "title": "AI Code Review: Show View",
+        "category": "AI Code Review"
+      },
+      {
+        "command": "aiCodeReview.selectAIProvider",
+        "title": "AI Code Review: Select AI Provider",
+        "category": "AI Code Review"
+      },
+      {
+        "command": "aiCodeReview.copyPrompt",
+        "title": "AI Code Review: Copy Prompt for External AI",
+        "category": "AI Code Review"
+      },
+      {
+        "command": "aiCodeReview.copyQuickPrompt",
+        "title": "AI Code Review: Copy Quick Prompt",
+        "category": "AI Code Review"
+      },
+      {
+        "command": "aiCodeReview.pasteResponse",
+        "title": "AI Code Review: Paste AI Response",
+        "category": "AI Code Review"
+      },
+      {
+        "command": "aiCodeReview.pasteResponseWebview",
+        "title": "AI Code Review: Paste Response (Webview)",
+        "category": "AI Code Review"
+      },
+      {
+        "command": "aiCodeReview.showFormatExamples",
+        "title": "AI Code Review: Show Response Format Examples",
+        "category": "AI Code Review"
+      },
+      {
+        "command": "aiCodeReview.checkReviewResult",
+        "title": "AI Code Review: Check Code Review Result",
+        "category": "AI Code Review"
+      }
     ],
     "viewsContainers": {
       "activitybar": [
@@ -273,6 +309,8 @@
     "typescript": "^4.9.0"
   },
   "dependencies": {
-    "simple-git": "^3.16.0"
+    "@types/uuid": "^10.0.0",
+    "simple-git": "^3.16.0",
+    "uuid": "^11.1.0"
   }
 }

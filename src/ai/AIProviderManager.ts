@@ -10,6 +10,7 @@ import { CopilotProvider } from './providers/CopilotProvider';
 import { AmazonQProvider } from './providers/AmazonQProvider';
 import { CursorAIProvider } from './providers/CursorAIProvider';
 import { ChatGPTProvider } from './providers/ChatGPTProvider';
+import { ExternalAIProvider } from './providers/ExternalAIProvider';
 
 export class AIProviderManager {
     private providers: Map<string, AIProvider> = new Map();
@@ -74,6 +75,19 @@ export class AIProviderManager {
                 supportedLanguages: ['javascript', 'typescript', 'html', 'python', 'java', 'c#', 'go', 'rust']
             }
         });
+
+        this.providers.set(AIProviderType.EXTERNAL_AI, {
+            id: AIProviderType.EXTERNAL_AI,
+            name: 'External AI Provider',
+            isInstalled: true, // Always available for manual use
+            isAvailable: true,
+            capabilities: {
+                supportsCodeReview: true,
+                supportsInlineSuggestions: false,
+                maxContextLength: 100000,
+                supportedLanguages: ['*'] // Supports all languages
+            }
+        });
     }
 
     public async detectInstalledProviders(): Promise<void> {
@@ -81,12 +95,12 @@ export class AIProviderManager {
         const extensions = vscode.extensions.all;
         
         for (const [id, provider] of this.providers) {
-            if (id === AIProviderType.CHATGPT) {
-                // ChatGPT is web-based, always available
+            if (id === AIProviderType.CHATGPT || id === AIProviderType.EXTERNAL_AI) {
+                // ChatGPT and External AI are always available
                 provider.isAvailable = true;
-                provider.isInstalled = true; // Mark as installed since it's web-based
+                provider.isInstalled = true;
                 
-                // Initialize ChatGPT provider instance
+                // Initialize provider instance
                 await this.initializeProviderInstance(id);
                 continue;
             }
@@ -140,6 +154,9 @@ export class AIProviderManager {
                 case AIProviderType.CHATGPT:
                     this.providerInstances.set(providerId, new ChatGPTProvider());
                     break;
+                case AIProviderType.EXTERNAL_AI:
+                    this.providerInstances.set(providerId, new ExternalAIProvider());
+                    break;
             }
         } catch (error) {
             console.error(`Failed to initialize ${providerId}:`, error);
@@ -168,7 +185,8 @@ export class AIProviderManager {
             [AIProviderType.COPILOT]: 'GitHub.copilot',
             [AIProviderType.AMAZON_Q]: 'AmazonWebServices.aws-toolkit-vscode',
             [AIProviderType.CURSOR_AI]: 'cursor.cursor-ai',
-            [AIProviderType.CHATGPT]: 'chatgpt.chatgpt' // This is a placeholder
+            [AIProviderType.CHATGPT]: 'chatgpt.chatgpt', // This is a placeholder
+            [AIProviderType.EXTERNAL_AI]: 'external.ai' // This is a placeholder
         };
         return extensionIds[providerId as AIProviderType] || '';
     }
@@ -541,7 +559,8 @@ export class AIProviderManager {
             [AIProviderType.COPILOT]: 'Install GitHub Copilot extension from the VS Code marketplace. You can search for "GitHub Copilot" in the Extensions view.',
             [AIProviderType.AMAZON_Q]: 'Install Amazon Q extension from the VS Code marketplace. You can search for "Amazon Q" in the Extensions view.',
             [AIProviderType.CURSOR_AI]: 'Install Cursor AI extension from the VS Code marketplace. You can search for "Cursor AI" in the Extensions view.',
-            [AIProviderType.CHATGPT]: 'ChatGPT is web-based and always available'
+            [AIProviderType.CHATGPT]: 'ChatGPT is web-based and always available',
+            [AIProviderType.EXTERNAL_AI]: 'External AI Provider is always available for manual use with any AI service'
         };
 
         return guidance[providerId as AIProviderType] || 'Installation guidance not available';
