@@ -28,6 +28,7 @@
     "onCommand:aiCodeReview.copyPrompt",
     "onCommand:aiCodeReview.copyPromptLocalChanges",
     "onCommand:aiCodeReview.copyPromptAllFiles",
+    "onCommand:aiCodeReview.copyPromptCompareBranches",
     "onCommand:aiCodeReview.showFormatExamples",
     "onCommand:aiCodeReview.checkReviewResult",
     "onCommand:aiCodeReview.openPanel",
@@ -51,6 +52,11 @@
       {
         "command": "aiCodeReview.copyPromptAllFiles",
         "title": "All Files - Scan all Files in repo (existing logic)",
+        "category": "AI Code Review"
+      },
+      {
+        "command": "aiCodeReview.copyPromptCompareBranches",
+        "title": "Compare Branches - Compare changes between two branches",
         "category": "AI Code Review"
       },
       {

@@ -305,6 +305,25 @@ export class ChangeDetector {
         return branches.all;
     }
 
+    public async getDefaultSourceBranch(): Promise<string | null> {
+        const branches = await this.getBranches();
+        const defaultBranches = ['develop', 'main', 'master'];
+        
+        for (const defaultBranch of defaultBranches) {
+            if (branches.includes(defaultBranch)) {
+                return defaultBranch;
+            }
+        }
+        
+        return null;
+    }
+
+    public async detectAndStoreBranchChanges(sourceBranch: string, targetBranch: string): Promise<{ changeInfo: ChangeInfo; filePath: string }> {
+        const changeInfo = await this.detectBranchChanges(sourceBranch, targetBranch);
+        const filePath = await this.storeChangesToFile(changeInfo);
+        return { changeInfo, filePath };
+    }
+
     public async getCurrentBranch(): Promise<string> {
         const status = await this.git.status();
         return status.current || '';

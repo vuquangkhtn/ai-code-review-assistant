@@ -47,13 +47,18 @@ export function activate(context: vscode.ExtensionContext) {
             const options = [
                 {
                     label: '$(git-branch) Local Changes',
-                    description: 'Only local changes (use git diff to check)',
+                    description: 'Only local changes',
                     command: 'aiCodeReview.copyPromptLocalChanges'
                 },
                 {
                     label: '$(folder) All Files',
-                    description: 'Scan all Files in repo (existing logic)',
+                    description: 'Scan all Files in workspace',
                     command: 'aiCodeReview.copyPromptAllFiles'
+                },
+                {
+                    label: '$(git-compare) Compare Branches',
+                    description: 'Compare changes between two branches',
+                    command: 'aiCodeReview.copyPromptCompareBranches'
                 }
             ];
 
@@ -95,6 +100,74 @@ export function activate(context: vscode.ExtensionContext) {
                 await externalAIManager.copyPromptToClipboard(request);
             } catch (error) {
                 vscode.window.showErrorMessage(`Failed to copy prompt for all files: ${error}`);
+            }
+        }),
+
+        vscode.commands.registerCommand('aiCodeReview.copyPromptCompareBranches', async () => {
+            try {
+                // Get all branches
+                const branches = await changeDetector.getBranches();
+                if (branches.length < 2) {
+                    vscode.window.showErrorMessage('At least 2 branches are required for comparison.');
+                    return;
+                }
+
+                // Get default source branch
+                const defaultSourceBranch = await changeDetector.getDefaultSourceBranch();
+                const currentBranch = await changeDetector.getCurrentBranch();
+
+                // Create branch options for quick pick
+                const branchOptions = branches.map(branch => ({
+                    label: branch,
+                    description: branch === currentBranch ? '(current)' : ''
+                }));
+
+                // Select source branch
+                const selectedSource = await vscode.window.showQuickPick(branchOptions, {
+                    placeHolder: `Select source branch ${defaultSourceBranch ? `(default: ${defaultSourceBranch})` : ''}`,
+                    title: 'Compare Branches - Step 1/2: Select Source Branch'
+                });
+
+                if (!selectedSource) {
+                    return;
+                }
+
+                const sourceBranch = selectedSource.label;
+
+                // Select target branch (exclude the selected source branch)
+                const targetBranchOptions = branches
+                    .filter(branch => branch !== sourceBranch)
+                    .map(branch => ({
+                        label: branch,
+                        description: branch === currentBranch ? '(current)' : ''
+                    }));
+
+                const selectedTarget = await vscode.window.showQuickPick(targetBranchOptions, {
+                    placeHolder: 'Select target branch to compare against',
+                    title: 'Compare Branches - Step 2/2: Select Target Branch'
+                });
+
+                if (!selectedTarget) {
+                    return;
+                }
+
+                const targetBranch = selectedTarget.label;
+
+                // Create request for branch comparison
+                const request: ReviewRequest = {
+                    changeInfo: {
+                        type: ChangeType.BRANCH,
+                        source: sourceBranch,
+                        target: targetBranch,
+                        files: []
+                    },
+                    aiProvider: 'external'
+                };
+
+                await externalAIManager.copyPromptToClipboard(request);
+                vscode.window.showInformationMessage(`Comparing changes from ${sourceBranch} to ${targetBranch}`);
+            } catch (error) {
+                vscode.window.showErrorMessage(`Failed to copy prompt for branch comparison: ${error}`);
             }
         }),
         vscode.commands.registerCommand('aiCodeReview.showFormatExamples', async () => {

@@ -47,6 +47,14 @@ export class ExternalAIManager {
                 // For all files, use detectWorkspaceFiles logic
                 const changeInfo = await this.changeDetector.detectWorkspaceFiles();
                 result = { changeInfo, filePath: await this.storeChangesToFile(changeInfo) };
+            } else if (request.changeInfo.type === 'branch') {
+                // For branch comparison, use the branch comparison method
+                const sourceBranch = request.changeInfo.source;
+                const targetBranch = request.changeInfo.target;
+                if (!sourceBranch || !targetBranch) {
+                    throw new Error('Source and target branches are required for branch comparison');
+                }
+                result = await this.changeDetector.detectAndStoreBranchChanges(sourceBranch, targetBranch);
             } else {
                 // For local changes, use the existing method
                 result = await this.changeDetector.detectAndStoreLocalChanges();
