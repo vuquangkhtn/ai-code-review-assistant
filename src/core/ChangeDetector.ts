@@ -128,7 +128,7 @@ export class ChangeDetector {
         }
     }
 
-    private async detectWorkspaceFiles(): Promise<ChangeInfo> {
+    public async detectWorkspaceFiles(): Promise<ChangeInfo> {
         const changedFiles: ChangedFile[] = [];
         
         if (!this.workspacePath) {

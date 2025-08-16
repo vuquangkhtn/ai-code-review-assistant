@@ -26,6 +26,8 @@
   "main": "./out/extension.js",
   "activationEvents": [
     "onCommand:aiCodeReview.copyPrompt",
+    "onCommand:aiCodeReview.copyPromptLocalChanges",
+    "onCommand:aiCodeReview.copyPromptAllFiles",
     "onCommand:aiCodeReview.showFormatExamples",
     "onCommand:aiCodeReview.checkReviewResult",
     "onCommand:aiCodeReview.openPanel",
@@ -38,7 +40,17 @@
     "commands": [
       {
         "command": "aiCodeReview.copyPrompt",
-        "title": "Copy Prompt for External AI",
+        "title": "Copy AI Prompt",
+        "category": "AI Code Review"
+      },
+      {
+        "command": "aiCodeReview.copyPromptLocalChanges",
+        "title": "Local Changes - Only local changes (use git diff to check)",
+        "category": "AI Code Review"
+      },
+      {
+        "command": "aiCodeReview.copyPromptAllFiles",
+        "title": "All Files - Scan all Files in repo (existing logic)",
         "category": "AI Code Review"
       },
       {

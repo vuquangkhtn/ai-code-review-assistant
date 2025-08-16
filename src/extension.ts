@@ -17,9 +17,19 @@ let issuesPanelProvider: IssuesPanelProvider;
 
 export function activate(context: vscode.ExtensionContext) {
     console.log('AI Code Review Assistant is now active!');
+    // Test comment to verify git diff detection
 
     // Initialize components
     changeDetector = new ChangeDetector();
+    
+    // Initialize ChangeDetector with workspace
+    const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+    if (workspaceFolder) {
+        changeDetector.initialize(workspaceFolder).catch(error => {
+            console.error('Failed to initialize ChangeDetector:', error);
+        });
+    }
+    
     externalAIManager = ExternalAIManager.getInstance();
     externalAIManager.setChangeDetector(changeDetector);
     inlineAnnotationsProvider = new InlineAnnotationsProvider();
@@ -34,6 +44,29 @@ export function activate(context: vscode.ExtensionContext) {
     const commands = [
         // External AI commands
         vscode.commands.registerCommand('aiCodeReview.copyPrompt', async () => {
+            const options = [
+                {
+                    label: '$(git-branch) Local Changes',
+                    description: 'Only local changes (use git diff to check)',
+                    command: 'aiCodeReview.copyPromptLocalChanges'
+                },
+                {
+                    label: '$(folder) All Files',
+                    description: 'Scan all Files in repo (existing logic)',
+                    command: 'aiCodeReview.copyPromptAllFiles'
+                }
+            ];
+
+            const selected = await vscode.window.showQuickPick(options, {
+                placeHolder: 'Select the type of code review prompt to copy'
+            });
+
+            if (selected) {
+                await vscode.commands.executeCommand(selected.command);
+            }
+        }),
+
+        vscode.commands.registerCommand('aiCodeReview.copyPromptLocalChanges', async () => {
             try {
                 const request: ReviewRequest = {
                     changeInfo: {
@@ -45,7 +78,23 @@ export function activate(context: vscode.ExtensionContext) {
                 };
                 await externalAIManager.copyPromptToClipboard(request);
             } catch (error) {
-                vscode.window.showErrorMessage(`Failed to copy prompt: ${error}`);
+                vscode.window.showErrorMessage(`Failed to copy prompt for local changes: ${error}`);
+            }
+        }),
+
+        vscode.commands.registerCommand('aiCodeReview.copyPromptAllFiles', async () => {
+            try {
+                const request: ReviewRequest = {
+                    changeInfo: {
+                        type: ChangeType.ALL_FILES,
+                        source: 'workspace',
+                        files: []
+                    },
+                    aiProvider: 'external'
+                };
+                await externalAIManager.copyPromptToClipboard(request);
+            } catch (error) {
+                vscode.window.showErrorMessage(`Failed to copy prompt for all files: ${error}`);
             }
         }),
         vscode.commands.registerCommand('aiCodeReview.showFormatExamples', async () => {

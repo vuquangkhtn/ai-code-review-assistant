@@ -1,8 +1,10 @@
 import * as vscode from 'vscode';
-import { ReviewRequest, ReviewResult } from '../types';
+import { ReviewRequest, ReviewResult, ChangeInfo } from '../types';
 import { PromptGenerator, PromptResult } from './PromptGenerator';
 import { ResponseParser } from './ResponseParser';
 import { CleanupManager } from '../utils/CleanupManager';
+import * as path from 'path';
+import * as fs from 'fs';
 
 
 export class ExternalAIManager {
@@ -39,8 +41,16 @@ export class ExternalAIManager {
             // Clean up previous AI review files before starting new review
             await this.cleanupPreviousFiles();
             
-            // First, store the changes to a file
-            const result = await this.changeDetector.detectAndStoreLocalChanges();
+            // Store the changes to a file based on the request type
+            let result;
+            if (request.changeInfo.type === 'all-files') {
+                // For all files, use detectWorkspaceFiles logic
+                const changeInfo = await this.changeDetector.detectWorkspaceFiles();
+                result = { changeInfo, filePath: await this.storeChangesToFile(changeInfo) };
+            } else {
+                // For local changes, use the existing method
+                result = await this.changeDetector.detectAndStoreLocalChanges();
+            }
             
             if (!result || !result.filePath) {
                 vscode.window.showErrorMessage('Failed to store changes to file. Please try again.');
@@ -522,5 +532,28 @@ export class ExternalAIManager {
      */
     public async getLastChangeFilePath(): Promise<string | undefined> {
         return this.lastChangeFilePath;
+    }
+
+    private async storeChangesToFile(changeInfo: ChangeInfo): Promise<string> {
+        const workspacePath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || '';
+        const aiReviewDir = path.join(workspacePath, '.ai-code-review');
+        const changesDir = path.join(aiReviewDir, 'changes');
+        
+        // Create the .ai-code-review and changes directories if they don't exist
+        if (!fs.existsSync(aiReviewDir)) {
+            fs.mkdirSync(aiReviewDir, { recursive: true });
+        }
+        if (!fs.existsSync(changesDir)) {
+            fs.mkdirSync(changesDir, { recursive: true });
+        }
+        
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        const fileName = `ai-code-review-changes-${timestamp}.json`;
+        const filePath = path.join(changesDir, fileName);
+        
+        const content = JSON.stringify(changeInfo, null, 2);
+        fs.writeFileSync(filePath, content, 'utf8');
+        
+        return filePath;
     }
 }
