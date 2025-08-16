@@ -1,0 +1,210 @@
+{
+  "name": "ai-code-review-assistant",
+  "displayName": "AI Code Review Assistant",
+  "description": "A powerful VS Code extension that automates code review using AI to provide senior-level feedback on your code changes.",
+  "version": "0.1.0",
+  "publisher": "your-publisher-name",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Other",
+    "Programming Languages",
+    "Snippets"
+  ],
+  "keywords": [
+    "code review",
+    "AI",
+    "copilot",
+    "amazon-q",
+    "cursor-ai",
+    "chatgpt",
+    "typescript",
+    "javascript",
+    "html"
+  ],
+  "main": "./out/extension.js",
+  "activationEvents": [
+    "onCommand:aiCodeReview.startReview",
+    "onCommand:aiCodeReview.reviewCommitChanges",
+    "onCommand:aiCodeReview.reviewBranchChanges",
+    "onCommand:aiCodeReview.reviewLocalChanges",
+    "onCommand:aiCodeReview.reviewAllFiles",
+    "onView:aiCodeReview.issuesPanel"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "aiCodeReview.startReview",
+        "title": "AI Code Review: Start Review",
+        "category": "AI Code Review"
+      },
+      {
+        "command": "aiCodeReview.reviewCommitChanges",
+        "title": "AI Code Review: Review Commit Changes",
+        "category": "AI Code Review"
+      },
+      {
+        "command": "aiCodeReview.reviewBranchChanges",
+        "title": "AI Code Review: Review Branch Changes",
+        "category": "AI Code Review"
+      },
+      {
+        "command": "aiCodeReview.reviewLocalChanges",
+        "title": "AI Code Review: Review Local Changes",
+        "category": "AI Code Review"
+      },
+      {
+        "command": "aiCodeReview.reviewAllFiles",
+        "title": "AI Code Review: Review All Files",
+        "category": "AI Code Review"
+      },
+              {
+            "command": "aiCodeReview.refreshIssues",
+            "title": "AI Code Review: Refresh Issues",
+            "category": "AI Code Review"
+        },
+        {
+            "command": "aiCodeReview.test",
+            "title": "AI Code Review: Test Extension",
+            "category": "AI Code Review"
+        },
+        {
+            "command": "aiCodeReview.showProviders",
+            "title": "AI Code Review: Show AI Providers",
+            "category": "AI Code Review"
+        },
+        {
+            "command": "aiCodeReview.refreshProviders",
+            "title": "AI Code Review: Refresh AI Providers",
+            "category": "AI Code Review"
+        },
+        {
+            "command": "aiCodeReview.debugProviders",
+            "title": "AI Code Review: Debug AI Providers",
+            "category": "AI Code Review"
+        }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "aiCodeReview",
+          "title": "AI Code Review",
+          "icon": "resources/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "aiCodeReview": [
+        {
+          "id": "aiCodeReview.issuesPanel",
+          "name": "Issues",
+          "when": "aiCodeReview.hasIssues"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "AI Code Review Assistant",
+      "properties": {
+        "aiCodeReview.defaultChangeType": {
+          "type": "string",
+          "enum": [
+            "local",
+            "commit",
+            "branch"
+          ],
+          "default": "local",
+          "description": "Default change type for code reviews"
+        },
+        "aiCodeReview.defaultAIProvider": {
+          "type": "string",
+          "enum": [
+            "copilot",
+            "amazon-q",
+            "cursor-ai",
+            "chatgpt"
+          ],
+          "default": "copilot",
+          "description": "Default AI provider for code reviews"
+        },
+        "aiCodeReview.autoCache": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically cache review results and preferences"
+        },
+        "aiCodeReview.severityThreshold": {
+          "type": "string",
+          "enum": [
+            "low",
+            "medium",
+            "high",
+            "critical"
+          ],
+          "default": "low",
+          "description": "Minimum severity level to display issues"
+        },
+        "aiCodeReview.supportedLanguages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "javascript",
+            "typescript",
+            "html"
+          ],
+          "description": "Programming languages supported for code review"
+        }
+      }
+    },
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "aiCodeReview.startReview",
+          "when": "workspaceFolderCount > 0"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "aiCodeReview.reviewLocalChanges",
+          "when": "editorTextFocus",
+          "group": "aiCodeReview"
+        },
+        {
+          "command": "aiCodeReview.reviewAllFiles",
+          "when": "editorTextFocus",
+          "group": "aiCodeReview"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "aiCodeReview.showProviders",
+          "when": "view == aiCodeReview.issuesPanel",
+          "group": "navigation"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/glob": "^8.1.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^16.0.0",
+    "@types/vscode": "^1.74.0",
+    "@typescript-eslint/eslint-plugin": "^5.0.0",
+    "@typescript-eslint/parser": "^5.0.0",
+    "eslint": "^8.0.0",
+    "mocha": "^11.7.1",
+    "typescript": "^4.9.0"
+  },
+  "dependencies": {
+    "simple-git": "^3.16.0"
+  }
+}
