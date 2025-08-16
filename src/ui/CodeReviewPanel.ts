@@ -104,7 +104,17 @@ export class CodeReviewPanel {
     }
 
     private _openFile(file: string, line?: number) {
-        const uri = vscode.Uri.file(file);
+        // Ensure file path is absolute
+        let absolutePath = file;
+        if (!absolutePath.startsWith('/') && !absolutePath.match(/^[a-zA-Z]:/)) {
+            // Relative path - join with workspace root
+            const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+            if (workspaceFolder) {
+                absolutePath = vscode.Uri.joinPath(workspaceFolder.uri, file).fsPath;
+            }
+        }
+        
+        const uri = vscode.Uri.file(absolutePath);
         vscode.window.showTextDocument(uri).then(editor => {
             if (line && line > 0) {
                 const position = new vscode.Position(line - 1, 0);
@@ -278,16 +288,16 @@ export class CodeReviewPanel {
             background: var(--vscode-list-hoverBackground);
         }
         .issue-item.critical {
-            border-left-color: #ff4444;
+            border-left-color: #9b59b6;
         }
         .issue-item.high {
-            border-left-color: #ff8800;
+            border-left-color: #e74c3c;
         }
         .issue-item.medium {
-            border-left-color: #ffcc00;
+            border-left-color: #f1c40f;
         }
         .issue-item.low {
-            border-left-color: #00aa00;
+            border-left-color: #3498db;
         }
         .issue-header {
             display: flex;
@@ -307,19 +317,19 @@ export class CodeReviewPanel {
             font-weight: bold;
         }
         .severity-critical {
-            background: #ff4444;
+            background: #9b59b6;
             color: white;
         }
         .severity-high {
-            background: #ff8800;
+            background: #e74c3c;
             color: white;
         }
         .severity-medium {
-            background: #ffcc00;
-            color: black;
+            background: #f1c40f;
+            color: #2c3e50;
         }
         .severity-low {
-            background: #00aa00;
+            background: #3498db;
             color: white;
         }
         .issue-description {
@@ -407,10 +417,10 @@ export class CodeReviewPanel {
             align-items: center;
             gap: 3px;
         }
-        .stat-critical { color: #ff4444; }
-        .stat-high { color: #ff8800; }
-        .stat-medium { color: #ffcc00; }
-        .stat-low { color: #00aa00; }
+        .stat-critical { color: #9b59b6; }
+        .stat-high { color: #e74c3c; }
+        .stat-medium { color: #f1c40f; }
+        .stat-low { color: #3498db; }
     </style>
 </head>
 <body>

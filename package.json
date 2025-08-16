@@ -31,7 +31,8 @@
     "onCommand:aiCodeReview.openPanel",
     "onCommand:aiCodeReview.closePanel",
     "onCommand:aiCodeReview.openPromptFile",
-    "onCommand:aiCodeReview.openChangeFile"
+    "onCommand:aiCodeReview.openChangeFile",
+    "onCommand:aiCodeReview.openIssue"
   ],
   "contributes": {
     "commands": [
@@ -69,6 +70,11 @@
         "command": "aiCodeReview.openChangeFile",
         "title": "Open Change File",
         "category": "AI Code Review"
+      },
+      {
+        "command": "aiCodeReview.openIssue",
+        "title": "Open Issue",
+        "category": "AI Code Review"
       }
     ],
 
@@ -86,6 +92,11 @@
         {
           "id": "aiCodeReviewPanel",
           "name": "Code Review",
+          "when": "true"
+        },
+        {
+          "id": "aiCodeReviewIssues",
+          "name": "Issues",
           "when": "true"
         }
       ]

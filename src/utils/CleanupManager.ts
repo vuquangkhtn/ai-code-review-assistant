@@ -4,10 +4,11 @@ import * as vscode from 'vscode';
 
 export class CleanupManager {
     /**
-     * Cleans up all files in the .ai-code-review directory
-     * This ensures a fresh start for each new code review session
+     * Selectively cleans up files in specific subdirectories of .ai-code-review
+     * Only removes files when new files are generated in those folders
+     * @param foldersToClean Array of folder names to clean ('prompts', 'changes', 'results')
      */
-    public static async cleanupAIReviewDirectory(): Promise<void> {
+    public static async cleanupSelectiveDirectories(foldersToClean: string[] = ['prompts', 'changes', 'results']): Promise<void> {
         try {
             const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
             if (!workspaceRoot) {
@@ -18,34 +19,61 @@ export class CleanupManager {
             
             // Check if the directory exists
             if (!fs.existsSync(aiReviewDir)) {
-                // Directory doesn't exist, nothing to clean
                 return;
             }
 
-            // Clean up all subdirectories
-            const subdirs = ['prompts', 'changes', 'results'];
-            
-            for (const subdir of subdirs) {
+            // Clean up only specified subdirectories
+            for (const subdir of foldersToClean) {
                 const subdirPath = path.join(aiReviewDir, subdir);
                 if (fs.existsSync(subdirPath)) {
                     await this.cleanupDirectory(subdirPath);
                 }
             }
 
-            // Also clean any files directly in .ai-code-review (legacy files)
-            const files = fs.readdirSync(aiReviewDir);
-            for (const file of files) {
-                const filePath = path.join(aiReviewDir, file);
-                const stat = fs.statSync(filePath);
-                if (stat.isFile()) {
-                    fs.unlinkSync(filePath);
-                }
+        } catch (error) {
+            console.error('Error cleaning up AI review directories:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Completely removes the entire .ai-code-review directory
+     * Used during extension deactivation or complete cleanup
+     */
+    public static async cleanupCompleteDirectory(): Promise<void> {
+        try {
+            const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+            if (!workspaceRoot) {
+                return;
+            }
+
+            const aiReviewDir = path.join(workspaceRoot, '.ai-code-review');
+            
+            // Check if the directory exists
+            if (!fs.existsSync(aiReviewDir)) {
+                return;
+            }
+
+            // Remove the entire directory and all its contents
+            await this.cleanupDirectory(aiReviewDir);
+            
+            // Remove the directory itself
+            if (fs.existsSync(aiReviewDir)) {
+                fs.rmdirSync(aiReviewDir);
             }
 
         } catch (error) {
-            console.error('Error cleaning up AI review directory:', error);
+            console.error('Error completely cleaning up AI review directory:', error);
             throw error;
         }
+    }
+
+    /**
+     * Legacy method - now calls selective cleanup for backward compatibility
+     * @deprecated Use cleanupSelectiveDirectories or cleanupCompleteDirectory instead
+     */
+    public static async cleanupAIReviewDirectory(): Promise<void> {
+        return this.cleanupSelectiveDirectories();
     }
 
     /**

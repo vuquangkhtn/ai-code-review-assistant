@@ -138,7 +138,17 @@ export class InlineAnnotationsProvider {
         const diagnosticMap = new Map<string, vscode.Diagnostic[]>();
 
         this._issues.forEach(issue => {
-            const uri = vscode.Uri.file(issue.filePath);
+            // Ensure file path is absolute
+            let absolutePath = issue.filePath;
+            if (!absolutePath.startsWith('/') && !absolutePath.match(/^[a-zA-Z]:/)) {
+                // Relative path - join with workspace root
+                const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+                if (workspaceFolder) {
+                    absolutePath = vscode.Uri.joinPath(workspaceFolder.uri, issue.filePath).fsPath;
+                }
+            }
+            
+            const uri = vscode.Uri.file(absolutePath);
             const uriString = uri.toString();
 
             if (!diagnosticMap.has(uriString)) {

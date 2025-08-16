@@ -33,7 +33,11 @@ A powerful VS Code extension that automates code review using AI to provide seni
 - **Smart Caching**: Remembers your preferences for future reviews
 
 ### 🎨 Triple Interface Options
-- **Dedicated Sidebar Panel**: Comprehensive overview of all issues grouped by severity
+- **Dedicated Sidebar Panel**: Comprehensive overview of all issues grouped by severity with color-coded visual indicators
+  - 🟣 **Critical Issues**: Purple icons for immediate attention
+  - 🔴 **High Issues**: Red error icons for important fixes
+  - 🟡 **Medium Issues**: Yellow warning icons for moderate concerns
+  - 🔵 **Low Issues**: Blue info icons for minor improvements
 - **Review History Panel**: Complete history of all code reviews with detailed tracking
 - **Inline Editor Annotations**: Contextual hints and suggestions directly in your code
 - **Navigation**: Jump directly to problematic lines from the issue panel
@@ -88,6 +92,21 @@ A powerful VS Code extension that automates code review using AI to provide seni
 - Select "Local Changes" type
 - Review uncommitted modifications
 - Get instant feedback on your current work
+
+### File Management & Cleanup
+
+#### Smart Cleanup Behavior
+The extension automatically manages temporary files in the `.ai-code-review` directory:
+
+- **Selective Cleanup**: When generating new review files, only cleans specific folders (`prompts/`, `changes/`, `results/`) to make room for new content
+- **Complete Cleanup**: When the extension is deactivated, the entire `.ai-code-review` directory is removed to keep your workspace clean
+- **Preservation**: Files in other subdirectories are preserved during selective cleanup operations
+
+#### Manual Cleanup
+You can manually clean up review files by:
+1. Restarting the extension (triggers selective cleanup)
+2. Disabling and re-enabling the extension (triggers complete cleanup)
+3. Deleting the `.ai-code-review` folder manually
 
 ### Review History Management
 

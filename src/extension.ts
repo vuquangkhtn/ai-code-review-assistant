@@ -4,13 +4,16 @@ import { ChangeDetector } from './core/ChangeDetector';
 import { CodeReviewPanel } from './ui/CodeReviewPanel';
 import { InlineAnnotationsProvider } from './ui/InlineAnnotationsProvider';
 import { CodeReviewTreeProvider } from './ui/CodeReviewTreeProvider';
-import { ReviewRequest, ChangeType } from './types';
+import { IssuesPanelProvider } from './ui/IssuesPanelProvider';
+import { CleanupManager } from './utils/CleanupManager';
+import { ReviewRequest, ChangeType, CodeIssue } from './types';
 
 
 let externalAIManager: ExternalAIManager;
 let changeDetector: ChangeDetector;
 let inlineAnnotationsProvider: InlineAnnotationsProvider;
 let codeReviewTreeProvider: CodeReviewTreeProvider;
+let issuesPanelProvider: IssuesPanelProvider;
 
 export function activate(context: vscode.ExtensionContext) {
     console.log('AI Code Review Assistant is now active!');
@@ -21,9 +24,11 @@ export function activate(context: vscode.ExtensionContext) {
     externalAIManager.setChangeDetector(changeDetector);
     inlineAnnotationsProvider = new InlineAnnotationsProvider();
     codeReviewTreeProvider = new CodeReviewTreeProvider();
+    issuesPanelProvider = new IssuesPanelProvider();
 
-    // Register tree data provider for sidebar
+    // Register tree data providers for sidebar
     vscode.window.registerTreeDataProvider('aiCodeReviewPanel', codeReviewTreeProvider);
+    vscode.window.registerTreeDataProvider('aiCodeReviewIssues', issuesPanelProvider);
 
     // Register commands
     const commands = [
@@ -57,6 +62,9 @@ export function activate(context: vscode.ExtensionContext) {
                     
                     // Update inline annotations
                     inlineAnnotationsProvider.updateIssues(result.issues);
+                    
+                    // Update issues panel
+                    issuesPanelProvider.updateIssues(result.issues);
                     
                     vscode.window.showInformationMessage('Code review result processed successfully!');
                 }
@@ -95,6 +103,30 @@ export function activate(context: vscode.ExtensionContext) {
             } catch (error) {
                 vscode.window.showErrorMessage(`Failed to open change file: ${error}`);
             }
+        }),
+        vscode.commands.registerCommand('aiCodeReview.openIssue', async (issue: CodeIssue) => {
+            try {
+                // Ensure file path is absolute
+                let absolutePath = issue.filePath;
+                if (!absolutePath.startsWith('/') && !absolutePath.match(/^[a-zA-Z]:/)) {
+                    // Relative path - join with workspace root
+                    const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+                    if (workspaceFolder) {
+                        absolutePath = vscode.Uri.joinPath(workspaceFolder.uri, issue.filePath).fsPath;
+                    }
+                }
+                
+                const uri = vscode.Uri.file(absolutePath);
+                const document = await vscode.workspace.openTextDocument(uri);
+                const editor = await vscode.window.showTextDocument(document);
+                
+                // Navigate to the specific line
+                const position = new vscode.Position(Math.max(0, issue.lineNumber - 1), issue.columnNumber || 0);
+                editor.selection = new vscode.Selection(position, position);
+                editor.revealRange(new vscode.Range(position, position), vscode.TextEditorRevealType.InCenter);
+            } catch (error) {
+                vscode.window.showErrorMessage(`Failed to open issue: ${error}`);
+            }
         })
      ];
 
@@ -110,4 +142,9 @@ export function deactivate() {
     if (CodeReviewPanel.currentPanel) {
         CodeReviewPanel.currentPanel.dispose();
     }
+    
+    // Clean up .ai-code-review directory on extension deactivation
+    // CleanupManager.cleanupCompleteDirectory().catch(error => {
+    //     console.error('Error during extension deactivation cleanup:', error);
+    // });
 }

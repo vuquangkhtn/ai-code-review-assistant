@@ -69,12 +69,14 @@ export class ExternalAIManager {
 
     /**
      * Cleans up previous AI review files to ensure a fresh start
+     * Only cleans specific folders when new files are being generated
      */
     private async cleanupPreviousFiles(): Promise<void> {
         try {
             const fileCount = CleanupManager.getFileCount();
             if (fileCount.total > 0) {
-                await CleanupManager.cleanupAIReviewDirectory();
+                // Only clean prompts, changes, and results folders when generating new files
+                await CleanupManager.cleanupSelectiveDirectories(['prompts', 'changes', 'results']);
                 console.log(`Cleaned up ${fileCount.total} files from previous AI review sessions`);
             }
         } catch (error) {
@@ -438,7 +440,7 @@ export class ExternalAIManager {
                 return null;
             }
 
-            // Check if .ai-code-review/results folder exists
+            // Ensure .ai-code-review/results folder exists
             const resultsFolder = vscode.Uri.joinPath(workspaceFolder.uri, '.ai-code-review', 'results');
             
             try {
@@ -448,8 +450,13 @@ export class ExternalAIManager {
                     return null;
                 }
             } catch (error) {
-                vscode.window.showErrorMessage('.ai-code-review/results folder not found. Please run a code review first.');
-                return null;
+                // Directory doesn't exist, create it
+                try {
+                    await vscode.workspace.fs.createDirectory(resultsFolder);
+                } catch (createError) {
+                    vscode.window.showErrorMessage('Failed to create .ai-code-review/results directory.');
+                    return null;
+                }
             }
 
             // Read directory contents
