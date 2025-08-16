@@ -1,4 +1,4 @@
-import { ReviewRequest, ReviewResult, AIProviderType } from '../../types';
+import { ReviewRequest, ReviewResult } from '../../types';
 import { AbstractAIProvider } from './BaseAIProvider';
 import { PromptGenerator } from '../PromptGenerator';
 import { ResponseParser } from '../ResponseParser';

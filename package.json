@@ -25,119 +25,15 @@
   ],
   "main": "./out/extension.js",
   "activationEvents": [
-    "onCommand:aiCodeReview.startReview",
-    "onCommand:aiCodeReview.reviewCommitChanges",
-    "onCommand:aiCodeReview.reviewBranchChanges",
-    "onCommand:aiCodeReview.reviewLocalChanges",
-    "onCommand:aiCodeReview.reviewAllFiles",
-    "onCommand:aiCodeReview.reviewFilesByType",
-    "onCommand:aiCodeReview.reviewFilesByDirectory",
-    "onCommand:aiCodeReview.reviewAllFilesIncludingSkipped",
     "onCommand:aiCodeReview.copyPrompt",
     "onCommand:aiCodeReview.copyQuickPrompt",
-    "onCommand:aiCodeReview.pasteResponse",
-    "onCommand:aiCodeReview.pasteResponseWebview",
     "onCommand:aiCodeReview.showFormatExamples",
     "onCommand:aiCodeReview.checkReviewResult",
-    "onView:aiCodeReview.issuesPanel"
+    "onCommand:aiCodeReview.openPanel",
+    "onCommand:aiCodeReview.closePanel"
   ],
   "contributes": {
     "commands": [
-      {
-        "command": "aiCodeReview.startReview",
-        "title": "AI Code Review: Start Review",
-        "category": "AI Code Review"
-      },
-      {
-        "command": "aiCodeReview.reviewCommitChanges",
-        "title": "AI Code Review: Review Commit Changes",
-        "category": "AI Code Review"
-      },
-      {
-        "command": "aiCodeReview.reviewBranchChanges",
-        "title": "AI Code Review: Review Branch Changes",
-        "category": "AI Code Review"
-      },
-      {
-        "command": "aiCodeReview.reviewLocalChanges",
-        "title": "AI Code Review: Review Local Changes",
-        "category": "AI Code Review"
-      },
-      {
-        "command": "aiCodeReview.reviewAllFiles",
-        "title": "AI Code Review: Review All Files",
-        "category": "AI Code Review"
-      },
-      {
-        "command": "aiCodeReview.reviewFilesByType",
-        "title": "AI Code Review: Review Files by Type",
-        "category": "AI Code Review"
-      },
-      {
-        "command": "aiCodeReview.reviewFilesByDirectory",
-        "title": "AI Code Review: Review Files by Directory",
-        "category": "AI Code Review"
-      },
-      {
-        "command": "aiCodeReview.reviewAllFilesIncludingSkipped",
-        "title": "AI Code Review: Review All Files (Including Skipped)",
-        "category": "AI Code Review"
-      },
-      {
-        "command": "aiCodeReview.refreshIssues",
-        "title": "AI Code Review: Refresh Issues",
-        "category": "AI Code Review"
-      },
-      {
-        "command": "aiCodeReview.test",
-        "title": "AI Code Review: Test Extension",
-        "category": "AI Code Review"
-      },
-      {
-        "command": "aiCodeReview.showProviders",
-        "title": "AI Code Review: Show AI Providers",
-        "category": "AI Code Review"
-      },
-      {
-        "command": "aiCodeReview.refreshProviders",
-        "title": "AI Code Review: Refresh AI Providers",
-        "category": "AI Code Review"
-      },
-      {
-        "command": "aiCodeReview.debugProviders",
-        "title": "AI Code Review: Debug AI Providers",
-        "category": "AI Code Review"
-      },
-      {
-        "command": "aiCodeReview.refreshHistory",
-        "title": "AI Code Review: Refresh History",
-        "category": "AI Code Review"
-      },
-      {
-        "command": "aiCodeReview.clearHistory",
-        "title": "AI Code Review: Clear History",
-        "category": "AI Code Review"
-      },
-      {
-        "command": "aiCodeReview.exportHistory",
-        "title": "AI Code Review: Export History",
-        "category": "AI Code Review"
-      },
-      {
-        "command": "aiCodeReview.debugStorage",
-        "title": "AI Code Review: Debug Storage",
-        "category": "AI Code Review"
-      },
-      {
-        "command": "aiCodeReview.showView",
-        "title": "AI Code Review: Show View",
-        "category": "AI Code Review"
-      },
-      {
-        "command": "aiCodeReview.selectAIProvider",
-        "title": "AI Code Review: Select AI Provider",
-        "category": "AI Code Review"
-      },
       {
         "command": "aiCodeReview.copyPrompt",
         "title": "AI Code Review: Copy Prompt for External AI",
@@ -149,16 +45,6 @@
         "category": "AI Code Review"
       },
       {
-        "command": "aiCodeReview.pasteResponse",
-        "title": "AI Code Review: Paste AI Response",
-        "category": "AI Code Review"
-      },
-      {
-        "command": "aiCodeReview.pasteResponseWebview",
-        "title": "AI Code Review: Paste Response (Webview)",
-        "category": "AI Code Review"
-      },
-      {
         "command": "aiCodeReview.showFormatExamples",
         "title": "AI Code Review: Show Response Format Examples",
         "category": "AI Code Review"
@@ -167,31 +53,19 @@
         "command": "aiCodeReview.checkReviewResult",
         "title": "AI Code Review: Check Code Review Result",
         "category": "AI Code Review"
+      },
+      {
+        "command": "aiCodeReview.openPanel",
+        "title": "AI Code Review: Open Review Panel",
+        "category": "AI Code Review"
+      },
+      {
+        "command": "aiCodeReview.closePanel",
+        "title": "AI Code Review: Close Review Panel",
+        "category": "AI Code Review"
       }
     ],
-    "viewsContainers": {
-      "activitybar": [
-        {
-          "id": "aiCodeReview",
-          "title": "AI Code Review",
-          "icon": "resources/icon.svg"
-        }
-      ]
-    },
-    "views": {
-      "aiCodeReview": [
-        {
-          "id": "aiCodeReview.issuesPanel",
-          "name": "Issues",
-          "type": "webview"
-        },
-        {
-          "id": "aiCodeReview.reviewHistory",
-          "name": "Review History",
-          "type": "webview"
-        }
-      ]
-    },
+
     "configuration": {
       "title": "AI Code Review Assistant",
       "properties": {
@@ -245,49 +119,8 @@
           "description": "Programming languages supported for code review"
         }
       }
-    },
-    "menus": {
-      "commandPalette": [
-        {
-          "command": "aiCodeReview.startReview",
-          "when": "workspaceFolderCount > 0"
-        }
-      ],
-      "editor/context": [
-        {
-          "command": "aiCodeReview.reviewLocalChanges",
-          "when": "editorTextFocus",
-          "group": "aiCodeReview"
-        },
-        {
-          "command": "aiCodeReview.reviewAllFiles",
-          "when": "editorTextFocus",
-          "group": "aiCodeReview"
-        },
-        {
-          "command": "aiCodeReview.reviewFilesByType",
-          "when": "editorTextFocus",
-          "group": "aiCodeReview"
-        },
-        {
-          "command": "aiCodeReview.reviewFilesByDirectory",
-          "when": "editorTextFocus",
-          "group": "aiCodeReview"
-        },
-        {
-          "command": "aiCodeReview.reviewAllFilesIncludingSkipped",
-          "when": "editorTextFocus",
-          "group": "aiCodeReview"
-        }
-      ],
-      "view/title": [
-        {
-          "command": "aiCodeReview.showProviders",
-          "when": "view == aiCodeReview.issuesPanel",
-          "group": "navigation"
-        }
-      ]
     }
+
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",

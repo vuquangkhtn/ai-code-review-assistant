@@ -59,42 +59,10 @@ export interface ChangedFile {
     diff?: string;
 }
 
-export interface AIProvider {
-    id: string;
-    name: string;
-    isInstalled: boolean;
-    isAvailable: boolean;
-    capabilities: AIProviderCapabilities;
-}
-
-export interface AIProviderCapabilities {
-    supportsCodeReview: boolean;
-    supportsInlineSuggestions: boolean;
-    maxContextLength: number;
-    supportedLanguages: string[];
-}
-
 export interface ReviewRequest {
     changeInfo: ChangeInfo;
     aiProvider: string;
-    options: ReviewOptions;
-}
-
-export interface ReviewOptions {
-    severityThreshold: IssueSeverity;
-    includeCodeExamples: boolean;
-    includeSuggestions: boolean;
-    maxIssuesPerFile: number;
-    focusCategories?: IssueCategory[];
-}
-
-export interface UserPreferences {
-    defaultChangeType: ChangeType;
-    defaultAIProvider: string;
-    severityThreshold: IssueSeverity;
-    supportedLanguages: string[];
-    autoCache: boolean;
-    reviewTemplate: string;
+    options?: any; // Simplified since ReviewOptions is no longer used
 }
 
 export enum IssueSeverity {
@@ -121,12 +89,4 @@ export enum ChangeType {
     COMMIT = 'commit',
     BRANCH = 'branch',
     ALL_FILES = 'all-files'
-}
-
-export enum AIProviderType {
-    COPILOT = 'copilot',
-    AMAZON_Q = 'amazon-q',
-    CURSOR_AI = 'cursor-ai',
-    CHATGPT = 'chatgpt',
-    EXTERNAL_AI = 'external-ai'
 }

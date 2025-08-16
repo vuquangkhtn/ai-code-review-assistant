@@ -37,88 +37,169 @@ export class ChangeDetector {
     }
 
     public async detectLocalChanges(): Promise<ChangeInfo> {
-        const status = await this.git.status();
+        try {
+            // Try git-based detection first
+            const status = await this.git.status();
+            const changedFiles: ChangedFile[] = [];
+
+            // Process modified files
+            for (const file of status.modified) {
+                const diff = await this.git.diff([file]);
+                changedFiles.push({
+                    path: file,
+                    status: 'modified',
+                    additions: this.countAdditions(diff),
+                    deletions: this.countDeletions(diff),
+                    diff
+                });
+            }
+
+            // Process added files
+            for (const file of status.created) {
+                try {
+                    const filePath = path.join(this.workspacePath, file);
+                    const content = fs.readFileSync(filePath, 'utf8');
+                    const lines = content.split('\n');
+                    
+                    changedFiles.push({
+                        path: file,
+                        status: 'added',
+                        additions: lines.length,
+                        deletions: 0,
+                        diff: content
+                    });
+                } catch (error) {
+                    // If we can't read the file, add it without content
+                    changedFiles.push({
+                        path: file,
+                        status: 'added'
+                    });
+                }
+            }
+
+            // Process deleted files
+            for (const file of status.deleted) {
+                changedFiles.push({
+                    path: file,
+                    status: 'deleted'
+                });
+            }
+
+            // Process renamed files
+            for (const file of status.renamed) {
+                changedFiles.push({
+                    path: file.to,
+                    status: 'renamed'
+                });
+            }
+
+            // Process untracked files (not_added)
+            for (const file of status.not_added || []) {
+                try {
+                    const filePath = path.join(this.workspacePath, file);
+                    const content = fs.readFileSync(filePath, 'utf8');
+                    const lines = content.split('\n');
+                    
+                    changedFiles.push({
+                        path: file,
+                        status: 'added',
+                        additions: lines.length,
+                        deletions: 0,
+                        diff: content
+                    });
+                } catch (error) {
+                    // If we can't read the file, add it without content
+                    changedFiles.push({
+                        path: file,
+                        status: 'added'
+                    });
+                }
+            }
+
+            return {
+                type: ChangeType.LOCAL,
+                source: 'working directory',
+                files: changedFiles
+            };
+        } catch (error) {
+            // Fallback for non-git workspaces
+            return this.detectWorkspaceFiles();
+        }
+    }
+
+    private async detectWorkspaceFiles(): Promise<ChangeInfo> {
         const changedFiles: ChangedFile[] = [];
-
-        // Process modified files
-        for (const file of status.modified) {
-            const diff = await this.git.diff([file]);
-            changedFiles.push({
-                path: file,
-                status: 'modified',
-                additions: this.countAdditions(diff),
-                deletions: this.countDeletions(diff),
-                diff
-            });
+        
+        if (!this.workspacePath) {
+            // Use current workspace if not set
+            const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+            if (workspaceFolder) {
+                this.workspacePath = workspaceFolder.uri.fsPath;
+            } else {
+                throw new Error('No workspace folder found');
+            }
         }
-
-        // Process added files
-        for (const file of status.created) {
+        
+        // Scan workspace files
+        const files = await this.scanDirectory(this.workspacePath);
+        
+        for (const file of files) {
             try {
-                const filePath = path.join(this.workspacePath, file);
-                const content = fs.readFileSync(filePath, 'utf8');
+                const content = fs.readFileSync(file, 'utf8');
+                const relativePath = path.relative(this.workspacePath, file);
                 const lines = content.split('\n');
                 
                 changedFiles.push({
-                    path: file,
-                    status: 'added',
+                    path: relativePath,
+                    status: 'summary',
                     additions: lines.length,
                     deletions: 0,
                     diff: content
                 });
             } catch (error) {
-                // If we can't read the file, add it without content
-                changedFiles.push({
-                    path: file,
-                    status: 'added'
-                });
+                // Skip files that can't be read
+                continue;
             }
         }
-
-        // Process deleted files
-        for (const file of status.deleted) {
-            changedFiles.push({
-                path: file,
-                status: 'deleted'
-            });
-        }
-
-        // Process renamed files
-        for (const file of status.renamed) {
-            changedFiles.push({
-                path: file.to,
-                status: 'renamed'
-            });
-        }
-
-        // Process untracked files (not_added)
-        for (const file of status.not_added || []) {
-            try {
-                const filePath = path.join(this.workspacePath, file);
-                const content = fs.readFileSync(filePath, 'utf8');
-                const lines = content.split('\n');
-                
-                changedFiles.push({
-                    path: file,
-                    status: 'added',
-                    additions: lines.length,
-                    deletions: 0,
-                    diff: content
-                });
-            } catch (error) {
-                // If we can't read the file, add it without content
-                changedFiles.push({
-                    path: file,
-                    status: 'added'
-                });
-            }
-        }
-
+        
         return {
             type: ChangeType.LOCAL,
-            source: 'working directory',
+            source: 'workspace files',
             files: changedFiles
         };
+    }
+
+    private async scanDirectory(dirPath: string): Promise<string[]> {
+        const files: string[] = [];
+        
+        try {
+            const entries = fs.readdirSync(dirPath, { withFileTypes: true });
+            
+            for (const entry of entries) {
+                const fullPath = path.join(dirPath, entry.name);
+                
+                if (entry.isDirectory()) {
+                    // Skip common directories that shouldn't be reviewed
+                    if (this.shouldSkipDirectory(fullPath)) {
+                        continue;
+                    }
+                    
+                    const subFiles = await this.scanDirectory(fullPath);
+                    files.push(...subFiles);
+                } else if (entry.isFile()) {
+                    // Skip files that shouldn't be reviewed
+                    if (this.shouldSkipFile(fullPath)) {
+                        continue;
+                    }
+                    
+                    files.push(fullPath);
+                }
+            }
+        } catch (error) {
+            // Skip directories that can't be read
+        }
+        
+        return files;
     }
 
     public async detectAndStoreLocalChanges(): Promise<{ changeInfo: ChangeInfo; filePath: string }> {

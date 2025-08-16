@@ -1,194 +1,209 @@
 import * as vscode from 'vscode';
-import { CodeReviewManager } from '../core/CodeReviewManager';
 import { CodeIssue, IssueSeverity } from '../types';
 
-export class InlineAnnotationsProvider implements vscode.CodeLensProvider {
-    private codeReviewManager: CodeReviewManager;
-    private decorationTypes: Map<IssueSeverity, vscode.TextEditorDecorationType> = new Map();
-    private activeDecorations: Map<string, vscode.TextEditorDecorationType[]> = new Map();
+export class InlineAnnotationsProvider {
+    private _decorationTypes: Map<IssueSeverity, vscode.TextEditorDecorationType> = new Map();
+    private _issues: CodeIssue[] = [];
+    private _diagnosticCollection: vscode.DiagnosticCollection;
 
-    constructor(codeReviewManager: CodeReviewManager) {
-        this.codeReviewManager = codeReviewManager;
-        this.initializeDecorationTypes();
-    }
-
-    private initializeDecorationTypes(): void {
-        // Create decoration types for different severity levels
-        this.decorationTypes.set(IssueSeverity.CRITICAL, vscode.window.createTextEditorDecorationType({
-            backgroundColor: new vscode.ThemeColor('errorForeground'),
-            border: '2px solid',
-            borderColor: new vscode.ThemeColor('errorForeground'),
-            overviewRulerColor: new vscode.ThemeColor('errorForeground'),
-            overviewRulerLane: vscode.OverviewRulerLane.Right
-        }));
-
-        this.decorationTypes.set(IssueSeverity.HIGH, vscode.window.createTextEditorDecorationType({
-            backgroundColor: new vscode.ThemeColor('warningForeground'),
-            border: '1px solid',
-            borderColor: new vscode.ThemeColor('warningForeground'),
-            overviewRulerColor: new vscode.ThemeColor('warningForeground'),
-            overviewRulerLane: vscode.OverviewRulerLane.Right
-        }));
-
-        this.decorationTypes.set(IssueSeverity.MEDIUM, vscode.window.createTextEditorDecorationType({
-            backgroundColor: new vscode.ThemeColor('textPreformat.foreground'),
-            border: '1px solid',
-            borderColor: new vscode.ThemeColor('textPreformat.foreground'),
-            overviewRulerColor: new vscode.ThemeColor('textPreformat.foreground'),
-            overviewRulerLane: vscode.OverviewRulerLane.Right
-        }));
-
-        this.decorationTypes.set(IssueSeverity.LOW, vscode.window.createTextEditorDecorationType({
-            backgroundColor: new vscode.ThemeColor('textPreformat.background'),
-            border: '1px solid',
-            borderColor: new vscode.ThemeColor('textPreformat.background'),
-            overviewRulerColor: new vscode.ThemeColor('textPreformat.background'),
-            overviewRulerLane: vscode.OverviewRulerLane.Right
-        }));
-    }
-
-    public provideCodeLenses(document: vscode.TextDocument, token: vscode.CancellationToken): vscode.CodeLens[] {
-        const codeLenses: vscode.CodeLens[] = [];
-        const results = this.codeReviewManager.getReviewResults();
+    constructor() {
+        this._diagnosticCollection = vscode.languages.createDiagnosticCollection('aiCodeReview');
+        this._initializeDecorationTypes();
         
-        // Get all issues for this document
-        const documentIssues: CodeIssue[] = [];
-        results.forEach(result => {
-            result.issues.forEach(issue => {
-                if (issue.filePath === document.fileName) {
-                    documentIssues.push(issue);
-                }
-            });
+        // Listen for active editor changes to update decorations
+        vscode.window.onDidChangeActiveTextEditor(() => {
+            this._updateDecorations();
         });
-
-        // Create code lenses for each issue
-        documentIssues.forEach(issue => {
-            const range = new vscode.Range(
-                issue.lineNumber - 1,
-                issue.columnNumber || 0,
-                issue.lineNumber - 1,
-                issue.columnNumber || 0
-            );
-
-            const codeLens = new vscode.CodeLens(range, {
-                title: `${issue.severity.toUpperCase()}: ${issue.title}`,
-                command: 'aiCodeReview.showIssueDetails',
-                arguments: [issue]
-            });
-
-            codeLenses.push(codeLens);
-        });
-
-        return codeLenses;
     }
 
-    public resolveCodeLens(codeLens: vscode.CodeLens, token: vscode.CancellationToken): vscode.CodeLens {
-        return codeLens;
+    private _initializeDecorationTypes() {
+        this._decorationTypes.set(IssueSeverity.CRITICAL, vscode.window.createTextEditorDecorationType({
+            backgroundColor: 'rgba(255, 68, 68, 0.1)',
+            border: '1px solid #ff4444',
+            borderWidth: '0 0 0 3px',
+            overviewRulerColor: '#ff4444',
+            overviewRulerLane: vscode.OverviewRulerLane.Right,
+            after: {
+                contentText: ' ⚠️ Critical',
+                color: '#ff4444',
+                fontWeight: 'bold'
+            }
+        }));
+
+        this._decorationTypes.set(IssueSeverity.HIGH, vscode.window.createTextEditorDecorationType({
+            backgroundColor: 'rgba(255, 136, 0, 0.1)',
+            border: '1px solid #ff8800',
+            borderWidth: '0 0 0 3px',
+            overviewRulerColor: '#ff8800',
+            overviewRulerLane: vscode.OverviewRulerLane.Right,
+            after: {
+                contentText: ' ⚠️ High',
+                color: '#ff8800',
+                fontWeight: 'bold'
+            }
+        }));
+
+        this._decorationTypes.set(IssueSeverity.MEDIUM, vscode.window.createTextEditorDecorationType({
+            backgroundColor: 'rgba(255, 204, 0, 0.1)',
+            border: '1px solid #ffcc00',
+            borderWidth: '0 0 0 3px',
+            overviewRulerColor: '#ffcc00',
+            overviewRulerLane: vscode.OverviewRulerLane.Right,
+            after: {
+                contentText: ' ⚠️ Medium',
+                color: '#ffcc00'
+            }
+        }));
+
+        this._decorationTypes.set(IssueSeverity.LOW, vscode.window.createTextEditorDecorationType({
+            backgroundColor: 'rgba(0, 170, 0, 0.1)',
+            border: '1px solid #00aa00',
+            borderWidth: '0 0 0 3px',
+            overviewRulerColor: '#00aa00',
+            overviewRulerLane: vscode.OverviewRulerLane.Right,
+            after: {
+                contentText: ' ℹ️ Low',
+                color: '#00aa00'
+            }
+        }));
     }
 
-    public updateDecorations(editor: vscode.TextEditor): void {
-        const document = editor.document;
-        const results = this.codeReviewManager.getReviewResults();
-        
+    public updateIssues(issues: CodeIssue[]) {
+        this._issues = issues;
+        this._updateDecorations();
+        this._updateDiagnostics();
+    }
+
+    public clearIssues() {
+        this._issues = [];
+        this._clearDecorations();
+        this._diagnosticCollection.clear();
+    }
+
+    private _updateDecorations() {
+        const editor = vscode.window.activeTextEditor;
+        if (!editor) {
+            return;
+        }
+
         // Clear existing decorations
-        this.clearDecorations(editor);
-        
-        // Get all issues for this document
-        const documentIssues: CodeIssue[] = [];
-        results.forEach(result => {
-            result.issues.forEach(issue => {
-                if (issue.filePath === document.fileName) {
-                    documentIssues.push(issue);
-                }
-            });
+        this._decorationTypes.forEach(decorationType => {
+            editor.setDecorations(decorationType, []);
         });
 
-        // Apply decorations for each issue
-        documentIssues.forEach(issue => {
-            const decorationType = this.decorationTypes.get(issue.severity);
-            if (decorationType) {
+        // Group issues by severity for the current file
+        const currentFileIssues = this._issues.filter(issue => 
+            issue.filePath === editor.document.uri.fsPath ||
+            issue.filePath === editor.document.uri.path ||
+            issue.filePath.endsWith(editor.document.uri.fsPath.split('/').pop() || '')
+        );
+
+        const issuesBySeverity = new Map<IssueSeverity, CodeIssue[]>();
+        currentFileIssues.forEach(issue => {
+            if (!issuesBySeverity.has(issue.severity)) {
+                issuesBySeverity.set(issue.severity, []);
+            }
+            issuesBySeverity.get(issue.severity)!.push(issue);
+        });
+
+        // Apply decorations for each severity
+        issuesBySeverity.forEach((issues, severity) => {
+            const decorationType = this._decorationTypes.get(severity);
+            if (!decorationType) return;
+
+            const decorations: vscode.DecorationOptions[] = issues.map(issue => {
+                const line = Math.max(0, issue.lineNumber - 1); // Convert to 0-based
                 const range = new vscode.Range(
-                    issue.lineNumber - 1,
+                    line,
                     issue.columnNumber || 0,
-                    issue.lineNumber - 1,
-                    issue.columnNumber || 0
+                    line,
+                    editor.document.lineAt(line).text.length
                 );
 
-                editor.setDecorations(decorationType, [range]);
-                
-                // Track decorations for this editor
-                if (!this.activeDecorations.has(editor.document.uri.toString())) {
-                    this.activeDecorations.set(editor.document.uri.toString(), []);
-                }
-                this.activeDecorations.get(editor.document.uri.toString())!.push(decorationType);
-            }
+                return {
+                    range,
+                    hoverMessage: new vscode.MarkdownString(
+                        `**${issue.title}** (${issue.severity})\n\n${issue.description}\n\n` +
+                        (issue.suggestions.length > 0 ? 
+                            `**Suggestions:**\n${issue.suggestions.map(s => `• ${s.description}`).join('\n')}` : '')
+                    )
+                };
+            });
+
+            editor.setDecorations(decorationType, decorations);
         });
     }
 
-    public clearDecorations(editor: vscode.TextEditor): void {
-        const uri = editor.document.uri.toString();
-        const decorations = this.activeDecorations.get(uri);
-        
-        if (decorations) {
-            decorations.forEach(decorationType => {
-                editor.setDecorations(decorationType, []);
-            });
-            this.activeDecorations.delete(uri);
+    private _updateDiagnostics() {
+        const diagnosticMap = new Map<string, vscode.Diagnostic[]>();
+
+        this._issues.forEach(issue => {
+            const uri = vscode.Uri.file(issue.filePath);
+            const uriString = uri.toString();
+
+            if (!diagnosticMap.has(uriString)) {
+                diagnosticMap.set(uriString, []);
+            }
+
+            const line = Math.max(0, issue.lineNumber - 1); // Convert to 0-based
+            const range = new vscode.Range(
+                line,
+                issue.columnNumber || 0,
+                line,
+                issue.columnNumber ? issue.columnNumber + 10 : 100 // Approximate end position
+            );
+
+            const diagnostic = new vscode.Diagnostic(
+                range,
+                `${issue.title}: ${issue.description}`,
+                this._getSeverityLevel(issue.severity)
+            );
+
+            diagnostic.source = 'AI Code Review';
+            diagnostic.code = issue.id;
+
+            diagnosticMap.get(uriString)!.push(diagnostic);
+        });
+
+        // Clear existing diagnostics
+        this._diagnosticCollection.clear();
+
+        // Set new diagnostics
+        diagnosticMap.forEach((diagnostics, uriString) => {
+            this._diagnosticCollection.set(vscode.Uri.parse(uriString), diagnostics);
+        });
+    }
+
+    private _getSeverityLevel(severity: IssueSeverity): vscode.DiagnosticSeverity {
+        switch (severity) {
+            case IssueSeverity.CRITICAL:
+                return vscode.DiagnosticSeverity.Error;
+            case IssueSeverity.HIGH:
+                return vscode.DiagnosticSeverity.Error;
+            case IssueSeverity.MEDIUM:
+                return vscode.DiagnosticSeverity.Warning;
+            case IssueSeverity.LOW:
+                return vscode.DiagnosticSeverity.Information;
+            default:
+                return vscode.DiagnosticSeverity.Information;
         }
     }
 
-    public clearAllDecorations(): void {
-        this.activeDecorations.forEach((decorations, uri) => {
-            const editor = vscode.window.visibleTextEditors.find(e => e.document.uri.toString() === uri);
-            if (editor) {
-                decorations.forEach(decorationType => {
-                    editor.setDecorations(decorationType, []);
-                });
-            }
+    private _clearDecorations() {
+        const editor = vscode.window.activeTextEditor;
+        if (!editor) {
+            return;
+        }
+
+        this._decorationTypes.forEach(decorationType => {
+            editor.setDecorations(decorationType, []);
         });
-        this.activeDecorations.clear();
     }
 
-    public showIssueHover(issue: CodeIssue, position: vscode.Position): void {
-        const hover = new vscode.Hover([
-            `**${issue.severity.toUpperCase()} - ${issue.category}**`,
-            issue.description,
-            '',
-            '**Suggestions:**',
-            ...issue.suggestions.map(s => `• ${s.description}`)
-        ]);
-
-        // This would require additional implementation to show hover at position
-        // For now, we'll show it in the status bar
-        vscode.window.showInformationMessage(
-            `${issue.severity.toUpperCase()}: ${issue.description}`
-        );
-    }
-
-    public getIssuesForLine(document: vscode.TextDocument, line: number): CodeIssue[] {
-        const results = this.codeReviewManager.getReviewResults();
-        const issues: CodeIssue[] = [];
-        
-        results.forEach(result => {
-            result.issues.forEach(issue => {
-                if (issue.filePath === document.fileName && issue.lineNumber === line + 1) {
-                    issues.push(issue);
-                }
-            });
-        });
-
-        return issues;
-    }
-
-    public dispose(): void {
-        // Clean up decoration types
-        this.decorationTypes.forEach(decorationType => {
+    public dispose() {
+        this._decorationTypes.forEach(decorationType => {
             decorationType.dispose();
         });
-        this.decorationTypes.clear();
-        
-        // Clear all decorations
-        this.clearAllDecorations();
-        this.activeDecorations.clear();
+        this._diagnosticCollection.dispose();
     }
 }

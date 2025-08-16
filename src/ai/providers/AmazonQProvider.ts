@@ -1,8 +1,8 @@
-import { ReviewRequest, ReviewResult, AIProviderType } from '../../types';
+import { ReviewRequest, ReviewResult } from '../../types';
 import { AbstractAIProvider } from './BaseAIProvider';
 
 export class AmazonQProvider extends AbstractAIProvider {
-    public readonly id = AIProviderType.AMAZON_Q;
+    public readonly id = 'amazon-q';
     public readonly name = 'Amazon Q';
     public readonly isAvailable = true;
 

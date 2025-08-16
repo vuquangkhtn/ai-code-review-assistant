@@ -1,8 +1,8 @@
-import { ReviewRequest, ReviewResult, AIProviderType } from '../../types';
+import { ReviewRequest, ReviewResult } from '../../types';
 import { AbstractAIProvider } from './BaseAIProvider';
 
 export class CursorAIProvider extends AbstractAIProvider {
-    public readonly id = AIProviderType.CURSOR_AI;
+    public readonly id = 'cursor-ai';
     public readonly name = 'Cursor AI';
     public readonly isAvailable = true;
 

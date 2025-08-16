@@ -2,20 +2,18 @@ import * as vscode from 'vscode';
 import { ReviewRequest, ReviewResult } from '../types';
 import { PromptGenerator, PromptResult } from './PromptGenerator';
 import { ResponseParser } from './ResponseParser';
-import { StorageManager } from '../core/StorageManager';
+import { CleanupManager } from '../utils/CleanupManager';
 
 export class ExternalAIManager {
     private static instance: ExternalAIManager;
-    private storageManager: StorageManager;
     private changeDetector?: any; // ChangeDetector instance
 
-    private constructor(storageManager: StorageManager) {
-        this.storageManager = storageManager;
+    private constructor() {
     }
 
-    public static getInstance(storageManager: StorageManager): ExternalAIManager {
+    public static getInstance(): ExternalAIManager {
         if (!ExternalAIManager.instance) {
-            ExternalAIManager.instance = new ExternalAIManager(storageManager);
+            ExternalAIManager.instance = new ExternalAIManager();
         }
         return ExternalAIManager.instance;
     }
@@ -34,6 +32,9 @@ export class ExternalAIManager {
                 vscode.window.showErrorMessage('ChangeDetector not initialized. Please try again.');
                 return;
             }
+            
+            // Clean up previous AI review files before starting new review
+            await this.cleanupPreviousFiles();
             
             // First, store the changes to a file
             const result = await this.changeDetector.detectAndStoreLocalChanges();
@@ -84,10 +85,29 @@ export class ExternalAIManager {
     }
 
     /**
+     * Cleans up previous AI review files to ensure a fresh start
+     */
+    private async cleanupPreviousFiles(): Promise<void> {
+        try {
+            const fileCount = CleanupManager.getFileCount();
+            if (fileCount.total > 0) {
+                await CleanupManager.cleanupAIReviewDirectory();
+                console.log(`Cleaned up ${fileCount.total} files from previous AI review sessions`);
+            }
+        } catch (error) {
+            console.warn('Failed to cleanup previous files:', error);
+            // Don't throw error - cleanup failure shouldn't prevent new review
+        }
+    }
+
+    /**
      * Shows a quick prompt option for simpler AI queries
      */
     public async showQuickPrompt(request: ReviewRequest): Promise<void> {
         try {
+            // Clean up previous AI review files before starting new review
+            await this.cleanupPreviousFiles();
+            
             // Use workspace analysis for repository indexing, but not for workspace-prompt
             const isRepositoryIndex = request.changeInfo.source === 'repository-index';
             const isWorkspacePrompt = request.changeInfo.source === 'workspace-prompt';
@@ -160,9 +180,6 @@ export class ExternalAIManager {
                 );
                 return null;
             }
-
-            // Store the result
-            this.storageManager.saveReviewResult(result);
 
             vscode.window.showInformationMessage(
                 `Successfully processed AI response: ${result.issues.length} issues found.`
@@ -468,25 +485,45 @@ export class ExternalAIManager {
      */
     public async checkReviewResultFromFile(): Promise<ReviewResult | null> {
         try {
-            // Show file picker for JSON files
-            const fileUri = await vscode.window.showOpenDialog({
-                canSelectFiles: true,
-                canSelectFolders: false,
-                canSelectMany: false,
-                filters: {
-                    'JSON Files': ['json'],
-                    'All Files': ['*']
-                },
-                openLabel: 'Select AI Review Result File'
-            });
-
-            if (!fileUri || fileUri.length === 0) {
+            // Get workspace folder
+            const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+            if (!workspaceFolder) {
+                vscode.window.showErrorMessage('No workspace folder found.');
                 return null;
             }
 
-            // Read the file content
-            const fileContent = await vscode.workspace.fs.readFile(fileUri[0]);
+            // Check if .ai-code-review/results folder exists
+            const resultsFolder = vscode.Uri.joinPath(workspaceFolder.uri, '.ai-code-review', 'results');
+            
+            try {
+                const folderStat = await vscode.workspace.fs.stat(resultsFolder);
+                if (!(folderStat.type & vscode.FileType.Directory)) {
+                    vscode.window.showErrorMessage('.ai-code-review/results is not a directory.');
+                    return null;
+                }
+            } catch (error) {
+                vscode.window.showErrorMessage('.ai-code-review/results folder not found. Please run a code review first.');
+                return null;
+            }
+
+            // Read directory contents
+            const files = await vscode.workspace.fs.readDirectory(resultsFolder);
+            const jsonFiles = files.filter(([name, type]) => 
+                type === vscode.FileType.File && name.endsWith('.json')
+            ).sort((a, b) => b[0].localeCompare(a[0])); // Sort by name descending to get the latest
+
+            if (jsonFiles.length === 0) {
+                vscode.window.showErrorMessage('No JSON result files found in .ai-code-review/results folder.');
+                return null;
+            }
+
+            // Read the first (latest) JSON file
+            const firstFile = jsonFiles[0][0];
+            const fileUri = vscode.Uri.joinPath(resultsFolder, firstFile);
+            const fileContent = await vscode.workspace.fs.readFile(fileUri);
             const responseText = Buffer.from(fileContent).toString('utf8');
+
+            vscode.window.showInformationMessage(`Reading review result from: ${firstFile}`);
 
             // Create a dummy request for processing (we only need it for metadata)
             const dummyRequest: ReviewRequest = {

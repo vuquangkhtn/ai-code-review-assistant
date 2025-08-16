@@ -1,8 +1,8 @@
-import { ReviewRequest, ReviewResult, AIProviderType } from '../../types';
+import { ReviewRequest, ReviewResult } from '../../types';
 import { AbstractAIProvider } from './BaseAIProvider';
 
 export class CopilotProvider extends AbstractAIProvider {
-    public readonly id = AIProviderType.COPILOT;
+    public readonly id = 'copilot';
     public readonly name = 'GitHub Copilot';
     public readonly isAvailable = true;
 

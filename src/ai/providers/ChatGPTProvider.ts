@@ -1,8 +1,8 @@
-import { ReviewRequest, ReviewResult, AIProviderType } from '../../types';
+import { ReviewRequest, ReviewResult } from '../../types';
 import { AbstractAIProvider } from './BaseAIProvider';
 
 export class ChatGPTProvider extends AbstractAIProvider {
-    public readonly id = AIProviderType.CHATGPT;
+    public readonly id = 'chatgpt';
     public readonly name = 'ChatGPT';
     public readonly isAvailable = true;
 
