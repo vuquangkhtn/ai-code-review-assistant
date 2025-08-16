@@ -9,6 +9,7 @@ import {
     ChangeType 
 } from '../types';
 
+
 interface GitCommit {
     hash: string;
     message: string;

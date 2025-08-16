@@ -26,45 +26,70 @@
   "main": "./out/extension.js",
   "activationEvents": [
     "onCommand:aiCodeReview.copyPrompt",
-    "onCommand:aiCodeReview.copyQuickPrompt",
     "onCommand:aiCodeReview.showFormatExamples",
     "onCommand:aiCodeReview.checkReviewResult",
     "onCommand:aiCodeReview.openPanel",
-    "onCommand:aiCodeReview.closePanel"
+    "onCommand:aiCodeReview.closePanel",
+    "onCommand:aiCodeReview.openPromptFile",
+    "onCommand:aiCodeReview.openChangeFile"
   ],
   "contributes": {
     "commands": [
       {
         "command": "aiCodeReview.copyPrompt",
-        "title": "AI Code Review: Copy Prompt for External AI",
-        "category": "AI Code Review"
-      },
-      {
-        "command": "aiCodeReview.copyQuickPrompt",
-        "title": "AI Code Review: Copy Quick Prompt",
+        "title": "Copy Prompt for External AI",
         "category": "AI Code Review"
       },
       {
         "command": "aiCodeReview.showFormatExamples",
-        "title": "AI Code Review: Show Response Format Examples",
+        "title": "Show Response Format Examples",
         "category": "AI Code Review"
       },
       {
         "command": "aiCodeReview.checkReviewResult",
-        "title": "AI Code Review: Check Code Review Result",
+        "title": "Check Code Review Result",
         "category": "AI Code Review"
       },
       {
         "command": "aiCodeReview.openPanel",
-        "title": "AI Code Review: Open Review Panel",
+        "title": "Open Review Panel",
         "category": "AI Code Review"
       },
       {
         "command": "aiCodeReview.closePanel",
-        "title": "AI Code Review: Close Review Panel",
+        "title": "Close Review Panel",
+        "category": "AI Code Review"
+      },
+      {
+        "command": "aiCodeReview.openPromptFile",
+        "title": "Open Prompt File",
+        "category": "AI Code Review"
+      },
+      {
+        "command": "aiCodeReview.openChangeFile",
+        "title": "Open Change File",
         "category": "AI Code Review"
       }
     ],
+
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "aiCodeReview",
+          "title": "AI Code Review",
+          "icon": "$(search-view-icon)"
+        }
+      ]
+    },
+    "views": {
+      "aiCodeReview": [
+        {
+          "id": "aiCodeReviewPanel",
+          "name": "Code Review",
+          "when": "true"
+        }
+      ]
+    },
 
     "configuration": {
       "title": "AI Code Review Assistant",

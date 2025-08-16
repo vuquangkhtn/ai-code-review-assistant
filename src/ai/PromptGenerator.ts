@@ -122,6 +122,9 @@ export class PromptGenerator {
         prompt.push("- Ensure the JSON is valid and properly formatted");
         prompt.push("- Focus only on the files and changes provided above");
         prompt.push("- Save the complete JSON response to `.ai-code-review/results/code-review-result-YYYY-MM-DD-HH-MM-SS.json`");
+        prompt.push("");
+        prompt.push("**After saving the JSON file:**");
+        prompt.push("Please run the VS Code command `AI Code Review: Check Code Review Result` to automatically load and display your review results in the Code Review Panel.");
 
         const content = prompt.join('\n');
         const length = content.length;
@@ -228,7 +231,10 @@ export class PromptGenerator {
                 "Please read the content from this file and provide your code review analysis.",
                 "The file contains detailed instructions and code changes to review.",
                 "",
-                "**IMPORTANT:** Instead of providing your response in this chat, please save your JSON response to a new file in `.ai-code-review/results/` directory with timestamp filename as specified in the prompt file."
+                "**IMPORTANT:** Instead of providing your response in this chat, please save your JSON response to a new file in `.ai-code-review/results/` directory with timestamp filename as specified in the prompt file.",
+                "",
+                "**After saving the JSON file:**",
+                "Please run the VS Code command `AI Code Review: Check Code Review Result` to automatically load and display your review results in the Code Review Panel."
             ].join('\n');
 
             return {
@@ -249,30 +255,6 @@ export class PromptGenerator {
         }
     }
 
-    /**
-     * Generates a simplified prompt for quick reviews
-     */
-    public static generateQuickPrompt(request: ReviewRequest): string {
-        const prompt = [
-            "Please review this code and identify any issues:",
-            ""
-        ];
-
-        request.changeInfo.files.forEach(file => {
-            prompt.push(`File: ${file.path} (${file.status})`);
-            if (file.diff) {
-                prompt.push(file.diff);
-            }
-            prompt.push("");
-        });
-
-        return prompt.join('\n');
-    }
-
-    /**
-     * Generates a specialized prompt for workspace analysis and repository indexing
-     * Focuses on architecture, patterns, and high-level code review
-     */
     /**
      * Generates a prompt that references a stored changes file instead of including full content
      * This is used for the new workflow where changes are stored in a file first
@@ -338,7 +320,10 @@ export class PromptGenerator {
             "- Line numbers should correspond to the diff context when possible",
             "- Ensure the JSON is valid and properly formatted",
             "- Focus only on the files and changes provided in the changes file",
-            "- Save the complete JSON response to `.ai-code-review/results/code-review-result-YYYY-MM-DD-HH-MM-SS.json`"
+            "- Save the complete JSON response to `.ai-code-review/results/code-review-result-YYYY-MM-DD-HH-MM-SS.json`",
+            "",
+            "**After saving the JSON file:**",
+            "Please run the VS Code command `AI Code Review: Check Code Review Result` to automatically load and display your review results in the Code Review Panel."
         ];
 
         const content = prompt.join('\n');

@@ -2,6 +2,7 @@ import { ReviewRequest, ReviewResult } from '../../types';
 import { AbstractAIProvider } from './BaseAIProvider';
 import { PromptGenerator } from '../PromptGenerator';
 import { ResponseParser } from '../ResponseParser';
+
 import * as vscode from 'vscode';
 
 export class ExternalAIProvider extends AbstractAIProvider {

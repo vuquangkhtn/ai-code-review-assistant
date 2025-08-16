@@ -4,9 +4,12 @@ import { PromptGenerator, PromptResult } from './PromptGenerator';
 import { ResponseParser } from './ResponseParser';
 import { CleanupManager } from '../utils/CleanupManager';
 
+
 export class ExternalAIManager {
     private static instance: ExternalAIManager;
     private changeDetector?: any; // ChangeDetector instance
+    private lastPromptFilePath?: string;
+    private lastChangeFilePath?: string;
 
     private constructor() {
     }
@@ -49,36 +52,16 @@ export class ExternalAIManager {
             // Generate prompt that references the stored changes file
             const promptResult = PromptGenerator.generateFileReferencePrompt(changesFilePath);
             
+            // Store file paths for later access
+            this.lastChangeFilePath = changesFilePath;
+            if (promptResult.isFileBased && promptResult.filePath) {
+                this.lastPromptFilePath = promptResult.filePath;
+            }
+            
             await vscode.env.clipboard.writeText(promptResult.content);
             
-            if (promptResult.isFileBased && promptResult.filePath) {
-                vscode.window.showInformationMessage(
-                    `AI review prompt saved and copied to clipboard! The prompt references your code changes stored in: ${changesFilePath}`,
-                    'Open Changes File',
-                    'Open Prompt File',
-                    'Show Quick Prompt'
-                ).then(selection => {
-                    if (selection === 'Open Changes File') {
-                        vscode.commands.executeCommand('vscode.open', vscode.Uri.file(changesFilePath));
-                    } else if (selection === 'Open Prompt File') {
-                        vscode.commands.executeCommand('vscode.open', vscode.Uri.file(promptResult.filePath!));
-                    } else if (selection === 'Show Quick Prompt') {
-                        this.showQuickPrompt(request);
-                    }
-                });
-            } else {
-                vscode.window.showInformationMessage(
-                    `AI review prompt copied to clipboard! Your code changes are stored in: ${changesFilePath}`,
-                    'Open Changes File',
-                    'Show Quick Prompt'
-                ).then(selection => {
-                    if (selection === 'Open Changes File') {
-                        vscode.commands.executeCommand('vscode.open', vscode.Uri.file(changesFilePath));
-                    } else if (selection === 'Show Quick Prompt') {
-                        this.showQuickPrompt(request);
-                    }
-                });
-            }
+            // Show simple information message with no action buttons
+            vscode.window.showInformationMessage('Prompt copied to clipboard!');
         } catch (error) {
             vscode.window.showErrorMessage(`Failed to copy prompt: ${error}`);
         }
@@ -97,39 +80,6 @@ export class ExternalAIManager {
         } catch (error) {
             console.warn('Failed to cleanup previous files:', error);
             // Don't throw error - cleanup failure shouldn't prevent new review
-        }
-    }
-
-    /**
-     * Shows a quick prompt option for simpler AI queries
-     */
-    public async showQuickPrompt(request: ReviewRequest): Promise<void> {
-        try {
-            // Clean up previous AI review files before starting new review
-            await this.cleanupPreviousFiles();
-            
-            // Use workspace analysis for repository indexing, but not for workspace-prompt
-            const isRepositoryIndex = request.changeInfo.source === 'repository-index';
-            const isWorkspacePrompt = request.changeInfo.source === 'workspace-prompt';
-            
-            const quickPrompt = (isRepositoryIndex && !isWorkspacePrompt)
-                ? PromptGenerator.generateWorkspaceAnalysisPrompt(request)
-                : PromptGenerator.generateQuickPrompt(request);
-                
-            await vscode.env.clipboard.writeText(quickPrompt);
-            
-            let message: string;
-            if (isRepositoryIndex && !isWorkspacePrompt) {
-                message = 'Workspace analysis prompt copied to clipboard! This provides architectural insights for your repository.';
-            } else if (isWorkspacePrompt) {
-                message = 'Workspace analysis template copied to clipboard! Paste this to your AI to analyze the entire codebase.';
-            } else {
-                message = 'Quick prompt copied to clipboard! This is a simplified version for faster AI analysis.';
-            }
-                
-            vscode.window.showInformationMessage(message);
-        } catch (error) {
-            vscode.window.showErrorMessage(`Failed to copy quick prompt: ${error}`);
         }
     }
 
@@ -180,10 +130,6 @@ export class ExternalAIManager {
                 );
                 return null;
             }
-
-            vscode.window.showInformationMessage(
-                `Successfully processed AI response: ${result.issues.length} issues found.`
-            );
 
             return result;
         } catch (error) {
@@ -523,8 +469,6 @@ export class ExternalAIManager {
             const fileContent = await vscode.workspace.fs.readFile(fileUri);
             const responseText = Buffer.from(fileContent).toString('utf8');
 
-            vscode.window.showInformationMessage(`Reading review result from: ${firstFile}`);
-
             // Create a dummy request for processing (we only need it for metadata)
             const dummyRequest: ReviewRequest = {
                 changeInfo: {
@@ -546,7 +490,7 @@ export class ExternalAIManager {
             
             if (result) {
                 vscode.window.showInformationMessage(
-                    `Successfully processed review result with ${result.issues.length} issues.`
+                    `Successfully loaded review result from ${firstFile} with ${result.issues.length} issues.`
                 );
             } else {
                 vscode.window.showErrorMessage('Failed to parse the review result file. Please check the JSON format.');
@@ -557,5 +501,19 @@ export class ExternalAIManager {
             vscode.window.showErrorMessage(`Error reading review result file: ${error}`);
             return null;
         }
+    }
+
+    /**
+     * Gets the path of the last generated prompt file
+     */
+    public async getLastPromptFilePath(): Promise<string | undefined> {
+        return this.lastPromptFilePath;
+    }
+
+    /**
+     * Gets the path of the last generated change file
+     */
+    public async getLastChangeFilePath(): Promise<string | undefined> {
+        return this.lastChangeFilePath;
     }
 }

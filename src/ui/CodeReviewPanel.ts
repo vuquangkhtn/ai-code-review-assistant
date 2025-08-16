@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { ReviewResult, CodeIssue } from '../types';
 
+
 export class CodeReviewPanel {
     public static currentPanel: CodeReviewPanel | undefined;
     public static readonly viewType = 'aiCodeReview.panel';
