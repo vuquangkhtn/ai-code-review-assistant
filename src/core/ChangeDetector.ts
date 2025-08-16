@@ -45,6 +45,11 @@ export class ChangeDetector {
 
             // Process modified files
             for (const file of status.modified) {
+                // Skip files that shouldn't be reviewed
+                if (this.shouldSkipFile(file)) {
+                    continue;
+                }
+                
                 const diff = await this.git.diff([file]);
                 changedFiles.push({
                     path: file,
@@ -57,6 +62,11 @@ export class ChangeDetector {
 
             // Process added files
             for (const file of status.created) {
+                // Skip files that shouldn't be reviewed
+                if (this.shouldSkipFile(file)) {
+                    continue;
+                }
+                
                 try {
                     const filePath = path.join(this.workspacePath, file);
                     const content = fs.readFileSync(filePath, 'utf8');
@@ -80,6 +90,11 @@ export class ChangeDetector {
 
             // Process deleted files
             for (const file of status.deleted) {
+                // Skip files that shouldn't be reviewed
+                if (this.shouldSkipFile(file)) {
+                    continue;
+                }
+                
                 changedFiles.push({
                     path: file,
                     status: 'deleted'
@@ -88,6 +103,11 @@ export class ChangeDetector {
 
             // Process renamed files
             for (const file of status.renamed) {
+                // Skip files that shouldn't be reviewed
+                if (this.shouldSkipFile(file.to)) {
+                    continue;
+                }
+                
                 changedFiles.push({
                     path: file.to,
                     status: 'renamed'
@@ -96,6 +116,11 @@ export class ChangeDetector {
 
             // Process untracked files (not_added)
             for (const file of status.not_added || []) {
+                // Skip files that shouldn't be reviewed
+                if (this.shouldSkipFile(file)) {
+                    continue;
+                }
+                
                 try {
                     const filePath = path.join(this.workspacePath, file);
                     const content = fs.readFileSync(filePath, 'utf8');
@@ -351,6 +376,12 @@ export class ChangeDetector {
 
         while ((match = filePattern.exec(diff)) !== null) {
             const filePath = match[1];
+            
+            // Skip files that shouldn't be reviewed
+            if (this.shouldSkipFile(filePath)) {
+                continue;
+            }
+            
             const additions = this.countAdditions(diff);
             const deletions = this.countDeletions(diff);
 
@@ -773,9 +804,33 @@ export class ChangeDetector {
     }
     
     private shouldSkipFile(filePath: string): boolean {
-        const skipExtensions = ['.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.pdf', '.zip', '.tar', '.gz'];
-        const skipDirectories = ['node_modules', '.git', 'dist', 'build', 'out', '.vscode'];
-        const skipFiles = ['.gitignore', '.npmignore', 'package-lock.json', 'yarn.lock'];
+        const skipExtensions = [
+            // Images
+            '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.webp', '.bmp', '.tiff',
+            // Archives and binaries
+            '.pdf', '.zip', '.tar', '.gz', '.rar', '.7z', '.dmg', '.pkg', '.deb', '.rpm',
+            // Executables and libraries
+            '.exe', '.dll', '.so', '.dylib',
+            // Fonts
+            '.ttf', '.otf', '.woff', '.woff2', '.eot',
+            // Media files
+            '.mp4', '.avi', '.mov', '.webm', '.mp3', '.wav', '.ogg',
+            // Compiled/generated files
+            '.min.js', '.min.css', '.map',
+            // Database and cache files
+            '.db', '.sqlite', '.sqlite3', '.cache', '.tmp', '.temp'
+        ];
+        const skipDirectories = [
+            'node_modules', '.git', 'dist', 'build', 'out', '.vscode',
+            // Additional config and cache directories
+            '.next', '.nuxt', 'coverage', '.nyc_output', '.pytest_cache',
+            '__pycache__', '.venv', 'venv', 'env'
+        ];
+        const skipFiles = [
+            '.gitignore', '.npmignore', 'package-lock.json', 'yarn.lock',
+            // Auto-generated documentation
+            'CHANGELOG.md', 'LICENSE', 'AUTHORS'
+        ];
         
         // Check if file is in a directory we should skip
         for (const dir of skipDirectories) {
@@ -790,6 +845,11 @@ export class ChangeDetector {
             return true;
         }
         
+        // Check for TypeScript declaration files (often auto-generated)
+        if (ext === '.ts' && filePath.endsWith('.d.ts')) {
+            return true;
+        }
+        
         // Check specific files
         const fileName = path.basename(filePath);
         if (skipFiles.includes(fileName)) {
@@ -800,7 +860,12 @@ export class ChangeDetector {
     }
 
     private shouldSkipDirectory(filePath: string): boolean {
-        const skipDirectories = ['node_modules', '.git', 'dist', 'build', 'out', '.vscode'];
+        const skipDirectories = [
+            'node_modules', '.git', 'dist', 'build', 'out', '.vscode',
+            // Additional config and cache directories
+            '.next', '.nuxt', 'coverage', '.nyc_output', '.pytest_cache',
+            '__pycache__', '.venv', 'venv', 'env'
+        ];
         
         // Check if file is in a directory we should skip
         for (const dir of skipDirectories) {
@@ -813,7 +878,20 @@ export class ChangeDetector {
     }
 
     private shouldSkipBinaryFile(filePath: string): boolean {
-        const binaryExtensions = ['.png', '.jpg', '.jpeg', '.gif', '.ico', '.pdf', '.zip', '.tar', '.gz', '.exe', '.dll', '.so', '.dylib'];
+        const binaryExtensions = [
+            // Images
+            '.png', '.jpg', '.jpeg', '.gif', '.ico', '.webp', '.bmp', '.tiff', '.svg',
+            // Archives and binaries
+            '.pdf', '.zip', '.tar', '.gz', '.rar', '.7z', '.dmg', '.pkg', '.deb', '.rpm',
+            // Executables and libraries
+            '.exe', '.dll', '.so', '.dylib',
+            // Fonts
+            '.ttf', '.otf', '.woff', '.woff2', '.eot',
+            // Media files
+            '.mp4', '.avi', '.mov', '.webm', '.mp3', '.wav', '.ogg',
+            // Database and cache files
+            '.db', '.sqlite', '.sqlite3'
+        ];
         
         const ext = path.extname(filePath).toLowerCase();
         return binaryExtensions.includes(ext);
