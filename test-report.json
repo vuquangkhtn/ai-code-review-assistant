@@ -1,0 +1,15 @@
+{
+  "timestamp": "2025-08-16T07:36:07.127Z",
+  "results": {
+    "extensionLoaded": false,
+    "providerAvailable": true,
+    "reviewExecuted": true,
+    "issuesFound": true,
+    "errors": []
+  },
+  "summary": {
+    "passed": 3,
+    "total": 4,
+    "success": false
+  }
+}

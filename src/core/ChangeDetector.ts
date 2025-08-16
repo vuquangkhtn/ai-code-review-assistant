@@ -209,14 +209,11 @@ export class ChangeDetector {
             const files = await this.git.raw(['ls-files']);
             const fileList = files.trim().split('\n').filter((file: string) => file.length > 0);
             
-            console.log(`Found ${fileList.length} tracked files in repository`);
-            
             const changedFiles: ChangedFile[] = [];
             
             for (const file of fileList) {
                 // Skip binary files and common non-code files
                 if (this.shouldSkipFile(file)) {
-                    console.log(`Skipping file: ${file}`);
                     continue;
                 }
                 
@@ -226,23 +223,18 @@ export class ChangeDetector {
                         vscode.Uri.file(path.join(this.workspacePath, file))
                     );
                     
-                    const fileContent = content.toString();
-                    console.log(`Processing file: ${file} (${fileContent.length} characters)`);
-                    
                     changedFiles.push({
                         path: file,
                         status: 'modified',
                         additions: 0,
                         deletions: 0,
-                        diff: fileContent
+                        diff: content.toString()
                     });
                 } catch (error) {
-                    console.log(`Failed to read file ${file}: ${error}`);
+                    // Skip files that can't be read
                     continue;
                 }
             }
-            
-            console.log(`Final result: ${changedFiles.length} files to review`);
             
             return {
                 type: ChangeType.ALL_FILES,
@@ -251,6 +243,143 @@ export class ChangeDetector {
             };
         } catch (error) {
             throw new Error(`Failed to get all repository files: ${error}`);
+        }
+    }
+
+    public async getFilesByType(fileExtensions: string[]): Promise<ChangeInfo> {
+        try {
+            const files = await this.git.raw(['ls-files']);
+            const fileList = files.trim().split('\n').filter((file: string) => file.length > 0);
+            
+            const changedFiles: ChangedFile[] = [];
+            
+            for (const file of fileList) {
+                const ext = path.extname(file).toLowerCase();
+                
+                // Only include files with specified extensions
+                if (!fileExtensions.includes(ext)) {
+                    continue;
+                }
+                
+                // Skip if it's in a directory we should skip
+                if (this.shouldSkipDirectory(file)) {
+                    continue;
+                }
+                
+                try {
+                    const content = await vscode.workspace.fs.readFile(
+                        vscode.Uri.file(path.join(this.workspacePath, file))
+                    );
+                    
+                    changedFiles.push({
+                        path: file,
+                        status: 'modified',
+                        additions: 0,
+                        deletions: 0,
+                        diff: content.toString()
+                    });
+                } catch (error) {
+                    continue;
+                }
+            }
+            
+            return {
+                type: ChangeType.ALL_FILES,
+                source: 'repository-filtered',
+                files: changedFiles
+            };
+        } catch (error) {
+            throw new Error(`Failed to get files by type: ${error}`);
+        }
+    }
+
+    public async getFilesByDirectory(directories: string[]): Promise<ChangeInfo> {
+        try {
+            const files = await this.git.raw(['ls-files']);
+            const fileList = files.trim().split('\n').filter((file: string) => file.length > 0);
+            
+            const changedFiles: ChangedFile[] = [];
+            
+            for (const file of fileList) {
+                // Check if file is in one of the specified directories
+                const isInTargetDirectory = directories.some(dir => {
+                    const normalizedDir = dir.endsWith('/') ? dir : dir + '/';
+                    return file.startsWith(normalizedDir) || file === dir;
+                });
+                
+                if (!isInTargetDirectory) {
+                    continue;
+                }
+                
+                // Skip binary files
+                if (this.shouldSkipBinaryFile(file)) {
+                    continue;
+                }
+                
+                try {
+                    const content = await vscode.workspace.fs.readFile(
+                        vscode.Uri.file(path.join(this.workspacePath, file))
+                    );
+                    
+                    changedFiles.push({
+                        path: file,
+                        status: 'modified',
+                        additions: 0,
+                        deletions: 0,
+                        diff: content.toString()
+                    });
+                } catch (error) {
+                    continue;
+                }
+            }
+            
+            return {
+                type: ChangeType.ALL_FILES,
+                source: 'repository-directory',
+                files: changedFiles
+            };
+        } catch (error) {
+            throw new Error(`Failed to get files by directory: ${error}`);
+        }
+    }
+
+    public async getAllFilesIncludingSkipped(): Promise<ChangeInfo> {
+        try {
+            const files = await this.git.raw(['ls-files']);
+            const fileList = files.trim().split('\n').filter((file: string) => file.length > 0);
+            
+            const changedFiles: ChangedFile[] = [];
+            
+            for (const file of fileList) {
+                // Only skip truly binary files that can't be read as text
+                if (this.shouldSkipBinaryFile(file)) {
+                    continue;
+                }
+                
+                try {
+                    const content = await vscode.workspace.fs.readFile(
+                        vscode.Uri.file(path.join(this.workspacePath, file))
+                    );
+                    
+                    changedFiles.push({
+                        path: file,
+                        status: 'modified',
+                        additions: 0,
+                        deletions: 0,
+                        diff: content.toString()
+                    });
+                } catch (error) {
+                    continue;
+                }
+            }
+            
+            return {
+                type: ChangeType.ALL_FILES,
+                source: 'repository-complete',
+                files: changedFiles
+            };
+        } catch (error) {
+            throw new Error(`Failed to get all files including skipped: ${error}`);
         }
     }
     
@@ -279,5 +408,25 @@ export class ChangeDetector {
         }
         
         return false;
+    }
+
+    private shouldSkipDirectory(filePath: string): boolean {
+        const skipDirectories = ['node_modules', '.git', 'dist', 'build', 'out', '.vscode'];
+        
+        // Check if file is in a directory we should skip
+        for (const dir of skipDirectories) {
+            if (filePath.includes(`${dir}/`) || filePath.startsWith(`${dir}/`)) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+
+    private shouldSkipBinaryFile(filePath: string): boolean {
+        const binaryExtensions = ['.png', '.jpg', '.jpeg', '.gif', '.ico', '.pdf', '.zip', '.tar', '.gz', '.exe', '.dll', '.so', '.dylib'];
+        
+        const ext = path.extname(filePath).toLowerCase();
+        return binaryExtensions.includes(ext);
     }
 }

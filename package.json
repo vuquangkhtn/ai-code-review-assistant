@@ -3,7 +3,7 @@
   "displayName": "AI Code Review Assistant",
   "description": "A powerful VS Code extension that automates code review using AI to provide senior-level feedback on your code changes.",
   "version": "0.1.0",
-  "publisher": "your-publisher-name",
+  "publisher": "ai-code-review",
   "engines": {
     "vscode": "^1.74.0"
   },
@@ -30,6 +30,9 @@
     "onCommand:aiCodeReview.reviewBranchChanges",
     "onCommand:aiCodeReview.reviewLocalChanges",
     "onCommand:aiCodeReview.reviewAllFiles",
+    "onCommand:aiCodeReview.reviewFilesByType",
+    "onCommand:aiCodeReview.reviewFilesByDirectory",
+    "onCommand:aiCodeReview.reviewAllFilesIncludingSkipped",
     "onView:aiCodeReview.issuesPanel"
   ],
   "contributes": {
@@ -59,6 +62,21 @@
         "title": "AI Code Review: Review All Files",
         "category": "AI Code Review"
       },
+      {
+        "command": "aiCodeReview.reviewFilesByType",
+        "title": "AI Code Review: Review Files by Type",
+        "category": "AI Code Review"
+      },
+      {
+        "command": "aiCodeReview.reviewFilesByDirectory",
+        "title": "AI Code Review: Review Files by Directory",
+        "category": "AI Code Review"
+      },
+      {
+        "command": "aiCodeReview.reviewAllFilesIncludingSkipped",
+        "title": "AI Code Review: Review All Files (Including Skipped)",
+        "category": "AI Code Review"
+      },
               {
             "command": "aiCodeReview.refreshIssues",
             "title": "AI Code Review: Refresh Issues",
@@ -83,6 +101,36 @@
             "command": "aiCodeReview.debugProviders",
             "title": "AI Code Review: Debug AI Providers",
             "category": "AI Code Review"
+        },
+        {
+            "command": "aiCodeReview.refreshHistory",
+            "title": "AI Code Review: Refresh History",
+            "category": "AI Code Review"
+        },
+        {
+            "command": "aiCodeReview.clearHistory",
+            "title": "AI Code Review: Clear History",
+            "category": "AI Code Review"
+        },
+        {
+            "command": "aiCodeReview.exportHistory",
+            "title": "AI Code Review: Export History",
+            "category": "AI Code Review"
+        },
+        {
+            "command": "aiCodeReview.debugStorage",
+            "title": "AI Code Review: Debug Storage",
+            "category": "AI Code Review"
+        },
+        {
+            "command": "aiCodeReview.showView",
+            "title": "AI Code Review: Show View",
+            "category": "AI Code Review"
+        },
+        {
+            "command": "aiCodeReview.selectAIProvider",
+            "title": "AI Code Review: Select AI Provider",
+            "category": "AI Code Review"
         }
     ],
     "viewsContainers": {
@@ -99,7 +147,12 @@
         {
           "id": "aiCodeReview.issuesPanel",
           "name": "Issues",
-          "when": "aiCodeReview.hasIssues"
+          "type": "webview"
+        },
+        {
+          "id": "aiCodeReview.reviewHistory",
+          "name": "Review History",
+          "type": "webview"
         }
       ]
     },
@@ -172,6 +225,21 @@
         },
         {
           "command": "aiCodeReview.reviewAllFiles",
+          "when": "editorTextFocus",
+          "group": "aiCodeReview"
+        },
+        {
+          "command": "aiCodeReview.reviewFilesByType",
+          "when": "editorTextFocus",
+          "group": "aiCodeReview"
+        },
+        {
+          "command": "aiCodeReview.reviewFilesByDirectory",
+          "when": "editorTextFocus",
+          "group": "aiCodeReview"
+        },
+        {
+          "command": "aiCodeReview.reviewAllFilesIncludingSkipped",
           "when": "editorTextFocus",
           "group": "aiCodeReview"
         }

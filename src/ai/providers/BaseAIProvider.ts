@@ -22,8 +22,6 @@ export abstract class AbstractAIProvider implements BaseAIProvider {
     protected formatPrompt(request: ReviewRequest): string {
         const { changeInfo, options } = request;
         
-        console.log(`Formatting prompt for ${changeInfo.files.length} files`);
-        
         let prompt = `Please review the following code changes and provide feedback in this exact format:
 
 Issue Level: [Low/Medium/High/Critical]
@@ -50,17 +48,11 @@ Files Changed:
         for (const file of changeInfo.files) {
             prompt += `\n${file.path} (${file.status})`;
             if (file.diff) {
-                const diffLength = file.diff.length;
-                console.log(`Adding file ${file.path} with ${diffLength} characters of content`);
                 prompt += `\n\`\`\`diff\n${file.diff}\n\`\`\``;
-            } else {
-                console.log(`File ${file.path} has no diff content`);
             }
         }
 
         prompt += `\n\nPlease provide a comprehensive code review following the template above.`;
-        
-        console.log(`Final prompt length: ${prompt.length} characters`);
 
         return prompt;
     }

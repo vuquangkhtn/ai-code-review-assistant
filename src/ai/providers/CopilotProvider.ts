@@ -8,24 +8,24 @@ export class CopilotProvider extends AbstractAIProvider {
 
     public async performReview(request: ReviewRequest): Promise<ReviewResult> {
         try {
+            console.log('CopilotProvider: Starting performReview');
             // In practice, you'd integrate with Copilot's API or use their extension commands
             // This is a simplified implementation
             
-            console.log(`CopilotProvider: Starting review for ${request.changeInfo.files.length} files`);
-            
             const prompt = this.formatPrompt(request);
+            console.log('CopilotProvider: Generated prompt, length:', prompt.length);
             
             // For now, we'll simulate a response
             // In practice, you'd call Copilot's API or use their extension
             const response = await this.simulateCopilotResponse(prompt);
-            
-            console.log(`CopilotProvider: Received response: ${response.substring(0, 200)}...`);
+            console.log('CopilotProvider: Received response, length:', response.length);
+            console.log('CopilotProvider: Response content:', response);
             
             const issues = this.parseAIResponse(response);
+            console.log('CopilotProvider: Parsed', issues.length, 'issues from response');
+            console.log('CopilotProvider: Parsed issues:', issues);
             
-            console.log(`CopilotProvider: Parsed ${issues.length} issues`);
-            
-            return {
+            const reviewResult = {
                 issues: issues.map(issue => ({
                     id: this.generateIssueId(),
                     severity: issue.severity as any,
@@ -69,6 +69,15 @@ export class CopilotProvider extends AbstractAIProvider {
                     filesReviewed: request.changeInfo.files.map(f => f.path)
                 }
             };
+            
+            console.log('CopilotProvider: Final ReviewResult:', {
+                issuesCount: reviewResult.issues.length,
+                summary: reviewResult.summary,
+                metadata: reviewResult.metadata
+            });
+            console.log('CopilotProvider: Individual issues:', reviewResult.issues);
+            
+            return reviewResult;
         } catch (error) {
             throw new Error(`Copilot review failed: ${error}`);
         }

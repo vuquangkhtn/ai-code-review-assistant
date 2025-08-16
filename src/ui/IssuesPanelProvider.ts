@@ -45,17 +45,54 @@ export class IssuesPanelProvider implements vscode.WebviewViewProvider {
             }
         );
 
-        // Initial load
-        this.refresh();
+        // Initial load - delay to ensure webview is ready
+        setTimeout(() => {
+            this.refresh();
+        }, 100);
     }
 
     public refresh(): void {
+        console.log('IssuesPanelProvider.refresh() called');
         if (this._view) {
+            console.log('Webview exists, getting review results');
             const results = this.codeReviewManager.getReviewResults();
+            console.log('Review results:', results.length, 'results found');
+            
+            // Log detailed information about the results
+            if (results.length > 0) {
+                results.forEach((result, index) => {
+                    console.log(`Result ${index}:`, {
+                        timestamp: result.metadata.timestamp,
+                        totalIssues: result.summary.totalIssues,
+                        issuesCount: result.issues?.length || 0,
+                        aiProvider: result.metadata.aiProvider
+                    });
+                });
+            }
+            
+            // Serialize the results to handle Date objects properly for webview
+            const serializedResults = results.map(result => ({
+                ...result,
+                metadata: {
+                    ...result.metadata,
+                    timestamp: result.metadata.timestamp.toISOString()
+                },
+                issues: result.issues.map(issue => ({
+                    ...issue,
+                    timestamp: issue.timestamp.toISOString()
+                }))
+            }));
+            
+            console.log('Serialized results for webview:', serializedResults.length, 'results');
+            console.log('First serialized result:', serializedResults[0]);
+            
             this._view.webview.postMessage({
                 command: 'updateIssues',
-                results: results
+                results: serializedResults
             });
+            console.log('Posted message to webview with', serializedResults.length, 'results');
+        } else {
+            console.log('No webview available to refresh');
         }
     }
 
@@ -91,9 +128,17 @@ export class IssuesPanelProvider implements vscode.WebviewViewProvider {
         );
         
         if (result === 'Yes') {
-            // This would require access to StorageManager
-            vscode.window.showInformationMessage('All review results cleared.');
+            // Clear stored issues
+            await this.codeReviewManager.clearReviewResults();
+            
+            // Set context to hide the issues panel when no issues
+            vscode.commands.executeCommand('setContext', 'aiCodeReview.hasIssues', false);
+            
+            
+            // Refresh the view to show empty state
             this.refresh();
+            
+            vscode.window.showInformationMessage('All review results cleared.');
         }
     }
 
@@ -295,27 +340,66 @@ export class IssuesPanelProvider implements vscode.WebviewViewProvider {
                     
                     window.addEventListener('message', event => {
                         const message = event.data;
+                        console.log('Webview received message:', message.command, message);
                         switch (message.command) {
                             case 'updateIssues':
+                                console.log('Updating issues display with:', message.results?.length || 0, 'results');
                                 updateIssuesDisplay(message.results);
                                 break;
                         }
                     });
                     
                     function updateIssuesDisplay(results) {
+                        console.log('Updating issues display with results:', results);
+                        console.log('Results type:', typeof results);
+                        console.log('Results length:', results ? results.length : 'undefined');
+                        
                         const content = document.getElementById('content');
                         
                         if (!results || results.length === 0) {
+                            console.log('No results found, showing no-issues message');
                             content.innerHTML = '<div class="no-issues">No review results available. Start a code review to see issues here.</div>';
                             return;
                         }
                         
+                        console.log('Processing', results.length, 'results');
                         let html = '';
                         
+                        // Calculate summary
+                        let totalIssues = 0;
+                        let criticalIssues = 0;
+                        let highIssues = 0;
+                        let mediumIssues = 0;
+                        let lowIssues = 0;
+                        
+                        results.forEach((result, index) => {
+                            console.log('Processing result', index, ':', result);
+                            if (result.summary) {
+                                console.log('Result summary:', result.summary);
+                                totalIssues += result.summary.totalIssues || 0;
+                                criticalIssues += result.summary.criticalIssues || 0;
+                                highIssues += result.summary.highIssues || 0;
+                                mediumIssues += result.summary.mediumIssues || 0;
+                                lowIssues += result.summary.lowIssues || 0;
+                            }
+                            if (result.issues) {
+                                console.log('Result issues count:', result.issues.length);
+                                console.log('Result issues:', result.issues);
+                            }
+                        });
+                        
+                        const summary = {
+                            totalIssues,
+                            criticalIssues,
+                            highIssues,
+                            mediumIssues,
+                            lowIssues
+                        };
+                        
+                        console.log('Calculated summary:', summary);
+                        
                         // Add summary
-                        const totalIssues = results.reduce((sum, result) => sum + result.summary.totalIssues, 0);
                         if (totalIssues > 0) {
-                            const summary = results[results.length - 1].summary;
                             html += \`
                                 <div class="summary">
                                     <div class="summary-grid">
@@ -341,9 +425,11 @@ export class IssuesPanelProvider implements vscode.WebviewViewProvider {
                         }
                         
                         // Add issues
-                        results.forEach(result => {
+                        results.forEach((result, resultIndex) => {
                             if (result.issues && result.issues.length > 0) {
-                                result.issues.forEach(issue => {
+                                console.log('Adding issues from result', resultIndex, ':', result.issues.length, 'issues');
+                                result.issues.forEach((issue, issueIndex) => {
+                                    console.log('Adding issue', issueIndex, ':', issue);
                                     html += \`
                                         <div class="issue-item" onclick="navigateToIssue('\${JSON.stringify(issue).replace(/"/g, '&quot;')}')">
                                             <div class="issue-header">
@@ -356,10 +442,15 @@ export class IssuesPanelProvider implements vscode.WebviewViewProvider {
                                         </div>
                                     \`;
                                 });
+                            } else {
+                                console.log('Result', resultIndex, 'has no issues or empty issues array');
                             }
                         });
                         
+                        console.log('Final HTML length:', html.length);
+                        console.log('Setting content.innerHTML');
                         content.innerHTML = html;
+                        console.log('Content updated successfully');
                     }
                     
                     function navigateToIssue(issueJson) {

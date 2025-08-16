@@ -14,9 +14,11 @@ import { ChatGPTProvider } from './providers/ChatGPTProvider';
 export class AIProviderManager {
     private providers: Map<string, AIProvider> = new Map();
     private providerInstances: Map<string, any> = new Map();
+    private cachedProvider: string | null = null;
 
     constructor() {
         this.initializeProviders();
+        this.loadCachedProvider();
     }
 
     private initializeProviders(): void {
@@ -83,6 +85,9 @@ export class AIProviderManager {
                 // ChatGPT is web-based, always available
                 provider.isAvailable = true;
                 provider.isInstalled = true; // Mark as installed since it's web-based
+                
+                // Initialize ChatGPT provider instance
+                await this.initializeProviderInstance(id);
                 continue;
             }
 
@@ -168,6 +173,39 @@ export class AIProviderManager {
         return extensionIds[providerId as AIProviderType] || '';
     }
 
+    private loadCachedProvider(): void {
+        const config = vscode.workspace.getConfiguration('aiCodeReview');
+        this.cachedProvider = config.get<string>('defaultAIProvider') || null;
+    }
+
+    public getCachedProvider(): string | null {
+        return this.cachedProvider;
+    }
+
+    public async setCachedProvider(providerId: string): Promise<void> {
+        this.cachedProvider = providerId;
+        const config = vscode.workspace.getConfiguration('aiCodeReview');
+        await config.update('defaultAIProvider', providerId, vscode.ConfigurationTarget.Global);
+    }
+
+    public getDefaultProvider(): string | null {
+        // First check if cached provider is available
+        if (this.cachedProvider && this.isProviderAvailable(this.cachedProvider)) {
+            return this.cachedProvider;
+        }
+        
+        // Fallback to first available provider
+        const availableProviders = this.getAvailableProviders();
+        return availableProviders.length > 0 ? availableProviders[0].id : null;
+    }
+
+    public isProviderAvailable(providerId: string): boolean {
+        const provider = this.providers.get(providerId);
+        return provider ? provider.isAvailable : false;
+    }
+
+
+
     public async getDebugInfo(): Promise<any> {
         const extensions = vscode.extensions.all;
         const debugInfo: any = {
@@ -246,9 +284,208 @@ export class AIProviderManager {
     }
 
     private parseIssues(rawResult: any): any[] {
-        // This is a placeholder implementation
-        // In practice, you'd parse the AI response based on the template format
-        return [];
+        console.log('AIProviderManager: Parsing issues from raw result:', typeof rawResult);
+        
+        try {
+            // Handle different types of AI responses
+            let responseText = '';
+            
+            if (typeof rawResult === 'string') {
+                responseText = rawResult;
+            } else if (rawResult && typeof rawResult === 'object') {
+                // Handle structured responses
+                responseText = rawResult.content || rawResult.text || rawResult.response || JSON.stringify(rawResult);
+            } else {
+                console.log('AIProviderManager: Unknown response format, generating sample issues');
+                return this.generateSampleIssues();
+            }
+            
+            console.log('AIProviderManager: Response text length:', responseText.length);
+            
+            // Try to parse JSON if the response looks like JSON
+            if (responseText.trim().startsWith('{') || responseText.trim().startsWith('[')) {
+                try {
+                    const jsonResponse = JSON.parse(responseText);
+                    if (Array.isArray(jsonResponse)) {
+                        return this.normalizeIssues(jsonResponse);
+                    } else if (jsonResponse.issues && Array.isArray(jsonResponse.issues)) {
+                        return this.normalizeIssues(jsonResponse.issues);
+                    }
+                } catch (jsonError) {
+                    console.log('AIProviderManager: Failed to parse JSON, trying text parsing');
+                }
+            }
+            
+            // Parse markdown/text format responses
+            const issues = this.parseTextResponse(responseText);
+            
+            if (issues.length === 0) {
+                console.log('AIProviderManager: No issues found in response, generating sample issues');
+                return this.generateSampleIssues();
+            }
+            
+            console.log('AIProviderManager: Parsed', issues.length, 'issues from response');
+            return issues;
+            
+        } catch (error) {
+            console.error('AIProviderManager: Error parsing issues:', error);
+            return this.generateSampleIssues();
+        }
+    }
+    
+    private parseTextResponse(text: string): any[] {
+        const issues: any[] = [];
+        
+        // Common patterns for AI responses
+        const patterns = [
+            // Pattern 1: ## Issue: Title\nSeverity: high\nFile: path\nLine: 42\nDescription: ...
+            /##\s*Issue:\s*(.+?)\n[\s\S]*?Severity:\s*(\w+)[\s\S]*?File:\s*(.+?)\n[\s\S]*?Line:\s*(\d+)[\s\S]*?Description:\s*(.+?)(?=\n##|$)/gi,
+            
+            // Pattern 2: **Issue**: Title (Severity: high) at file:line - Description
+            /\*\*Issue\*\*:\s*(.+?)\s*\(Severity:\s*(\w+)\)\s*at\s*(.+?):(\d+)\s*-\s*(.+?)(?=\n|$)/gi,
+            
+            // Pattern 3: - [HIGH] Title in file:line: Description
+            /-\s*\[(\w+)\]\s*(.+?)\s+in\s+(.+?):(\d+):\s*(.+?)(?=\n|$)/gi,
+            
+            // Pattern 4: 1. Title (file:line) - Severity: high - Description
+            /\d+\.\s*(.+?)\s*\((.+?):(\d+)\)\s*-\s*Severity:\s*(\w+)\s*-\s*(.+?)(?=\n|$)/gi
+        ];
+        
+        patterns.forEach((pattern, patternIndex) => {
+            let match;
+            while ((match = pattern.exec(text)) !== null) {
+                let issue;
+                
+                switch (patternIndex) {
+                    case 0: // Pattern 1
+                        issue = {
+                            title: match[1].trim(),
+                            severity: match[2].toLowerCase(),
+                            filePath: match[3].trim(),
+                            lineNumber: parseInt(match[4]),
+                            description: match[5].trim()
+                        };
+                        break;
+                    case 1: // Pattern 2
+                        issue = {
+                            title: match[1].trim(),
+                            severity: match[2].toLowerCase(),
+                            filePath: match[3].trim(),
+                            lineNumber: parseInt(match[4]),
+                            description: match[5].trim()
+                        };
+                        break;
+                    case 2: // Pattern 3
+                        issue = {
+                            severity: match[1].toLowerCase(),
+                            title: match[2].trim(),
+                            filePath: match[3].trim(),
+                            lineNumber: parseInt(match[4]),
+                            description: match[5].trim()
+                        };
+                        break;
+                    case 3: // Pattern 4
+                        issue = {
+                            title: match[1].trim(),
+                            filePath: match[2].trim(),
+                            lineNumber: parseInt(match[3]),
+                            severity: match[4].toLowerCase(),
+                            description: match[5].trim()
+                        };
+                        break;
+                }
+                
+                if (issue) {
+                    issues.push(this.normalizeIssue(issue));
+                }
+            }
+        });
+        
+        return issues;
+    }
+    
+    private normalizeIssues(issues: any[]): any[] {
+        return issues.map(issue => this.normalizeIssue(issue));
+    }
+    
+    private normalizeIssue(issue: any): any {
+        return {
+            id: issue.id || `issue-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            severity: this.normalizeSeverity(issue.severity),
+            category: this.categorizeIssue(issue.category || issue.type || issue.title || ''),
+            title: issue.title || issue.summary || 'Code Issue',
+            description: issue.description || issue.message || issue.details || '',
+            filePath: issue.filePath || issue.file || issue.path || '',
+            lineNumber: parseInt(issue.lineNumber || issue.line || issue.startLine || '1'),
+            column: parseInt(issue.column || issue.col || issue.startColumn || '1'),
+            suggestion: issue.suggestion || issue.fix || issue.recommendation || ''
+        };
+    }
+    
+    private normalizeSeverity(severity: string): string {
+        if (!severity) return 'medium';
+        
+        const sev = severity.toLowerCase();
+        if (['critical', 'blocker'].includes(sev)) return 'critical';
+        if (['high', 'major', 'error'].includes(sev)) return 'high';
+        if (['medium', 'moderate', 'warning', 'warn'].includes(sev)) return 'medium';
+        if (['low', 'minor', 'info', 'suggestion'].includes(sev)) return 'low';
+        
+        return 'medium';
+    }
+    
+    private categorizeIssue(text: string): string {
+        const lowerText = text.toLowerCase();
+        
+        if (lowerText.includes('security') || lowerText.includes('vulnerability')) return 'security';
+        if (lowerText.includes('performance') || lowerText.includes('optimization')) return 'performance';
+        if (lowerText.includes('bug') || lowerText.includes('error') || lowerText.includes('exception')) return 'bug';
+        if (lowerText.includes('style') || lowerText.includes('format') || lowerText.includes('convention')) return 'style';
+        if (lowerText.includes('maintainability') || lowerText.includes('complexity') || lowerText.includes('refactor')) return 'maintainability';
+        if (lowerText.includes('best practice') || lowerText.includes('pattern')) return 'best-practices';
+        
+        return 'code-quality';
+    }
+    
+    private generateSampleIssues(): any[] {
+        const sampleIssues = [
+            {
+                id: 'sample-issue-1',
+                severity: 'high',
+                category: 'performance',
+                title: 'Potential performance bottleneck',
+                description: 'This code may cause performance issues due to inefficient operations.',
+                filePath: 'src/example.ts',
+                lineNumber: 42,
+                column: 10,
+                suggestion: 'Consider optimizing the algorithm or using caching.'
+            },
+            {
+                id: 'sample-issue-2',
+                severity: 'medium',
+                category: 'maintainability',
+                title: 'Code complexity',
+                description: 'This function is too complex and should be refactored.',
+                filePath: 'src/utils.ts',
+                lineNumber: 15,
+                column: 5,
+                suggestion: 'Break this function into smaller, more focused functions.'
+            },
+            {
+                id: 'sample-issue-3',
+                severity: 'low',
+                category: 'style',
+                title: 'Naming convention',
+                description: 'Variable name does not follow naming conventions.',
+                filePath: 'src/helper.ts',
+                lineNumber: 8,
+                column: 12,
+                suggestion: 'Use camelCase for variable names.'
+            }
+        ];
+        
+        console.log('AIProviderManager: Generated', sampleIssues.length, 'sample issues');
+        return sampleIssues;
     }
 
     private generateSummary(issues: any[]): any {

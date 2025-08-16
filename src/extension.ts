@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { CodeReviewManager } from './core/CodeReviewManager';
 import { IssuesPanelProvider } from './ui/IssuesPanelProvider';
+import { ReviewHistoryProvider } from './ui/ReviewHistoryProvider';
 import { InlineAnnotationsProvider } from './ui/InlineAnnotationsProvider';
 import { AIProviderManager } from './ai/AIProviderManager';
 import { ChangeDetector } from './core/ChangeDetector';
@@ -8,6 +9,7 @@ import { StorageManager } from './core/StorageManager';
 
 let codeReviewManager: CodeReviewManager;
 let issuesPanelProvider: IssuesPanelProvider;
+let reviewHistoryProvider: ReviewHistoryProvider;
 let inlineAnnotationsProvider: InlineAnnotationsProvider;
 let aiProviderManager: AIProviderManager;
 let changeDetector: ChangeDetector;
@@ -25,6 +27,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     // Initialize UI components
     issuesPanelProvider = new IssuesPanelProvider(codeReviewManager);
+    reviewHistoryProvider = new ReviewHistoryProvider(codeReviewManager);
     inlineAnnotationsProvider = new InlineAnnotationsProvider(codeReviewManager);
 
     // Register commands
@@ -41,10 +44,82 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand('aiCodeReview.reviewLocalChanges', () => {
             codeReviewManager.reviewLocalChanges();
         }),
-        vscode.commands.registerCommand('aiCodeReview.reviewAllFiles', () => {
-            codeReviewManager.reviewAllFiles();
+        vscode.commands.registerCommand('aiCodeReview.reviewAllFiles', async () => {
+            console.log('Extension: reviewAllFiles command triggered');
+            try {
+                await codeReviewManager.reviewAllFiles();
+                console.log('Extension: reviewAllFiles completed successfully');
+                
+                // Show the AI Code Review view container
+                await vscode.commands.executeCommand('workbench.view.extension.aiCodeReview');
+                
+                // Focus on the issues panel
+                await vscode.commands.executeCommand('aiCodeReview.issuesPanel.focus');
+                
+                // Trigger a refresh of the issues panel
+                issuesPanelProvider.refresh();
+            } catch (error) {
+                console.error('Extension: reviewAllFiles failed:', error);
+            }
+        }),
+        vscode.commands.registerCommand('aiCodeReview.reviewFilesByType', () => {
+            codeReviewManager.reviewFilesByType();
+        }),
+        vscode.commands.registerCommand('aiCodeReview.reviewFilesByDirectory', () => {
+            codeReviewManager.reviewFilesByDirectory();
+        }),
+        vscode.commands.registerCommand('aiCodeReview.reviewAllFilesIncludingSkipped', () => {
+            codeReviewManager.reviewAllFilesIncludingSkipped();
         }),
         vscode.commands.registerCommand('aiCodeReview.refreshIssues', () => {
+            issuesPanelProvider.refresh();
+        }),
+        vscode.commands.registerCommand('aiCodeReview.refreshHistory', () => {
+            reviewHistoryProvider.refresh();
+        }),
+        vscode.commands.registerCommand('aiCodeReview.clearHistory', async () => {
+            await codeReviewManager.clearReviewResults();
+            reviewHistoryProvider.refresh();
+            vscode.window.showInformationMessage('Review history cleared.');
+        }),
+        vscode.commands.registerCommand('aiCodeReview.exportHistory', async () => {
+            const results = codeReviewManager.getReviewResults();
+            const data = JSON.stringify(results, null, 2);
+            
+            const uri = await vscode.window.showSaveDialog({
+                saveLabel: 'Export Review History',
+                defaultUri: vscode.Uri.file('review-history.json'),
+                filters: {
+                    'JSON Files': ['json'],
+                    'All Files': ['*']
+                }
+            });
+            
+            if (uri) {
+                await vscode.workspace.fs.writeFile(uri, Buffer.from(data, 'utf8'));
+                vscode.window.showInformationMessage(`Review history exported to ${uri.fsPath}`);
+            }
+        }),
+        vscode.commands.registerCommand('aiCodeReview.debugStorage', async () => {
+            console.log('Extension: Debug storage command triggered');
+            const results = codeReviewManager.getReviewResults();
+            console.log('Extension: Retrieved', results.length, 'results from storage');
+            
+            if (results.length > 0) {
+                results.forEach((result, index) => {
+                    console.log(`Extension: Result ${index}:`, {
+                        timestamp: result.metadata.timestamp,
+                        timestampType: typeof result.metadata.timestamp,
+                        totalIssues: result.summary.totalIssues,
+                        issuesCount: result.issues?.length || 0,
+                        aiProvider: result.metadata.aiProvider
+                    });
+                });
+            }
+            
+            vscode.window.showInformationMessage(`Debug: Found ${results.length} stored results. Check console for details.`);
+            
+            // Force refresh the issues panel
             issuesPanelProvider.refresh();
         }),
         vscode.commands.registerCommand('aiCodeReview.test', () => {
@@ -64,12 +139,66 @@ export function activate(context: vscode.ExtensionContext) {
             output.appendLine('=== AI Provider Debug Information ===');
             output.appendLine(JSON.stringify(debugInfo, null, 2));
             output.show();
+        }),
+        vscode.commands.registerCommand('aiCodeReview.showView', async () => {
+            // Show the AI Code Review view container
+            await vscode.commands.executeCommand('workbench.view.extension.aiCodeReview');
+            // Focus on the issues panel
+            await vscode.commands.executeCommand('aiCodeReview.issuesPanel.focus');
+        }),
+        vscode.commands.registerCommand('aiCodeReview.selectAIProvider', async () => {
+            const allProviders = aiProviderManager.getAllProviders();
+            if (allProviders.length === 0) {
+                vscode.window.showErrorMessage('No AI providers available. Please install at least one supported extension.');
+                return;
+            }
+
+            const currentProvider = aiProviderManager.getCachedProvider();
+            const options = allProviders.map(provider => ({
+                label: provider.name,
+                description: provider.isInstalled ? '✅ Installed' : '❌ Not installed',
+                detail: provider.id === currentProvider ? '⭐ Currently selected' : (provider.isInstalled ? 'Ready to use' : 'Click to install'),
+                value: provider.id
+            }));
+
+            const selected = await vscode.window.showQuickPick(options, {
+                placeHolder: `Current: ${aiProviderManager.getProviderName(currentProvider || '')} - Select new AI provider`
+            });
+
+            if (!selected) return;
+
+            const provider = allProviders.find(p => p.id === selected.value);
+            if (provider && !provider.isInstalled) {
+                // Show installation guidance for uninstalled providers
+                const guidance = aiProviderManager.getInstallationGuidance(provider.id);
+                const action = await vscode.window.showInformationMessage(
+                    `${provider.name} is not installed.\n\n${guidance}`,
+                    'Open Extensions',
+                    'Cancel'
+                );
+                if (action === 'Open Extensions') {
+                    vscode.commands.executeCommand('workbench.extensions.search', provider.name);
+                }
+                return;
+            }
+
+            // Update the cached provider
+            await aiProviderManager.setCachedProvider(selected.value);
+            vscode.window.showInformationMessage(`AI provider changed to: ${provider?.name}`);
         })
     ];
 
-    // Register views - using a different approach for compatibility
-    // Note: createWebviewView is not available in all VS Code versions
-    // We'll use a different approach for now
+    // Register webview view providers
+    context.subscriptions.push(
+        vscode.window.registerWebviewViewProvider(
+            IssuesPanelProvider.viewType,
+            issuesPanelProvider
+        ),
+        vscode.window.registerWebviewViewProvider(
+            ReviewHistoryProvider.viewType,
+            reviewHistoryProvider
+        )
+    );
 
     // Register inline annotations
     context.subscriptions.push(
@@ -127,6 +256,9 @@ export function deactivate() {
     }
     if (issuesPanelProvider) {
         issuesPanelProvider.dispose();
+    }
+    if (reviewHistoryProvider) {
+        reviewHistoryProvider.dispose();
     }
     if (inlineAnnotationsProvider) {
         inlineAnnotationsProvider.dispose();

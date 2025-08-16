@@ -32,8 +32,9 @@ A powerful VS Code extension that automates code review using AI to provide seni
 - **Batch Processing**: Review multiple files simultaneously
 - **Smart Caching**: Remembers your preferences for future reviews
 
-### 🎨 Dual Interface Options
+### 🎨 Triple Interface Options
 - **Dedicated Sidebar Panel**: Comprehensive overview of all issues grouped by severity
+- **Review History Panel**: Complete history of all code reviews with detailed tracking
 - **Inline Editor Annotations**: Contextual hints and suggestions directly in your code
 - **Navigation**: Jump directly to problematic lines from the issue panel
 
@@ -67,6 +68,9 @@ A powerful VS Code extension that automates code review using AI to provide seni
 - **`AI Code Review: Refresh AI Providers`** - Refresh provider detection
 - **`AI Code Review: Debug AI Providers`** - Debug provider detection issues
 - **`AI Code Review: Test Extension`** - Test if extension is working
+- **`AI Code Review: Refresh History`** - Refresh the review history panel
+- **`AI Code Review: Clear History`** - Clear all review history
+- **`AI Code Review: Export History`** - Export review history to JSON file
 
 ### Change Type Examples
 
@@ -84,6 +88,28 @@ A powerful VS Code extension that automates code review using AI to provide seni
 - Select "Local Changes" type
 - Review uncommitted modifications
 - Get instant feedback on your current work
+
+### Review History Management
+
+#### Accessing Review History
+1. **Activity Bar Icon**: Click the AI Code Review icon in the VS Code activity bar
+2. **Review History Panel**: Navigate to the "Review History" tab within the AI Code Review container
+3. **View All Reviews**: See a chronological list of all completed code reviews
+
+#### Review History Features
+- **Chronological Display**: Reviews sorted by date (newest first)
+- **Summary Statistics**: Quick overview of issues found (Total, Critical, High, Medium, Low)
+- **AI Provider Tracking**: See which AI provider was used for each review
+- **Detailed View**: Click "View" to open a detailed markdown report of any review
+- **Individual Management**: Delete specific reviews or export history
+- **Bulk Operations**: Clear all history or export complete review data
+
+#### Review History Actions
+- **View Details**: Opens a comprehensive markdown document with full review details
+- **Delete Review**: Remove individual reviews from history
+- **Export History**: Save all review data as JSON for backup or analysis
+- **Clear All**: Remove all review history (with confirmation)
+- **Refresh**: Update the history display with latest data
 
 ## 🔧 Configuration
 

@@ -14,7 +14,10 @@ export class StorageManager {
     public async saveReviewResult(result: ReviewResult): Promise<void> {
         try {
             const existingResults = this.getReviewResults();
-            existingResults.push(result);
+            
+            // Serialize the result to handle Date objects properly
+            const serializedResult = this.serializeReviewResult(result);
+            existingResults.push(serializedResult);
             
             // Keep only the last 50 results to prevent storage bloat
             if (existingResults.length > 50) {
@@ -22,13 +25,22 @@ export class StorageManager {
             }
             
             await this.globalState.update(this.REVIEW_RESULTS_KEY, existingResults);
+            console.log('StorageManager: Saved review result with', result.issues?.length || 0, 'issues');
         } catch (error) {
             console.error('Failed to save review result:', error);
         }
     }
 
     public getReviewResults(): ReviewResult[] {
-        return this.globalState.get<ReviewResult[]>(this.REVIEW_RESULTS_KEY, []);
+        try {
+            const storedResults = this.globalState.get<any[]>(this.REVIEW_RESULTS_KEY, []);
+            const deserializedResults = storedResults.map(result => this.deserializeReviewResult(result));
+            console.log('StorageManager: Retrieved', deserializedResults.length, 'review results from storage');
+            return deserializedResults;
+        } catch (error) {
+            console.error('Failed to get review results:', error);
+            return [];
+        }
     }
 
     public async getReviewResultById(id: string): Promise<ReviewResult | undefined> {
@@ -207,6 +219,34 @@ export class StorageManager {
             reviewResults,
             cacheEntries,
             totalSize
+        };
+    }
+
+    private serializeReviewResult(result: ReviewResult): any {
+        return {
+            ...result,
+            metadata: {
+                ...result.metadata,
+                timestamp: result.metadata.timestamp.toISOString()
+            },
+            issues: result.issues.map(issue => ({
+                ...issue,
+                timestamp: issue.timestamp.toISOString()
+            }))
+        };
+    }
+
+    private deserializeReviewResult(data: any): ReviewResult {
+        return {
+            ...data,
+            metadata: {
+                ...data.metadata,
+                timestamp: new Date(data.metadata.timestamp)
+            },
+            issues: data.issues.map((issue: any) => ({
+                ...issue,
+                timestamp: new Date(issue.timestamp)
+            }))
         };
     }
 }
