@@ -484,7 +484,7 @@ export class ExternalAIManager {
             ).sort((a, b) => b[0].localeCompare(a[0])); // Sort by name descending to get the latest
 
             if (jsonFiles.length === 0) {
-                vscode.window.showErrorMessage('No JSON result files found in .ai-code-review/results folder.');
+                vscode.window.showErrorMessage('No result found. You should paste the prompt first.');
                 return null;
             }
 

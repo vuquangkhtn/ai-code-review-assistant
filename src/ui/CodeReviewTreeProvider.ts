@@ -68,42 +68,56 @@ export class CodeReviewTreeProvider implements vscode.TreeDataProvider<CodeRevie
                     'Open detailed workflow guide in a new panel'
                 ),
                 new CodeReviewItem(
-                    'Default Change Type',
+                    'Configure Change Type',
                     vscode.TreeItemCollapsibleState.Expanded,
                     undefined,
                     'defaultChangeTypeGroup',
                     'gear'
                 ),
                 new CodeReviewItem(
-                    'Copy AI Prompt',
+                    'Generate AI Prompt',
                     vscode.TreeItemCollapsibleState.None,
                     {
                         command: 'aiCodeReview.copyPrompt',
                         title: 'Copy Prompt',
                         arguments: []
                     },
-                    'action'
+                    'action',
+                    'copy'
                 ),
                 new CodeReviewItem(
-                    'Check Code Scan Result',
+                    'Paste Prompt to AI Chat',
                     vscode.TreeItemCollapsibleState.None,
                     {
-                        command: 'aiCodeReview.checkReviewResult',
-                        title: 'Check Code Scan Result',
+                        command: 'aiCodeReview.pastePrompt',
+                        title: 'Paste Prompt to AI Chat',
                         arguments: []
                     },
                     'action',
-                    'View scan results from .ai-code-review/results folder'
+                    'send'
                 ),
                 new CodeReviewItem(
-                    'View Issue Report',
+                    'Generate Code Review Result',
+                    vscode.TreeItemCollapsibleState.None,
+                    {
+                        command: 'aiCodeReview.checkReviewResult',
+                        title: 'Generate Code Review Result',
+                        arguments: []
+                    },
+                    'action',
+                    'check',
+                    'Generate Code Review results'
+                ),
+                new CodeReviewItem(
+                    'View Code Review Report',
                     vscode.TreeItemCollapsibleState.None,
                     {
                         command: 'aiCodeReview.openPanel',
                         title: 'Open Panel',
                         arguments: []
                     },
-                    'action'
+                    'action',
+                    'eye'
                 ),
             ]);
         } else if (element.contextValue === 'defaultChangeTypeGroup') {

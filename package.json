@@ -37,7 +37,8 @@
     "onCommand:aiCodeReview.openPromptFile",
     "onCommand:aiCodeReview.openChangeFile",
     "onCommand:aiCodeReview.openIssue",
-    "onCommand:aiCodeReview.openSettings"
+    "onCommand:aiCodeReview.openSettings",
+    "onCommand:aiCodeReview.pastePrompt"
   ],
   "contributes": {
     "commands": [
@@ -101,6 +102,12 @@
         "title": "Open Settings",
         "category": "AI Code Review",
         "icon": "$(gear)"
+      },
+      {
+        "command": "aiCodeReview.pastePrompt",
+        "title": "Paste Prompt to AI Chat",
+        "category": "AI Code Review",
+        "icon": "$(send)"
       }
     ],
     "viewsContainers": {

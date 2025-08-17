@@ -312,6 +312,34 @@ export function activate(context: vscode.ExtensionContext) {
 
         vscode.commands.registerCommand('aiCodeReview.openWorkflowGuide', () => {
             WorkflowGuidePanel.createOrShow(context.extensionUri);
+        }),
+
+        vscode.commands.registerCommand('aiCodeReview.pastePrompt', async () => {
+            try {
+                // Show information message with instructions
+                const message = 'Copy the prompt from clipboard and paste it into your AI chat (e.g., ChatGPT, Claude, Copilot Chat). The prompt has been generated and is ready to use!';
+                const action = await vscode.window.showInformationMessage(
+                    message,
+                    { modal: false },
+                    'Open AI Chat Instructions'
+                );
+                
+                if (action === 'Open AI Chat Instructions') {
+                    // Show a more detailed guide
+                    const detailedMessage = `How to use the AI Code Review prompt:
+
+1. The prompt has been copied to your clipboard
+2. Open your preferred AI chat
+3. Paste the prompt (Ctrl+V) into the chat
+4. Send the message to get your code review
+5. When the AI responds, use "Generate Code Review Result" to process it
+(Use "Open Workflow Guide" for detail instructions)`;
+                    
+                    vscode.window.showInformationMessage(detailedMessage, { modal: true });
+                }
+            } catch (error) {
+                vscode.window.showErrorMessage(`Failed to show paste instructions: ${error}`);
+            }
         })
      ];
 
