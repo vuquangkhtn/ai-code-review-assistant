@@ -49,7 +49,7 @@ A powerful VS Code extension that automates code review using AI to provide seni
 - **Language Support**: Focus on JavaScript/TypeScript with extensible language support
 - **Template Customization**: Modify review templates to match your team's standards
 - **Severity Thresholds**: Configure which issues to display based on your preferences
-- **Default AI Selection**: Set your preferred AI provider for automatic reviews
+- **Manual AI Integration**: Copy prompts to use with your preferred AI provider
 
 ## 🛠️ Installation
 
@@ -144,7 +144,7 @@ You can manually clean up review files by:
 ### Customization Options
 - Modify review templates
 - Set severity thresholds
-- Configure default AI provider
+- Configure change detection preferences
 - Adjust language preferences
 - Customize caching behavior
 

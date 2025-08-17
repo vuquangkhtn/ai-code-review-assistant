@@ -108,7 +108,42 @@ suite('Extension Integration Test Suite', () => {
             }, 'openSettings command should execute without error');
         });
         
-        test('Should execute main copyPrompt command with quick pick', async () => {
+        test('Should execute main copyPrompt command using default configuration', async () => {
+            // Test that copyPrompt uses default configuration without showing quick pick
+            const originalShowQuickPick = vscode.window.showQuickPick;
+            let quickPickCalled = false;
+            
+            (vscode.window as any).showQuickPick = async (items: any[], options: any) => {
+                quickPickCalled = true;
+                return undefined; // Simulate user cancellation
+            };
+            
+            try {
+                await vscode.commands.executeCommand('aiCodeReview.copyPrompt');
+                // With default configuration (local), quick pick should NOT be called
+                assert.ok(!quickPickCalled, 'Quick pick should not be called when using default configuration');
+            } finally {
+                (vscode.window as any).showQuickPick = originalShowQuickPick;
+            }
+        });
+        
+        test('Should fallback to quick pick with invalid configuration', async () => {
+            // Mock configuration to return invalid value
+            const originalGetConfiguration = vscode.workspace.getConfiguration;
+            (vscode.workspace as any).getConfiguration = (section: string) => {
+                if (section === 'aiCodeReview') {
+                    return {
+                        get: (key: string, defaultValue: any) => {
+                            if (key === 'defaultChangeType') {
+                                return 'invalid-type'; // Invalid configuration
+                            }
+                            return defaultValue;
+                        }
+                    };
+                }
+                return originalGetConfiguration(section);
+            };
+            
             // Mock the quick pick to avoid user interaction
             const originalShowQuickPick = vscode.window.showQuickPick;
             let quickPickCalled = false;
@@ -120,9 +155,10 @@ suite('Extension Integration Test Suite', () => {
             
             try {
                 await vscode.commands.executeCommand('aiCodeReview.copyPrompt');
-                assert.ok(quickPickCalled, 'Quick pick should be called for main copyPrompt command');
+                assert.ok(quickPickCalled, 'Quick pick should be called with invalid configuration');
             } finally {
                 (vscode.window as any).showQuickPick = originalShowQuickPick;
+                (vscode.workspace as any).getConfiguration = originalGetConfiguration;
             }
         });
     });

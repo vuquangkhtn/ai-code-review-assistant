@@ -142,22 +142,13 @@
           "enum": [
             "local",
             "commit",
-            "branch"
+            "branch",
+            "all-files"
           ],
           "default": "local",
           "description": "Default change type for code reviews"
         },
-        "aiCodeReview.defaultAIProvider": {
-          "type": "string",
-          "enum": [
-            "copilot",
-            "amazon-q",
-            "cursor-ai",
-            "chatgpt"
-          ],
-          "default": "copilot",
-          "description": "Default AI provider for code reviews"
-        },
+
         "aiCodeReview.autoCache": {
           "type": "boolean",
           "default": true,

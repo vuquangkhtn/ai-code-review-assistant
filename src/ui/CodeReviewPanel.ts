@@ -70,6 +70,18 @@ export class CodeReviewPanel {
                     case 'clearHistory':
                         this._clearHistory();
                         return;
+                    case 'getDefaultChangeType':
+                        this._sendDefaultChangeType();
+                        return;
+                    case 'copyPromptLocalChanges':
+                        this._copyPromptLocalChanges();
+                        return;
+                    case 'copyPromptAllFiles':
+                        this._copyPromptAllFiles();
+                        return;
+                    case 'copyPromptCompareBranches':
+                        this._copyPromptCompareBranches(message.sourceBranch, message.targetBranch);
+                        return;
                 }
             },
             null,
@@ -173,6 +185,30 @@ export class CodeReviewPanel {
         });
     }
 
+    private _sendDefaultChangeType() {
+        const config = vscode.workspace.getConfiguration('aiCodeReview');
+        const defaultChangeType = config.get<string>('defaultChangeType', 'local');
+        
+        this._panel.webview.postMessage({
+            command: 'setDefaultChangeType',
+            changeType: defaultChangeType
+        });
+    }
+    
+    private _copyPromptLocalChanges() {
+        vscode.commands.executeCommand('aiCodeReview.copyPromptLocalChanges');
+    }
+    
+    private _copyPromptAllFiles() {
+        vscode.commands.executeCommand('aiCodeReview.copyPromptAllFiles');
+    }
+    
+    private _copyPromptCompareBranches(sourceBranch: string, targetBranch: string) {
+        // Store branch information for the compare branches command
+        // For now, we'll use the existing command and let it handle branch selection
+        vscode.commands.executeCommand('aiCodeReview.copyPromptCompareBranches');
+    }
+
     public dispose() {
         CodeReviewPanel.currentPanel = undefined;
 
@@ -190,6 +226,9 @@ export class CodeReviewPanel {
     private _update() {
         const webview = this._panel.webview;
         this._panel.webview.html = this._getHtmlForWebview(webview);
+        
+        // Send default change type to webview
+        this._sendDefaultChangeType();
     }
 
     private _getHtmlForWebview(webview: vscode.Webview) {
@@ -421,10 +460,123 @@ export class CodeReviewPanel {
         .stat-high { color: #e74c3c; }
         .stat-medium { color: #f1c40f; }
         .stat-low { color: #3498db; }
+        
+        /* Change Type Dropdown Styles */
+        .change-type-section {
+            padding: 15px;
+            border-bottom: 1px solid var(--vscode-panel-border);
+            background: var(--vscode-editor-background);
+        }
+        .change-type-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .change-type-label {
+            font-weight: bold;
+            font-size: 13px;
+            color: var(--vscode-foreground);
+        }
+        .change-type-dropdown {
+            padding: 6px 10px;
+            border: 1px solid var(--vscode-input-border);
+            background: var(--vscode-input-background);
+            color: var(--vscode-input-foreground);
+            border-radius: 3px;
+            font-size: 12px;
+            min-width: 120px;
+        }
+        .change-type-dropdown:focus {
+            outline: 1px solid var(--vscode-focusBorder);
+            border-color: var(--vscode-focusBorder);
+        }
+        .branch-selection {
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+            background: var(--vscode-editor-inactiveSelectionBackground);
+            border-radius: 5px;
+            border: 1px solid var(--vscode-input-border);
+        }
+        .branch-selection.visible {
+            display: block;
+        }
+        .branch-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        .branch-row:last-child {
+            margin-bottom: 0;
+        }
+        .branch-label {
+            font-size: 12px;
+            color: var(--vscode-foreground);
+            min-width: 80px;
+        }
+        .branch-input {
+            flex: 1;
+            padding: 4px 8px;
+            border: 1px solid var(--vscode-input-border);
+            background: var(--vscode-input-background);
+            color: var(--vscode-input-foreground);
+            border-radius: 3px;
+            font-size: 11px;
+        }
+        .branch-input:focus {
+            outline: 1px solid var(--vscode-focusBorder);
+            border-color: var(--vscode-focusBorder);
+        }
+        .copy-prompt-btn {
+            margin-top: 10px;
+            padding: 8px 16px;
+            border: 1px solid var(--vscode-button-border);
+            background: var(--vscode-button-background);
+            color: var(--vscode-button-foreground);
+            cursor: pointer;
+            font-size: 12px;
+            border-radius: 3px;
+            width: 100%;
+        }
+        .copy-prompt-btn:hover {
+            background: var(--vscode-button-hoverBackground);
+        }
+        .copy-prompt-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- Change Type Selection Section -->
+        <div class="change-type-section">
+            <div class="change-type-header">
+                <label class="change-type-label" for="changeTypeSelect">Default Change Type:</label>
+                <select id="changeTypeSelect" class="change-type-dropdown" onchange="onChangeTypeChange()">
+                    <option value="local">Local Changes</option>
+                    <option value="all-files">All Files</option>
+                    <option value="branch">Compare Branches</option>
+                </select>
+            </div>
+            
+            <!-- Branch Selection UI (hidden by default) -->
+            <div id="branchSelection" class="branch-selection">
+                <div class="branch-row">
+                    <label class="branch-label">Source Branch:</label>
+                    <input type="text" id="sourceBranch" class="branch-input" placeholder="e.g., main, develop" value="main">
+                </div>
+                <div class="branch-row">
+                    <label class="branch-label">Target Branch:</label>
+                    <input type="text" id="targetBranch" class="branch-input" placeholder="e.g., feature/new-feature" value="">
+                </div>
+            </div>
+            
+            <button id="copyPromptBtn" class="copy-prompt-btn" onclick="copyPromptWithSelection()">Copy Prompt</button>
+        </div>
+        
         <div class="tabs">
             <button class="tab active" onclick="switchTab('issues')">Issues</button>
             <button class="tab" onclick="switchTab('history')">History</button>
@@ -466,6 +618,68 @@ export class CodeReviewPanel {
         let currentIssues = [];
         let reviewHistory = [];
         let currentFilter = 'all';
+        let currentChangeType = 'local';
+        
+        // Initialize the panel
+        window.addEventListener('DOMContentLoaded', function() {
+            // Load default change type from configuration
+            loadDefaultChangeType();
+        });
+        
+        function loadDefaultChangeType() {
+            // Request default change type from extension
+            vscode.postMessage({
+                command: 'getDefaultChangeType'
+            });
+        }
+        
+        function onChangeTypeChange() {
+            const select = document.getElementById('changeTypeSelect');
+            const branchSelection = document.getElementById('branchSelection');
+            currentChangeType = select.value;
+            
+            if (currentChangeType === 'branch') {
+                branchSelection.classList.add('visible');
+            } else {
+                branchSelection.classList.remove('visible');
+            }
+        }
+        
+        function copyPromptWithSelection() {
+            const changeType = currentChangeType;
+            
+            if (changeType === 'branch') {
+                const sourceBranch = document.getElementById('sourceBranch').value.trim();
+                const targetBranch = document.getElementById('targetBranch').value.trim();
+                
+                if (!sourceBranch || !targetBranch) {
+                    alert('Please enter both source and target branch names.');
+                    return;
+                }
+                
+                vscode.postMessage({
+                    command: 'copyPromptCompareBranches',
+                    sourceBranch: sourceBranch,
+                    targetBranch: targetBranch
+                });
+            } else if (changeType === 'all-files') {
+                vscode.postMessage({
+                    command: 'copyPromptAllFiles'
+                });
+            } else {
+                // Default to local changes
+                vscode.postMessage({
+                    command: 'copyPromptLocalChanges'
+                });
+            }
+        }
+        
+        function setDefaultChangeType(changeType) {
+            const select = document.getElementById('changeTypeSelect');
+            select.value = changeType;
+            currentChangeType = changeType;
+            onChangeTypeChange();
+        }
 
         window.addEventListener('message', event => {
             const message = event.data;
@@ -481,6 +695,9 @@ export class CodeReviewPanel {
                 case 'updateHistory':
                     reviewHistory = message.history;
                     renderHistory(reviewHistory);
+                    break;
+                case 'setDefaultChangeType':
+                    setDefaultChangeType(message.changeType);
                     break;
             }
         });

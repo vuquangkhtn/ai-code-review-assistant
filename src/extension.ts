@@ -44,30 +44,48 @@ export function activate(context: vscode.ExtensionContext) {
     const commands = [
         // External AI commands
         vscode.commands.registerCommand('aiCodeReview.copyPrompt', async () => {
-            const options = [
-                {
-                    label: '$(git-branch) Local Changes',
-                    description: 'Only local changes',
-                    command: 'aiCodeReview.copyPromptLocalChanges'
-                },
-                {
-                    label: '$(folder) All Files',
-                    description: 'Scan all Files in workspace',
-                    command: 'aiCodeReview.copyPromptAllFiles'
-                },
-                {
-                    label: '$(git-compare) Compare Branches',
-                    description: 'Compare changes between two branches',
-                    command: 'aiCodeReview.copyPromptCompareBranches'
+            // Get the default change type from configuration
+            const config = vscode.workspace.getConfiguration('aiCodeReview');
+            const defaultChangeType = config.get<string>('defaultChangeType', 'local');
+            
+            // Map change types to commands
+            const commandMap: Record<string, string> = {
+                'local': 'aiCodeReview.copyPromptLocalChanges',
+                'commit': 'aiCodeReview.copyPromptCompareBranches', // Use branch comparison for commit-like workflow
+                'branch': 'aiCodeReview.copyPromptCompareBranches',
+                'all-files': 'aiCodeReview.copyPromptAllFiles'
+            };
+            
+            const command = commandMap[defaultChangeType];
+            if (command) {
+                await vscode.commands.executeCommand(command);
+            } else {
+                // Fallback to showing options if invalid configuration
+                const options = [
+                    {
+                        label: '$(git-branch) Local Changes',
+                        description: 'Only local changes',
+                        command: 'aiCodeReview.copyPromptLocalChanges'
+                    },
+                    {
+                        label: '$(folder) All Files',
+                        description: 'Scan all Files in workspace',
+                        command: 'aiCodeReview.copyPromptAllFiles'
+                    },
+                    {
+                        label: '$(git-compare) Compare Branches',
+                        description: 'Compare changes between two branches',
+                        command: 'aiCodeReview.copyPromptCompareBranches'
+                    }
+                ];
+
+                const selected = await vscode.window.showQuickPick(options, {
+                    placeHolder: 'Select the type of code review prompt to copy'
+                });
+
+                if (selected) {
+                    await vscode.commands.executeCommand(selected.command);
                 }
-            ];
-
-            const selected = await vscode.window.showQuickPick(options, {
-                placeHolder: 'Select the type of code review prompt to copy'
-            });
-
-            if (selected) {
-                await vscode.commands.executeCommand(selected.command);
             }
         }),
 
@@ -257,6 +275,20 @@ export function activate(context: vscode.ExtensionContext) {
                 await vscode.commands.executeCommand('workbench.action.openSettings', '@ext:ai-code-review.ai-code-review-assistant');
             } catch (error) {
                 vscode.window.showErrorMessage(`Failed to open settings: ${error}`);
+            }
+        }),
+
+        vscode.commands.registerCommand('aiCodeReview.setDefaultChangeType', async (changeType: string) => {
+            try {
+                const config = vscode.workspace.getConfiguration('aiCodeReview');
+                await config.update('defaultChangeType', changeType, vscode.ConfigurationTarget.Global);
+                
+                // Update the tree provider to reflect the change
+                codeReviewTreeProvider.updateDefaultChangeType(changeType);
+                
+                vscode.window.showInformationMessage(`Default change type set to: ${changeType}`);
+            } catch (error) {
+                vscode.window.showErrorMessage(`Failed to set default change type: ${error}`);
             }
         })
      ];
