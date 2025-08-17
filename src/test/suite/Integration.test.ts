@@ -102,6 +102,12 @@ suite('Extension Integration Test Suite', () => {
             }, 'copyPromptCompareBranches command should execute without error');
         });
         
+        test('Should execute openSettings command', async () => {
+            assert.doesNotThrow(async () => {
+                await vscode.commands.executeCommand('aiCodeReview.openSettings');
+            }, 'openSettings command should execute without error');
+        });
+        
         test('Should execute main copyPrompt command with quick pick', async () => {
             // Mock the quick pick to avoid user interaction
             const originalShowQuickPick = vscode.window.showQuickPick;

@@ -35,7 +35,8 @@
     "onCommand:aiCodeReview.closePanel",
     "onCommand:aiCodeReview.openPromptFile",
     "onCommand:aiCodeReview.openChangeFile",
-    "onCommand:aiCodeReview.openIssue"
+    "onCommand:aiCodeReview.openIssue",
+    "onCommand:aiCodeReview.openSettings"
   ],
   "contributes": {
     "commands": [
@@ -93,6 +94,12 @@
         "command": "aiCodeReview.openIssue",
         "title": "Open Issue",
         "category": "AI Code Review"
+      },
+      {
+        "command": "aiCodeReview.openSettings",
+        "title": "Open Settings",
+        "category": "AI Code Review",
+        "icon": "$(gear)"
       }
     ],
     "viewsContainers": {
@@ -115,6 +122,15 @@
           "id": "aiCodeReviewIssues",
           "name": "Issues",
           "when": "true"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "aiCodeReview.openSettings",
+          "when": "view == aiCodeReviewPanel",
+          "group": "navigation"
         }
       ]
     },
