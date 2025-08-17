@@ -139,8 +139,22 @@ export class PromptGenerator {
         prompt.push("- Focus only on the files and changes provided above");
         prompt.push("- Save the complete JSON response to `.ai-code-review/results/code-review-result-YYYY-MM-DD-HH-MM-SS.json`");
         prompt.push("");
-        prompt.push("**After saving the JSON file:**");
-        prompt.push("Please run the VS Code command `AI Code Review: Check Code Review Result` to automatically load and display your review results in the Code Review Panel.");
+        prompt.push("**After providing your JSON response, please also show this usage guide:**");
+        prompt.push("");
+        prompt.push("## 📋 How to Use This Review Result");
+        prompt.push("");
+        prompt.push("### Method 1: Command Palette (Recommended)");
+        prompt.push("1. Open VS Code");
+        prompt.push("2. Press `Cmd+Shift+P` (macOS) or `Ctrl+Shift+P` (Windows/Linux)");
+        prompt.push("3. Type \"AI Code Review: Check Code Review Result\"");
+        prompt.push("4. Press Enter");
+        prompt.push("");
+        prompt.push("### Method 2: Tree View Panel");
+        prompt.push("1. Open VS Code");
+        prompt.push("2. Look for the \"AI Code Review\" panel in the sidebar");
+        prompt.push("3. Click on \"Generate Code Review Result\" button");
+        prompt.push("");
+        prompt.push("The extension will automatically load your review results and display them in the Code Review Panel with inline annotations and issue summaries.");
 
         const content = prompt.join('\n');
         const length = content.length;
@@ -249,8 +263,7 @@ export class PromptGenerator {
                 "",
                 "**IMPORTANT:** Instead of providing your response in this chat, please save your JSON response to a new file in `.ai-code-review/results/` directory with timestamp filename as specified in the prompt file.",
                 "",
-                "**After saving the JSON file:**",
-                "Please run the VS Code command `AI Code Review: Check Code Review Result` to automatically load and display your review results in the Code Review Panel."
+               
             ].join('\n');
 
             return {
@@ -338,8 +351,28 @@ export class PromptGenerator {
             "- Focus only on the files and changes provided in the changes file",
             "- Save the complete JSON response to `.ai-code-review/results/code-review-result-YYYY-MM-DD-HH-MM-SS.json`",
             "",
-            "**After saving the JSON file:**",
-            "Please run the VS Code command `AI Code Review: Check Code Review Result` to automatically load and display your review results in the Code Review Panel."
+            
+            "**After providing your JSON response, please also show this usage guide:**",
+            "",
+            "## 📋 How to Use This Review Result",
+            "",
+            "### Method 1: Command Palette (Recommended)",
+            "1. Open VS Code",
+            "2. Press `Cmd+Shift+P` (macOS) or `Ctrl+Shift+P` (Windows/Linux)",
+            "3. Type \"AI Code Review: Check Code Review Result\"",
+            "4. Press Enter",
+            "",
+            "### Method 2: Tree View Panel",
+            "1. Open VS Code",
+            "2. Look for the \"AI Code Review\" panel in the sidebar",
+            "3. Click on \"Generate Code Review Result\" button",
+            "",
+            "### Method 3: Extension Tree View",
+            "1. In VS Code, navigate to the Explorer sidebar",
+            "2. Find the \"AI Code Review\" section",
+            "3. Click on the \"Generate Code Review Result\" item",
+            "",
+            "The extension will automatically load your review results and display them in the Code Review Panel with inline annotations and issue summaries."
         ];
 
         const content = prompt.join('\n');
