@@ -31,6 +31,7 @@
     "onCommand:aiCodeReview.copyPromptCompareBranches",
     "onCommand:aiCodeReview.showFormatExamples",
     "onCommand:aiCodeReview.checkReviewResult",
+    "aiCodeReview.checkScanResult",
     "onCommand:aiCodeReview.openPanel",
     "onCommand:aiCodeReview.closePanel",
     "onCommand:aiCodeReview.openPromptFile",

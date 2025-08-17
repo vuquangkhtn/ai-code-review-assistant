@@ -1,4 +1,6 @@
 import * as vscode from 'vscode';
+import * as fs from 'fs';
+import * as path from 'path';
 
 export class CodeReviewTreeProvider implements vscode.TreeDataProvider<CodeReviewItem> {
     private _onDidChangeTreeData: vscode.EventEmitter<CodeReviewItem | undefined | null | void> = new vscode.EventEmitter<CodeReviewItem | undefined | null | void>();
@@ -9,6 +11,26 @@ export class CodeReviewTreeProvider implements vscode.TreeDataProvider<CodeRevie
     constructor() {
         // Load the default change type from configuration
         this.loadDefaultChangeType();
+    }
+
+    private hasResultFiles(): boolean {
+        const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+        if (!workspaceFolder) {
+            return false;
+        }
+        
+        const resultsPath = path.join(workspaceFolder.uri.fsPath, '.ai-code-review', 'results');
+        
+        try {
+            if (!fs.existsSync(resultsPath)) {
+                return false;
+            }
+            
+            const files = fs.readdirSync(resultsPath);
+            return files.length > 0;
+        } catch (error) {
+            return false;
+        }
     }
 
     refresh(): void {
@@ -34,6 +56,18 @@ export class CodeReviewTreeProvider implements vscode.TreeDataProvider<CodeRevie
             // Root level items
             return Promise.resolve([
                 new CodeReviewItem(
+                    'Open Workflow Guide',
+                    vscode.TreeItemCollapsibleState.None,
+                    {
+                        command: 'aiCodeReview.openWorkflowGuide',
+                        title: 'Open Workflow Guide',
+                        arguments: []
+                    },
+                    'action',
+                    'book',
+                    'Open detailed workflow guide in a new panel'
+                ),
+                new CodeReviewItem(
                     'Default Change Type',
                     vscode.TreeItemCollapsibleState.Expanded,
                     undefined,
@@ -41,7 +75,28 @@ export class CodeReviewTreeProvider implements vscode.TreeDataProvider<CodeRevie
                     'gear'
                 ),
                 new CodeReviewItem(
-                    'Open Code Review Panel',
+                    'Copy AI Prompt',
+                    vscode.TreeItemCollapsibleState.None,
+                    {
+                        command: 'aiCodeReview.copyPrompt',
+                        title: 'Copy Prompt',
+                        arguments: []
+                    },
+                    'action'
+                ),
+                new CodeReviewItem(
+                    'Check Code Scan Result',
+                    vscode.TreeItemCollapsibleState.None,
+                    {
+                        command: 'aiCodeReview.checkReviewResult',
+                        title: 'Check Code Scan Result',
+                        arguments: []
+                    },
+                    'action',
+                    'View scan results from .ai-code-review/results folder'
+                ),
+                new CodeReviewItem(
+                    'View Issue Report',
                     vscode.TreeItemCollapsibleState.None,
                     {
                         command: 'aiCodeReview.openPanel',
@@ -50,16 +105,6 @@ export class CodeReviewTreeProvider implements vscode.TreeDataProvider<CodeRevie
                     },
                     'action'
                 ),
-                new CodeReviewItem(
-                    'Copy Prompt for External AI',
-                    vscode.TreeItemCollapsibleState.None,
-                    {
-                        command: 'aiCodeReview.copyPrompt',
-                        title: 'Copy Prompt',
-                        arguments: []
-                    },
-                    'action'
-                )
             ]);
         } else if (element.contextValue === 'defaultChangeTypeGroup') {
             // Default Change Type options
