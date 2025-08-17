@@ -4,6 +4,15 @@
   "description": "A powerful VS Code extension that automates code review using AI to provide senior-level feedback on your code changes.",
   "version": "0.1.0",
   "publisher": "ai-code-review",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ai-code-review/ai-code-review-assistant.git"
+  },
+  "homepage": "https://github.com/ai-code-review/ai-code-review-assistant#readme",
+  "bugs": {
+    "url": "https://github.com/ai-code-review/ai-code-review-assistant/issues"
+  },
   "engines": {
     "vscode": "^1.74.0"
   },
