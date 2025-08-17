@@ -1,11 +1,10 @@
-# AI Code Review Assistant
+# 🤖 AI Code Review Assistant
 
-> **🤖 100% AI-Generated Extension** 
-> This entire VS Code extension was created using AI tools including Claude, ChatGPT, and other AI assistants. From the initial concept to the final implementation, every line of code, documentation, and feature was generated through AI collaboration. This project demonstrates the power of AI-driven development and serves as a showcase of what's possible when humans and AI work together to build software.
+*A powerful VS Code extension that automates code review using AI to provide senior-level feedback on your code changes*
 
-A powerful VS Code extension that automates code review using AI to provide senior-level feedback on your code changes.
+This VS Code extension helps developers get comprehensive code reviews by generating structured prompts for AI tools and processing their responses. It provides detailed feedback on your code changes, helping you catch issues early and improve code quality through manual AI integration.
 
-## 🚀 Features
+## ✨ Features
 
 ### 🔍 Multi-Format Code Change Analysis
 - **Commit Changes**: Compare against specific commit hashes with smart defaults
@@ -13,15 +12,14 @@ A powerful VS Code extension that automates code review using AI to provide seni
 - **Local Changes**: Review uncommitted changes in real-time
 
 ### 🤖 AI-Powered Code Review
-- **Multiple AI Providers**: Seamlessly integrate with installed AI extensions
-  - **GitHub Copilot** - Full implementation with code review simulation
-  - **Amazon Q** - Full implementation with AWS-focused code review
-  - **Cursor AI** - Full implementation with modern development practices review
-  - **ChatGPT** - Full implementation with general code quality review
-- **Smart Detection**: Automatically detects installed extensions and provides installation guidance for missing ones
-- **Installation Support**: Helps users install missing AI extensions with direct marketplace links and extension IDs
-- **Working Implementations**: All providers are fully functional with realistic code review simulations
-- **No API Keys Required**: Works entirely with your existing AI tools
+- **Manual AI Integration**: Generate prompts for use with your preferred AI provider
+- **Structured Prompt Generation**: Creates comprehensive prompts with:
+  - Code changes and context
+  - Specific review guidelines
+  - Expected response format
+- **Flexible AI Support**: Works with any AI provider that accepts text prompts
+- **Result Processing**: Parse and display AI responses in structured format
+- **No API Keys Required**: Uses manual copy-paste workflow with AI tools
 
 ### 📋 Structured Review Output
 - **Issue Classification**: Low/Medium/High/Critical severity levels
@@ -35,15 +33,13 @@ A powerful VS Code extension that automates code review using AI to provide seni
 - **Batch Processing**: Review multiple files simultaneously
 - **Smart Caching**: Remembers your preferences for future reviews
 
-### 🎨 Triple Interface Options
-- **Dedicated Sidebar Panel**: Comprehensive overview of all issues grouped by severity with color-coded visual indicators
-  - 🟣 **Critical Issues**: Purple icons for immediate attention
-  - 🔴 **High Issues**: Red error icons for important fixes
-  - 🟡 **Medium Issues**: Yellow warning icons for moderate concerns
-  - 🔵 **Low Issues**: Blue info icons for minor improvements
-- **Review History Panel**: Complete history of all code reviews with detailed tracking
-- **Inline Editor Annotations**: Contextual hints and suggestions directly in your code
-- **Navigation**: Jump directly to problematic lines from the issue panel
+### 🎨 Dual Interface Options
+- **Code Review Panel**: Main interface for managing code review workflows and settings
+- **Issues Panel**: Comprehensive overview of all detected issues with:
+  - Color-coded severity indicators (Critical, High, Medium, Low)
+  - Direct navigation to problematic code lines
+  - Detailed issue descriptions and suggestions
+  - Click-to-open file functionality with precise line positioning
 
 ### ⚙️ Customizable Experience
 - **Language Support**: Focus on JavaScript/TypeScript with extensible language support
@@ -67,17 +63,14 @@ A powerful VS Code extension that automates code review using AI to provide seni
 5. **Review Results**: Navigate through issues in the sidebar or inline annotations
 
 ### Available Commands
-- **`AI Code Review: Start Review`** - Start a new code review
-- **`AI Code Review: Review Local Changes`** - Review uncommitted changes
-- **`AI Code Review: Review Commit Changes`** - Review specific commit changes
-- **`AI Code Review: Review Branch Changes`** - Review branch differences
-- **`AI Code Review: Show AI Providers`** - View status of all AI providers
-- **`AI Code Review: Refresh AI Providers`** - Refresh provider detection
-- **`AI Code Review: Debug AI Providers`** - Debug provider detection issues
-- **`AI Code Review: Test Extension`** - Test if extension is working
-- **`AI Code Review: Refresh History`** - Refresh the review history panel
-- **`AI Code Review: Clear History`** - Clear all review history
-- **`AI Code Review: Export History`** - Export review history to JSON file
+- **`AI Code Review: Local Changes`** - Review uncommitted changes using git diff
+- **`AI Code Review: All Files`** - Scan all files in the repository
+- **`AI Code Review: Compare Branches`** - Compare changes between two branches
+- **`AI Code Review: Check Code Review Result`** - Check and process AI review results
+- **`AI Code Review: Open Prompt File`** - Open the generated prompt file
+- **`AI Code Review: Open Change File`** - Open the change detection file
+- **`AI Code Review: Open Settings`** - Open extension settings
+- **`AI Code Review: Paste Prompt to AI Chat`** - Paste the generated prompt to AI chat
 
 ### Change Type Examples
 
@@ -118,26 +111,18 @@ You can manually clean up review files by:
 2. **Review History Panel**: Navigate to the "Review History" tab within the AI Code Review container
 3. **View All Reviews**: See a chronological list of all completed code reviews
 
-#### Review History Features
-- **Chronological Display**: Reviews sorted by date (newest first)
-- **Summary Statistics**: Quick overview of issues found (Total, Critical, High, Medium, Low)
-- **AI Provider Tracking**: See which AI provider was used for each review
-- **Detailed View**: Click "View" to open a detailed markdown report of any review
-- **Individual Management**: Delete specific reviews or export history
-- **Bulk Operations**: Clear all history or export complete review data
-
-#### Review History Actions
-- **View Details**: Opens a comprehensive markdown document with full review details
-- **Delete Review**: Remove individual reviews from history
-- **Export History**: Save all review data as JSON for backup or analysis
-- **Clear All**: Remove all review history (with confirmation)
-- **Refresh**: Update the history display with latest data
+#### Review Result Management
+- **Automatic Detection**: Scans for AI review result files in the workspace
+- **Structured Parsing**: Processes AI responses into organized issue lists
+- **Issue Classification**: Categorizes issues by type, severity, and location
+- **File Navigation**: Direct links to problematic code with line-level precision
+- **Result Storage**: Saves processed results in `.ai-code-review/results/` directory
 
 ## 🔧 Configuration
 
 ### Default Settings
 - **Change Type**: Local Changes
-- **AI Provider**: First available installed extension
+- **AI Provider**: Manual prompt generation for use with any AI provider
 - **Language Focus**: JavaScript/TypeScript
 - **Severity Display**: All levels (Low, Medium, High, Critical)
 
@@ -146,19 +131,24 @@ You can manually clean up review files by:
 - Set severity thresholds
 - Configure change detection preferences
 - Adjust language preferences
-- Customize caching behavior
+- Customize prompt generation behavior
 
 ## 🎯 Supported Languages
 
-- **Primary Focus**: JavaScript, TypeScript, HTML
-- **Planned Support**: Python, Java, C#, Go, Rust
-- **Extensible**: Framework for adding new language support
+- **Primary Focus**: JavaScript, TypeScript, HTML, CSS
+- **Additional Support**: Python, Java, C#, Go, Rust, PHP, Ruby, Swift, Kotlin
+- **Extensible**: Framework for adding new language support through configuration
 
 ## 💾 Data Storage
 
-- **Local Storage**: All review results and preferences saved locally
-- **No Cloud Sync**: Your code and review data stays on your machine
-- **Cache Management**: Intelligent caching with user control
+The extension stores data in your workspace under `.ai-code-review/`:
+- **`prompts/`**: Generated AI prompts for manual use
+- **`changes/`**: Detected code changes and diff files
+- **`results/`**: Processed AI review results
+- **`cache/`**: Cached review results for performance
+- **`logs/`**: Extension operation logs
+
+All data is stored locally and never transmitted externally.
 
 ## 🤖 AI Development Process
 
@@ -171,7 +161,7 @@ This project showcases the capabilities of AI-driven software development:
 - File structure and organization patterns generated by AI
 
 **💻 AI Code Generation**
-- **TypeScript Classes**: All core classes (ChangeDetector, ExternalAIManager, etc.) written by AI
+- **TypeScript Classes**: All core classes (ChangeDetector, PromptGenerator, etc.) written by AI
 - **VS Code Integration**: Extension manifest, commands, and API integrations created by AI
 - **UI Components**: Sidebar panels, tree providers, and inline annotations generated by AI
 - **Git Integration**: Complex git operations and diff parsing implemented by AI
@@ -194,19 +184,22 @@ This project showcases the capabilities of AI-driven software development:
 ## 🚧 Roadmap
 
 ### Phase 1 (Current)
-- Core change detection and AI integration
-- Basic review template and issue classification
-- Sidebar panel and inline annotations
+- Core change detection and prompt generation
+- Manual AI integration workflow
+- Result parsing and issue classification
+- Dual panel interface (Code Review + Issues)
 
 ### Phase 2
 - Additional programming language support
-- Advanced issue categorization and tagging
-- Team collaboration features (local sharing)
+- Enhanced prompt templates and customization
+- Advanced issue categorization and filtering
+- Improved line number accuracy and navigation
 
 ### Phase 3
-- Custom review templates
-- Performance optimization
-- Advanced AI provider integration
+- Custom review templates and workflows
+- Performance optimization and caching
+- Integration with more development tools
+- Team collaboration features
 
 ## 🤝 Contributing
 
@@ -227,8 +220,9 @@ We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.
 ### Testing the Extension
 After launching with F5, test the extension by:
 1. Opening the Command Palette (Ctrl+Shift+P / Cmd+Shift+P)
-2. Running `AI Code Review: Test Extension` to verify it's working
-3. Running `AI Code Review: Start Review` to test the main functionality
+2. Running `AI Code Review: Local Changes` to generate a prompt for uncommitted changes
+3. Running `AI Code Review: All Files` to scan all repository files
+4. Using `AI Code Review: Check Code Review Result` to process AI responses
 
 ## 📝 License
 
@@ -239,9 +233,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ### AI Development Partners
 This project was entirely developed through AI collaboration:
 - **Claude (Anthropic)** - Primary development assistant for architecture, implementation, and documentation
-- **ChatGPT (OpenAI)** - Code generation, debugging, and feature development
+- **Trae AI** - Advanced code analysis, refactoring, and optimization
 - **GitHub Copilot** - Code completion and suggestions during development
-- **Cursor AI** - Enhanced development workflow and code optimization
+- **Various AI Tools** - Testing, debugging, and feature validation
 
 ### Special Recognition
 - **100% AI-Generated Codebase** - Every component, from TypeScript classes to JSON configurations, was created by AI
