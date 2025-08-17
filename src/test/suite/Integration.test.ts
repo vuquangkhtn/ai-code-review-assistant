@@ -163,29 +163,7 @@ suite('Extension Integration Test Suite', () => {
         });
     });
 
-    suite('Panel Management Commands Tests', () => {
-        test('Should execute openPanel command', async () => {
-            assert.doesNotThrow(async () => {
-                await vscode.commands.executeCommand('aiCodeReview.openPanel');
-            }, 'openPanel command should execute without error');
-        });
-        
-        test('Should execute closePanel command', async () => {
-            assert.doesNotThrow(async () => {
-                await vscode.commands.executeCommand('aiCodeReview.closePanel');
-            }, 'closePanel command should execute without error');
-        });
-        
-        test('Should handle panel lifecycle', async () => {
-            // Open panel
-            await vscode.commands.executeCommand('aiCodeReview.openPanel');
-            assert.ok(CodeReviewPanel.currentPanel, 'Panel should be created');
-            
-            // Close panel
-            await vscode.commands.executeCommand('aiCodeReview.closePanel');
-            // Note: Panel might still exist but be disposed
-        });
-    });
+
 
     suite('File Management Commands Tests', () => {
         test('Should execute openPromptFile command', async () => {
@@ -209,65 +187,7 @@ suite('Extension Integration Test Suite', () => {
         });
     });
 
-    suite('Issue Navigation Commands Tests', () => {
-        test('Should execute openIssue command with valid issue', async () => {
-            const mockIssue: CodeIssue = {
-                id: 'test-issue-1',
-                title: 'Test Issue',
-                description: 'This is a test issue',
-                severity: IssueSeverity.MEDIUM,
-                category: IssueCategory.CODE_QUALITY,
-                filePath: '/test/file.ts',
-                lineNumber: 1,
-                columnNumber: 1,
-                timestamp: new Date(),
-                suggestions: [{
-                    id: 'test-suggestion-1',
-                    description: 'Fix this test issue',
-                    explanation: 'This is a test suggestion'
-                }]
-            };
-            
-            // Create a temporary test file
-            const testFilePath = path.join(workspaceFolder.uri.fsPath, 'test.ts');
-            try {
-                fs.writeFileSync(testFilePath, 'console.log("test");\n');
-                
-                assert.doesNotThrow(async () => {
-                    await vscode.commands.executeCommand('aiCodeReview.openIssue', mockIssue);
-                }, 'openIssue command should execute without error');
-            } finally {
-                // Cleanup test file
-                if (fs.existsSync(testFilePath)) {
-                    fs.unlinkSync(testFilePath);
-                }
-            }
-        });
-        
-        test('Should handle invalid file paths in openIssue', async () => {
-            const mockIssue: CodeIssue = {
-                id: 'test-issue-error',
-                title: 'Error Test Issue',
-                description: 'This should cause an error',
-                severity: IssueSeverity.LOW,
-                category: IssueCategory.OTHER,
-                filePath: '/test/error.ts',
-                lineNumber: 1,
-                columnNumber: 1,
-                timestamp: new Date(),
-                suggestions: [{
-                    id: 'test-suggestion-2',
-                    description: 'This should handle gracefully',
-                    explanation: 'This is a test suggestion for error handling'
-                }]
-            };
-            
-            // This should not throw, but might show an error message
-            assert.doesNotThrow(async () => {
-                await vscode.commands.executeCommand('aiCodeReview.openIssue', mockIssue);
-            }, 'openIssue should handle invalid files gracefully');
-        });
-    });
+
 
     suite('Review Result Processing Tests', () => {
         test('Should execute checkReviewResult command', async () => {
@@ -276,11 +196,7 @@ suite('Extension Integration Test Suite', () => {
             }, 'checkReviewResult command should execute without error');
         });
         
-        test('Should execute showFormatExamples command', async () => {
-            assert.doesNotThrow(async () => {
-                await vscode.commands.executeCommand('aiCodeReview.showFormatExamples');
-            }, 'showFormatExamples command should execute without error');
-        });
+
     });
 
     suite('Workflow Integration Tests', () => {
@@ -336,9 +252,7 @@ suite('Extension Integration Test Suite', () => {
             // Test commands that might receive invalid parameters
             const commands = [
                 'aiCodeReview.copyPromptLocalChanges',
-                'aiCodeReview.copyPromptAllFiles',
-                'aiCodeReview.openPanel',
-                'aiCodeReview.closePanel'
+                'aiCodeReview.copyPromptAllFiles'
             ];
             
             for (const command of commands) {

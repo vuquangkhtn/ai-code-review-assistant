@@ -1,5 +1,8 @@
 import { ReviewResult, CodeIssue, ReviewSummary, ReviewMetadata, IssueSeverity, IssueCategory, ChangeType } from '../types';
 import { v4 as uuidv4 } from 'uuid';
+import * as vscode from 'vscode';
+import * as fs from 'fs';
+import * as path from 'path';
 
 export interface ExternalAIResponse {
     issues: {
@@ -152,6 +155,9 @@ export class ResponseParser {
                 return null;
             }
             
+            // Validate and correct line number
+            const validatedLineNumber = this.validateLineNumber(filePath, issue.line || 1);
+            
             return {
                 id: uuidv4(),
                 severity: this.mapSeverity(issue.severity),
@@ -164,7 +170,7 @@ export class ResponseParser {
                     explanation: issue.suggestion
                 }] : [],
                 filePath: filePath,
-                lineNumber: issue.line || 1,
+                lineNumber: validatedLineNumber,
                 timestamp: new Date()
             };
         } catch {
@@ -172,6 +178,100 @@ export class ResponseParser {
         }
     }
 
+    /**
+     * Maps diff line numbers to actual file line numbers using diff context
+     */
+    private static mapDiffLineToActualLine(diffContent: string, diffLineNumber: number): number {
+        const lines = diffContent.split('\n');
+        let currentNewLine = 0;
+        let diffLineCount = 0;
+        
+        for (const line of lines) {
+            // Parse hunk headers to get starting line numbers
+            const hunkMatch = line.match(/^@@ -\d+(?:,\d+)? \+(\d+)(?:,\d+)? @@/);
+            if (hunkMatch) {
+                currentNewLine = parseInt(hunkMatch[1]);
+                continue;
+            }
+            
+            diffLineCount++;
+            
+            // If we've reached the target diff line
+            if (diffLineCount === diffLineNumber) {
+                if (line.startsWith('+') || line.startsWith(' ')) {
+                    return currentNewLine;
+                }
+                // For deleted lines, return the previous line
+                return Math.max(1, currentNewLine - 1);
+            }
+            
+            // Update line counters
+            if (line.startsWith('+') || line.startsWith(' ')) {
+                currentNewLine++;
+            }
+        }
+        
+        return diffLineNumber; // Fallback to original if mapping fails
+    }
+    
+    /**
+     * Extracts line number from enhanced diff comments
+     */
+    private static extractLineFromDiffComment(diffLine: string): number | null {
+        const lineMatch = diffLine.match(/\/\/ LINE: (\d+)/);
+        if (lineMatch) {
+            return parseInt(lineMatch[1]);
+        }
+        return null;
+    }
+    
+    /**
+     * Validates and corrects line numbers against actual file content
+     */
+    private static validateLineNumber(filePath: string, lineNumber: number): number {
+        try {
+            // Get workspace folder
+            const workspaceFolders = vscode.workspace.workspaceFolders;
+            if (!workspaceFolders || workspaceFolders.length === 0) {
+                return lineNumber;
+            }
+            
+            const workspacePath = workspaceFolders[0].uri.fsPath;
+            const fullFilePath = path.resolve(workspacePath, filePath);
+            
+            // Check if file exists
+            if (!fs.existsSync(fullFilePath)) {
+                return lineNumber;
+            }
+            
+            // Read file and count lines
+            const fileContent = fs.readFileSync(fullFilePath, 'utf8');
+            const totalLines = fileContent.split('\n').length;
+            
+            // If line number is valid, return it
+            if (lineNumber >= 1 && lineNumber <= totalLines) {
+                return lineNumber;
+            }
+            
+            // If line number is too high, return the last line
+            if (lineNumber > totalLines) {
+                console.warn(`Line number ${lineNumber} exceeds file length ${totalLines} for ${filePath}. Using line ${totalLines}.`);
+                return totalLines;
+            }
+            
+            // If line number is less than 1, return 1
+            if (lineNumber < 1) {
+                console.warn(`Invalid line number ${lineNumber} for ${filePath}. Using line 1.`);
+                return 1;
+            }
+            
+            return lineNumber;
+        } catch (error) {
+            console.warn(`Failed to validate line number for ${filePath}:`, error);
+            return lineNumber;
+        }
+    }
+    
     /**
      * Validates if a file path refers to an actual source code file
      * Filters out generated prompt files and non-code files
@@ -305,7 +405,8 @@ export class ResponseParser {
         if (line.startsWith('Line:') || /line\s*\d+/i.test(line)) {
             const lineMatch = line.match(/\d+/);
             if (lineMatch) {
-                issue.lineNumber = parseInt(lineMatch[0]);
+                const rawLineNumber = parseInt(lineMatch[0]);
+                issue.lineNumber = issue.filePath ? this.validateLineNumber(issue.filePath, rawLineNumber) : rawLineNumber;
             }
         }
         

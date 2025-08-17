@@ -29,14 +29,10 @@
     "onCommand:aiCodeReview.copyPromptLocalChanges",
     "onCommand:aiCodeReview.copyPromptAllFiles",
     "onCommand:aiCodeReview.copyPromptCompareBranches",
-    "onCommand:aiCodeReview.showFormatExamples",
     "onCommand:aiCodeReview.checkReviewResult",
     "aiCodeReview.checkScanResult",
-    "onCommand:aiCodeReview.openPanel",
-    "onCommand:aiCodeReview.closePanel",
     "onCommand:aiCodeReview.openPromptFile",
     "onCommand:aiCodeReview.openChangeFile",
-    "onCommand:aiCodeReview.openIssue",
     "onCommand:aiCodeReview.openSettings",
     "onCommand:aiCodeReview.pastePrompt"
   ],
@@ -63,23 +59,8 @@
         "category": "AI Code Review"
       },
       {
-        "command": "aiCodeReview.showFormatExamples",
-        "title": "Show Response Format Examples",
-        "category": "AI Code Review"
-      },
-      {
         "command": "aiCodeReview.checkReviewResult",
         "title": "Check Code Review Result",
-        "category": "AI Code Review"
-      },
-      {
-        "command": "aiCodeReview.openPanel",
-        "title": "Open Review Panel",
-        "category": "AI Code Review"
-      },
-      {
-        "command": "aiCodeReview.closePanel",
-        "title": "Close Review Panel",
         "category": "AI Code Review"
       },
       {
@@ -90,11 +71,6 @@
       {
         "command": "aiCodeReview.openChangeFile",
         "title": "Open Change File",
-        "category": "AI Code Review"
-      },
-      {
-        "command": "aiCodeReview.openIssue",
-        "title": "Open Issue",
         "category": "AI Code Review"
       },
       {

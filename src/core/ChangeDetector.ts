@@ -382,8 +382,12 @@ export class ChangeDetector {
                 continue;
             }
             
-            const additions = this.countAdditions(diff);
-            const deletions = this.countDeletions(diff);
+            // Extract file-specific diff
+            const fileDiff = this.extractFileDiff(diff, filePath);
+            const enhancedDiff = this.enhanceDiffWithLineNumbers(fileDiff);
+            
+            const additions = this.countAdditions(fileDiff);
+            const deletions = this.countDeletions(fileDiff);
 
             let status: 'modified' | 'added' | 'deleted' | 'renamed' = 'modified';
             if (additions > 0 && deletions === 0) {
@@ -397,11 +401,66 @@ export class ChangeDetector {
                 status,
                 additions,
                 deletions,
-                diff
+                diff: enhancedDiff
             });
         }
 
         return changedFiles;
+    }
+
+    private extractFileDiff(fullDiff: string, filePath: string): string {
+        const fileStartPattern = new RegExp(`^diff --git a/${filePath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')} b/${filePath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'm');
+        const nextFilePattern = /^diff --git a\//gm;
+        
+        const startMatch = fileStartPattern.exec(fullDiff);
+        if (!startMatch) {
+            return fullDiff;
+        }
+        
+        const startIndex = startMatch.index;
+        nextFilePattern.lastIndex = startIndex + startMatch[0].length;
+        const nextMatch = nextFilePattern.exec(fullDiff);
+        
+        if (nextMatch) {
+            return fullDiff.substring(startIndex, nextMatch.index);
+        } else {
+            return fullDiff.substring(startIndex);
+        }
+    }
+    
+    private enhanceDiffWithLineNumbers(diff: string): string {
+        const lines = diff.split('\n');
+        const enhancedLines: string[] = [];
+        let currentOldLine = 0;
+        let currentNewLine = 0;
+        
+        for (const line of lines) {
+            // Parse hunk headers to get line numbers
+            const hunkMatch = line.match(/^@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@/);
+            if (hunkMatch) {
+                currentOldLine = parseInt(hunkMatch[1]);
+                currentNewLine = parseInt(hunkMatch[3]);
+                enhancedLines.push(line + ` // OLD_START: ${currentOldLine}, NEW_START: ${currentNewLine}`);
+                continue;
+            }
+            
+            // Add line number comments for context
+            if (line.startsWith('+')) {
+                enhancedLines.push(line + ` // LINE: ${currentNewLine}`);
+                currentNewLine++;
+            } else if (line.startsWith('-')) {
+                enhancedLines.push(line + ` // OLD_LINE: ${currentOldLine}`);
+                currentOldLine++;
+            } else if (line.startsWith(' ')) {
+                enhancedLines.push(line + ` // LINE: ${currentNewLine}`);
+                currentOldLine++;
+                currentNewLine++;
+            } else {
+                enhancedLines.push(line);
+            }
+        }
+        
+        return enhancedLines.join('\n');
     }
 
     private countAdditions(diff: string): number {

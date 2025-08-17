@@ -126,14 +126,35 @@ export class IssuesPanelProvider implements vscode.TreeDataProvider<IssueItem> {
             const description = `${this.getFileName(issue.filePath)}:${issue.lineNumber}`;
             const color = this.getSeverityColor(issue.severity);
             
+            // Create URI for the file
+            const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+            let fileUri: vscode.Uri;
+            if (workspaceFolder && !issue.filePath.startsWith('/') && !issue.filePath.match(/^[a-zA-Z]:/)) {
+                // Relative path - join with workspace root
+                fileUri = vscode.Uri.joinPath(workspaceFolder.uri, issue.filePath);
+            } else {
+                // Absolute path
+                fileUri = vscode.Uri.file(issue.filePath);
+            }
+            
             return new IssueItem(
                 label,
                 iconName,
                 vscode.TreeItemCollapsibleState.None,
                 {
-                    command: 'aiCodeReview.openIssue',
-                    title: 'Open Issue',
-                    arguments: [issue]
+                    command: 'vscode.open',
+                    title: 'Open File',
+                    arguments: [
+                        fileUri,
+                        {
+                            selection: new vscode.Range(
+                                Math.max(0, issue.lineNumber - 1),
+                                issue.columnNumber || 0,
+                                Math.max(0, issue.lineNumber - 1),
+                                issue.columnNumber || 0
+                            )
+                        }
+                    ]
                 },
                 `${issue.severity} - ${issue.description}`,
                 'issue',

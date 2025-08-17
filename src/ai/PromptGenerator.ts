@@ -55,6 +55,18 @@ export class PromptGenerator {
             "4. Clear description of the issue",
             "5. Suggested fix or improvement",
             "",
+            "## CRITICAL: Line Number Guidelines",
+            "When reporting line numbers:",
+            "- For MODIFIED files: Use the line numbers from the CURRENT file (after changes)",
+            "- For ADDED files: Use the actual line numbers in the new file",
+            "- The diff includes line number comments (// LINE: X) to help you identify correct line numbers",
+            "- For diff context: Look for @@ -old_start,old_count +new_start,new_count @@ headers with comments showing OLD_START and NEW_START",
+            "- Use the line number comments (// LINE: X) on added (+) and context ( ) lines to determine accurate line numbers",
+            "- The +new_start number indicates the starting line in the current file",
+            "- Count lines from the diff context to determine exact line numbers",
+            "- If unsure about exact line number, provide your best estimate based on code context",
+            "- NEVER use line 1 as default - always analyze the diff to find the correct line",
+            "",
             "## Files to Review",
             ""
         ];
@@ -116,9 +128,13 @@ export class PromptGenerator {
         prompt.push("}");
         prompt.push("```");
         prompt.push("");
-        prompt.push("**Important Notes:**");
+        prompt.push("**Important Notes:");
         prompt.push("- Use EXACT file paths as shown in the file headers above");
-        prompt.push("- Line numbers should correspond to the diff context when possible");
+        prompt.push("- Line numbers MUST correspond to actual file line numbers (not diff line numbers)");
+        prompt.push("- For modified files: Use line numbers from the current version of the file");
+        prompt.push("- For added files: Use actual line numbers in the new file");
+        prompt.push("- Analyze diff headers (@@ -old,old_count +new,new_count @@) to determine correct line numbers");
+        prompt.push("- If you cannot determine exact line number, provide best estimate based on code context");
         prompt.push("- Ensure the JSON is valid and properly formatted");
         prompt.push("- Focus only on the files and changes provided above");
         prompt.push("- Save the complete JSON response to `.ai-code-review/results/code-review-result-YYYY-MM-DD-HH-MM-SS.json`");

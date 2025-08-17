@@ -108,17 +108,17 @@ export class CodeReviewTreeProvider implements vscode.TreeDataProvider<CodeRevie
                     'check',
                     'Generate Code Review results'
                 ),
-                new CodeReviewItem(
-                    'View Code Review Report',
-                    vscode.TreeItemCollapsibleState.None,
-                    {
-                        command: 'aiCodeReview.openPanel',
-                        title: 'Open Panel',
-                        arguments: []
-                    },
-                    'action',
-                    'eye'
-                ),
+                // new CodeReviewItem(
+                //     'View Code Review Report',
+                //     vscode.TreeItemCollapsibleState.None,
+                //     {
+                
+                //         title: 'Open Panel',
+                //         arguments: []
+                //     },
+                //     'action',
+                //     'eye'
+                // ),
             ]);
         } else if (element.contextValue === 'defaultChangeTypeGroup') {
             // Default Change Type options
