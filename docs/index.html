@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Code Review Assistant - VS Code Extension</title>
+    <meta name="description" content="A powerful VS Code extension that automates code review using AI to provide senior-level feedback on your code changes. No API keys required!">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="../resources/icon.svg" alt="AI Code Review Assistant" class="logo-icon">
+                <span class="logo-text">AI Code Review Assistant</span>
+            </div>
+            <div class="nav-links">
+                <a href="#features" class="nav-link">Features</a>
+                <a href="#demo" class="nav-link">Demo</a>
+                <a href="#comparison" class="nav-link">Why Choose Us</a>
+                <a href="#installation" class="nav-link">Install</a>
+                <a href="https://github.com/vuquangkhtn/ai-code-review-assistant" class="nav-link" target="_blank">GitHub</a>
+            </div>
+            <div class="nav-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-container">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <span class="badge-icon">🤖</span>
+                    <span>AI-Powered Code Reviews</span>
+                </div>
+                <h1 class="hero-title">
+                    Get <span class="gradient-text">Senior-Level</span><br>
+                    Code Reviews Instantly
+                </h1>
+                <p class="hero-description">
+                    Transform your development workflow with AI-powered code reviews. 
+                    Get comprehensive feedback on your code changes without any API keys or external dependencies.
+                </p>
+                <div class="hero-buttons">
+                    <a href="#installation" class="btn btn-primary">
+                        <span class="btn-icon">⚡</span>
+                        Install Extension
+                    </a>
+                    <a href="#demo" class="btn btn-secondary">
+                        <span class="btn-icon">▶️</span>
+                        Watch Demo
+                    </a>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <span class="stat-number">0</span>
+                        <span class="stat-label">API Keys Required</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">100%</span>
+                        <span class="stat-label">Manual Control</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">∞</span>
+                        <span class="stat-label">AI Providers Supported</span>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="code-window">
+                    <div class="window-header">
+                        <div class="window-controls">
+                            <span class="control close"></span>
+                            <span class="control minimize"></span>
+                            <span class="control maximize"></span>
+                        </div>
+                        <span class="window-title">VS Code - AI Code Review</span>
+                    </div>
+                    <div class="window-content">
+                        <div class="code-line">
+                            <span class="line-number">1</span>
+                            <span class="code-text">// AI Review Result</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="line-number">2</span>
+                            <span class="code-text"><span class="keyword">const</span> <span class="variable">issues</span> = [</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="line-number">3</span>
+                            <span class="code-text">  { <span class="property">severity</span>: <span class="string">'high'</span>, <span class="property">type</span>: <span class="string">'security'</span> },</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="line-number">4</span>
+                            <span class="code-text">  { <span class="property">severity</span>: <span class="string">'medium'</span>, <span class="property">type</span>: <span class="string">'performance'</span> }</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="line-number">5</span>
+                            <span class="code-text">];</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Powerful Features</h2>
+                <p class="section-description">
+                    Everything you need for comprehensive code reviews, powered by AI
+                </p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <h3 class="feature-title">Multi-Format Analysis</h3>
+                    <p class="feature-description">
+                        Review commit changes, branch comparisons, or local modifications with intelligent context awareness.
+                    </p>
+                    <ul class="feature-list">
+                        <li>Commit-based reviews</li>
+                        <li>Branch comparisons</li>
+                        <li>Real-time local changes</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🤖</div>
+                    <h3 class="feature-title">AI-Powered Reviews</h3>
+                    <p class="feature-description">
+                        Generate structured prompts for any AI provider. No API keys, no vendor lock-in.
+                    </p>
+                    <ul class="feature-list">
+                        <li>Works with any AI tool</li>
+                        <li>Structured prompt generation</li>
+                        <li>Manual copy-paste workflow</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📋</div>
+                    <h3 class="feature-title">Structured Output</h3>
+                    <p class="feature-description">
+                        Get organized feedback with severity levels, categories, and actionable suggestions.
+                    </p>
+                    <ul class="feature-list">
+                        <li>Issue classification</li>
+                        <li>Severity indicators</li>
+                        <li>Code examples included</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3 class="feature-title">Flexible Reviews</h3>
+                    <p class="feature-description">
+                        Trigger reviews on-demand, process multiple files, and customize to your workflow.
+                    </p>
+                    <ul class="feature-list">
+                        <li>On-demand processing</li>
+                        <li>Batch file reviews</li>
+                        <li>Smart caching</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎨</div>
+                    <h3 class="feature-title">Dual Interface</h3>
+                    <p class="feature-description">
+                        Choose between the main review panel or comprehensive issues overview.
+                    </p>
+                    <ul class="feature-list">
+                        <li>Code Review Panel</li>
+                        <li>Issues Panel with navigation</li>
+                        <li>Inline annotations</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚙️</div>
+                    <h3 class="feature-title">Customizable</h3>
+                    <p class="feature-description">
+                        Adapt the extension to your team's standards and preferences.
+                    </p>
+                    <ul class="feature-list">
+                        <li>Template customization</li>
+                        <li>Severity thresholds</li>
+                        <li>Language support</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Demo Section -->
+    <section id="demo" class="demo">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">See It In Action</h2>
+                <p class="section-description">
+                    Watch how AI Code Review Assistant transforms your development workflow
+                </p>
+            </div>
+            <div class="demo-container">
+                <div class="demo-placeholder">
+                    <div class="demo-icon">🎬</div>
+                    <h3>Interactive Demo Coming Soon</h3>
+                    <p>We're preparing an interactive demonstration of the extension's capabilities.</p>
+                    <div class="demo-features">
+                        <div class="demo-feature">
+                            <span class="demo-feature-icon">✨</span>
+                            <span>Live code review simulation</span>
+                        </div>
+                        <div class="demo-feature">
+                            <span class="demo-feature-icon">🔄</span>
+                            <span>Real-time AI prompt generation</span>
+                        </div>
+                        <div class="demo-feature">
+                            <span class="demo-feature-icon">📊</span>
+                            <span>Issue detection and categorization</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Comparison Section -->
+    <section id="comparison" class="comparison">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Why Choose AI Code Review Assistant?</h2>
+                <p class="section-description">
+                    Complete control over your code review process without vendor dependencies
+                </p>
+            </div>
+            <div class="comparison-grid">
+                <div class="comparison-card highlight">
+                    <div class="comparison-header">
+                        <h3>AI Code Review Assistant</h3>
+                        <div class="comparison-badge">Recommended</div>
+                    </div>
+                    <div class="comparison-features">
+                        <div class="comparison-feature">
+                            <span class="feature-check">✅</span>
+                            <span>No API keys required</span>
+                        </div>
+                        <div class="comparison-feature">
+                            <span class="feature-check">✅</span>
+                            <span>Works with any AI provider</span>
+                        </div>
+                        <div class="comparison-feature">
+                            <span class="feature-check">✅</span>
+                            <span>Complete manual control</span>
+                        </div>
+                        <div class="comparison-feature">
+                            <span class="feature-check">✅</span>
+                            <span>No vendor lock-in</span>
+                        </div>
+                        <div class="comparison-feature">
+                            <span class="feature-check">✅</span>
+                            <span>Privacy-first approach</span>
+                        </div>
+                        <div class="comparison-feature">
+                            <span class="feature-check">✅</span>
+                            <span>Structured prompt generation</span>
+                        </div>
+                        <div class="comparison-feature">
+                            <span class="feature-check">✅</span>
+                            <span>Free to use</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="comparison-card">
+                    <div class="comparison-header">
+                        <h3>Traditional AI Tools</h3>
+                    </div>
+                    <div class="comparison-features">
+                        <div class="comparison-feature">
+                            <span class="feature-cross">❌</span>
+                            <span>Requires API keys</span>
+                        </div>
+                        <div class="comparison-feature">
+                            <span class="feature-cross">❌</span>
+                            <span>Vendor-specific</span>
+                        </div>
+                        <div class="comparison-feature">
+                            <span class="feature-cross">❌</span>
+                            <span>Automatic processing</span>
+                        </div>
+                        <div class="comparison-feature">
+                            <span class="feature-cross">❌</span>
+                            <span>Platform dependency</span>
+                        </div>
+                        <div class="comparison-feature">
+                            <span class="feature-cross">❌</span>
+                            <span>Data sent to external servers</span>
+                        </div>
+                        <div class="comparison-feature">
+                            <span class="feature-check">✅</span>
+                            <span>Direct AI integration</span>
+                        </div>
+                        <div class="comparison-feature">
+                            <span class="feature-cross">❌</span>
+                            <span>Usage costs</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="comparison-highlight">
+                <div class="highlight-content">
+                    <h3>🔒 Your Code, Your Control</h3>
+                    <p>
+                        Unlike other tools that require API keys and send your code to external servers, 
+                        AI Code Review Assistant keeps everything local. You generate prompts, choose your AI provider, 
+                        and maintain complete control over your code review process.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Installation Section -->
+    <section id="installation" class="installation">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Get Started in Minutes</h2>
+                <p class="section-description">
+                    Install the extension and start getting AI-powered code reviews immediately
+                </p>
+            </div>
+            <div class="installation-steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Install Extension</h3>
+                        <p>Get the extension from VS Code Marketplace</p>
+                        <a href="vscode:extension/wanvu.ai-code-review-assistant" class="btn btn-primary">
+                            Install from VS Code
+                        </a>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Choose AI Provider</h3>
+                        <p>Use any AI tool you prefer - ChatGPT, Claude, Copilot, or others</p>
+                        <div class="ai-providers">
+                            <span class="provider">ChatGPT</span>
+                            <span class="provider">Claude</span>
+                            <span class="provider">Copilot</span>
+                            <span class="provider">Cursor</span>
+                            <span class="provider">Others</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Start Reviewing</h3>
+                        <p>Generate prompts, copy to your AI tool, and get instant feedback</p>
+                        <div class="workflow-preview">
+                            <span class="workflow-step">Generate Prompt</span>
+                            <span class="workflow-arrow">→</span>
+                            <span class="workflow-step">Copy to AI</span>
+                            <span class="workflow-arrow">→</span>
+                            <span class="workflow-step">Get Review</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <img src="../resources/icon.svg" alt="AI Code Review Assistant" class="logo-icon">
+                        <span class="logo-text">AI Code Review Assistant</span>
+                    </div>
+                    <p class="footer-description">
+                        Empowering developers with AI-powered code reviews while maintaining complete control and privacy.
+                    </p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#demo">Demo</a></li>
+                        <li><a href="#installation">Installation</a></li>
+                        <li><a href="https://github.com/vuquangkhtn/ai-code-review-assistant" target="_blank">GitHub</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <ul class="footer-links">
+                        <li><a href="https://github.com/vuquangkhtn/ai-code-review-assistant/blob/main/README.md" target="_blank">Documentation</a></li>
+                        <li><a href="https://github.com/vuquangkhtn/ai-code-review-assistant/issues" target="_blank">Issues</a></li>
+                        <li><a href="https://github.com/vuquangkhtn/ai-code-review-assistant/blob/main/CONTRIBUTING.md" target="_blank">Contributing</a></li>
+                        <li><a href="https://github.com/vuquangkhtn/ai-code-review-assistant/blob/main/LICENSE" target="_blank">License</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 AI Code Review Assistant. Licensed under MIT License.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
