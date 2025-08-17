@@ -15,3 +15,4 @@ yarn-error.log*
 
 # AI Code Review temporary files
 .ai-code-review/
+dist/
