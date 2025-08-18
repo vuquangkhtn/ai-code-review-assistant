@@ -144,6 +144,7 @@ body {
     background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
     position: relative;
     overflow: hidden;
+    min-height: 80vh;
 }
 
 .hero::before {
@@ -154,7 +155,7 @@ body {
     right: 0;
     bottom: 0;
     background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="%23e2e8f0" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>') repeat;
-    opacity: 0.5;
+    opacity: 0.3;
 }
 
 .hero-container {
@@ -162,15 +163,20 @@ body {
     margin: 0 auto;
     padding: 0 1.5rem;
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1.2fr 0.8fr;
     gap: 4rem;
     align-items: center;
     position: relative;
     z-index: 1;
+    min-height: 60vh;
 }
 
 .hero-content {
     animation: fadeInUp 0.8s ease-out;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
 }
 
 .hero-badge {
@@ -218,6 +224,7 @@ body {
     display: flex;
     gap: 1rem;
     margin-bottom: 3rem;
+    flex-wrap: wrap;
 }
 
 .btn {
@@ -289,14 +296,28 @@ body {
 
 .hero-visual {
     animation: fadeInRight 0.8s ease-out 0.2s both;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 400px;
 }
 
 .code-window {
     background: var(--bg-primary);
-    border-radius: 12px;
+    border-radius: 16px;
     box-shadow: var(--shadow-xl);
     overflow: hidden;
     border: 1px solid var(--border-color);
+    width: 100%;
+    max-width: 500px;
+    min-height: 320px;
+    transform: perspective(1000px) rotateY(-5deg) rotateX(5deg);
+    transition: transform 0.3s ease;
+}
+
+.code-window:hover {
+    transform: perspective(1000px) rotateY(0deg) rotateX(0deg);
 }
 
 .window-header {
@@ -475,6 +496,40 @@ body {
     left: 0;
     color: var(--success-color);
     font-weight: 600;
+}
+
+/* Base heading styles to prevent deprecated API warnings */
+h1, h2, h3, h4, h5, h6 {
+    font-size: inherit;
+}
+
+h1 {
+    font-size: 2.5rem;
+}
+
+h2 {
+    font-size: 2rem;
+}
+
+h3 {
+    font-size: 1.5rem;
+}
+
+h4 {
+    font-size: 1.25rem;
+}
+
+h5 {
+    font-size: 1.125rem;
+}
+
+h6 {
+    font-size: 1rem;
+}
+
+/* Specific fix for h1 in semantic elements */
+section h1, article h1, aside h1, nav h1 {
+    font-size: 2.5rem !important;
 }
 
 /* Demo Section */
@@ -816,10 +871,25 @@ body {
         display: flex;
     }
     
+    .hero {
+        min-height: auto;
+        padding: 100px 0 60px;
+    }
+    
     .hero-container {
         grid-template-columns: 1fr;
-        gap: 2rem;
+        gap: 3rem;
         text-align: center;
+        min-height: auto;
+    }
+    
+    .hero-content {
+        order: 1;
+    }
+    
+    .hero-visual {
+        order: 2;
+        min-height: 300px;
     }
     
     .hero-title {
@@ -829,10 +899,12 @@ body {
     .hero-buttons {
         flex-direction: column;
         align-items: center;
+        gap: 0.75rem;
     }
     
     .hero-stats {
         justify-content: center;
+        gap: 1.5rem;
     }
     
     .features-grid {
