@@ -289,6 +289,8 @@ body {
 
 .hero-visual {
     animation: fadeInRight 0.8s ease-out 0.2s both;
+    min-width: 400px;
+    min-height: 300px;
 }
 
 .code-window {
@@ -297,6 +299,9 @@ body {
     box-shadow: var(--shadow-xl);
     overflow: hidden;
     border: 1px solid var(--border-color);
+    width: 100%;
+    max-width: 500px;
+    min-height: 280px;
 }
 
 .window-header {
@@ -475,6 +480,35 @@ body {
     left: 0;
     color: var(--success-color);
     font-weight: 600;
+}
+
+/* Base heading styles to prevent deprecated API warnings */
+h1, h2, h3, h4, h5, h6 {
+    font-size: inherit;
+}
+
+h1 {
+    font-size: 2.5rem;
+}
+
+h2 {
+    font-size: 2rem;
+}
+
+h3 {
+    font-size: 1.5rem;
+}
+
+h4 {
+    font-size: 1.25rem;
+}
+
+h5 {
+    font-size: 1.125rem;
+}
+
+h6 {
+    font-size: 1rem;
 }
 
 /* Demo Section */
