@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://vuquangkhtn.github.io/ai-code-review-assistant/sitemap.xml
+
+# Disallow crawling of any potential admin or private directories
+Disallow: /.git/
+Disallow: /node_modules/
+Disallow: /.vscode/
