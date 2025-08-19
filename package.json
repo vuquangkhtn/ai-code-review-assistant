@@ -126,6 +126,15 @@
         }
       ]
     },
+    "keybindings": [
+      {
+        "command": "aiCodeReview.copyPrompt",
+        "key": "cmd+k cmd+g",
+        "mac": "cmd+k cmd+g",
+        "win": "ctrl+k ctrl+g",
+        "linux": "ctrl+k ctrl+g"
+      }
+    ],
     "configuration": {
       "title": "AI Code Review Assistant",
       "properties": {

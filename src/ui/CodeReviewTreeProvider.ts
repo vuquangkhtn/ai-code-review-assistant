@@ -75,7 +75,7 @@ export class CodeReviewTreeProvider implements vscode.TreeDataProvider<CodeRevie
                     'gear'
                 ),
                 new CodeReviewItem(
-                    'Generate AI Prompt',
+                    'Generate AI Prompt (Cmd+K Cmd+G)',
                     vscode.TreeItemCollapsibleState.None,
                     {
                         command: 'aiCodeReview.copyPrompt',
