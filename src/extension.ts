@@ -15,6 +15,7 @@ let changeDetector: ChangeDetector;
 let inlineAnnotationsProvider: InlineAnnotationsProvider;
 let codeReviewTreeProvider: CodeReviewTreeProvider;
 let issuesPanelProvider: IssuesPanelProvider;
+let resultFileWatcher: vscode.FileSystemWatcher | undefined;
 
 export function activate(context: vscode.ExtensionContext) {
     console.log('AI Code Review Assistant is now active!');
@@ -40,6 +41,9 @@ export function activate(context: vscode.ExtensionContext) {
     // Register tree data providers for sidebar
     vscode.window.registerTreeDataProvider('aiCodeReviewPanel', codeReviewTreeProvider);
     vscode.window.registerTreeDataProvider('aiCodeReviewIssues', issuesPanelProvider);
+
+    // Setup file watcher for .ai-code-review/results directory
+    setupResultFileWatcher(context);
 
     // Register commands
     const commands = [
@@ -297,6 +301,61 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(...commands);
 }
 
+/**
+ * Sets up a file system watcher for the .ai-code-review/results directory
+ * Automatically triggers checkReviewResult command when new files are detected
+ */
+function setupResultFileWatcher(context: vscode.ExtensionContext): void {
+    const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+    if (!workspaceFolder) {
+        return;
+    }
+
+    // Create file watcher pattern for .ai-code-review/results directory
+    const resultsPattern = new vscode.RelativePattern(
+        workspaceFolder,
+        '.ai-code-review/results/**/*.json'
+    );
+
+    // Create the file watcher
+    resultFileWatcher = vscode.workspace.createFileSystemWatcher(resultsPattern);
+
+    // Listen for file creation events
+    resultFileWatcher.onDidCreate(async (uri) => {
+        try {
+            console.log(`New result file detected: ${uri.fsPath}`);
+            
+            // Add a small delay to ensure file is fully written
+            setTimeout(async () => {
+                try {
+                    // Automatically trigger the checkReviewResult command
+                    await vscode.commands.executeCommand('aiCodeReview.checkReviewResult');
+                    
+                    vscode.window.showInformationMessage(
+                        'New AI review result detected and processed automatically!',
+                        'View Results'
+                    ).then(selection => {
+                        if (selection === 'View Results') {
+                            // Show the AI Code Review panel
+                            vscode.commands.executeCommand('workbench.view.extension.aiCodeReview');
+                        }
+                    });
+                } catch (error) {
+                    console.error('Error processing new result file:', error);
+                    vscode.window.showErrorMessage(`Failed to process new result file: ${error}`);
+                }
+            }, 500); // 500ms delay to ensure file is fully written
+        } catch (error) {
+            console.error('Error in result file watcher:', error);
+        }
+    });
+
+    // Add the watcher to context subscriptions for proper cleanup
+    context.subscriptions.push(resultFileWatcher);
+
+    console.log('Result file watcher setup complete for:', resultsPattern.pattern);
+}
+
 export function deactivate() {
     // Cleanup resources
     if (inlineAnnotationsProvider) {
@@ -304,6 +363,10 @@ export function deactivate() {
     }
     if (CodeReviewPanel.currentPanel) {
         CodeReviewPanel.currentPanel.dispose();
+    }
+    if (resultFileWatcher) {
+        resultFileWatcher.dispose();
+        resultFileWatcher = undefined;
     }
     
     // Clean up .ai-code-review directory on extension deactivation

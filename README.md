@@ -72,6 +72,23 @@ This VS Code extension helps developers get comprehensive code reviews by genera
 - **`AI Code Review: Open Settings`** - Open extension settings
 - **`AI Code Review: Paste Prompt to AI Chat`** - Paste the generated prompt to AI chat
 
+### 🔄 Automatic Result Processing
+
+The extension includes an intelligent file watcher that automatically monitors the `.ai-code-review/results` directory for new AI review result files:
+
+- **Automatic Detection**: When you save an AI response as a JSON file in `.ai-code-review/results/`, the extension automatically detects it
+- **Instant Processing**: The `checkReviewResult` command is triggered automatically without manual intervention
+- **Real-time Updates**: UI components (Issues Panel, Inline Annotations, Review History) are updated immediately
+- **User Notification**: You'll receive a notification with an option to view the processed results
+- **Background Operation**: The file watcher runs continuously while the extension is active
+
+#### How It Works
+1. Generate a code review prompt using any of the available commands
+2. Copy the prompt to your preferred AI provider (ChatGPT, Claude, etc.)
+3. Save the AI's JSON response to `.ai-code-review/results/your-result.json`
+4. The extension automatically detects the new file and processes it
+5. Review results appear instantly in the VS Code interface
+
 ### Change Type Examples
 
 #### Commit Review
