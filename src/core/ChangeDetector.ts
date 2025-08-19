@@ -863,7 +863,12 @@ export class ChangeDetector {
     }
     
     private shouldSkipFile(filePath: string): boolean {
-        const skipExtensions = [
+        // Get user-configured exclude extensions from VS Code settings
+        const config = vscode.workspace.getConfiguration('aiCodeReview');
+        const userExcludeExtensions = config.get<string[]>('excludeFileExtensions', []);
+        
+        // Default extensions that should always be skipped (binary/non-reviewable files)
+        const defaultSkipExtensions = [
             // Images
             '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.webp', '.bmp', '.tiff',
             // Archives and binaries
@@ -874,11 +879,13 @@ export class ChangeDetector {
             '.ttf', '.otf', '.woff', '.woff2', '.eot',
             // Media files
             '.mp4', '.avi', '.mov', '.webm', '.mp3', '.wav', '.ogg',
-            // Compiled/generated files
-            '.min.js', '.min.css', '.map',
             // Database and cache files
             '.db', '.sqlite', '.sqlite3', '.cache', '.tmp', '.temp'
         ];
+        
+        // Combine default and user-configured extensions
+        const skipExtensions = [...defaultSkipExtensions, ...userExcludeExtensions];
+        
         const skipDirectories = [
             'node_modules', '.git', 'dist', 'build', 'out', '.vscode',
             // Additional config and cache directories

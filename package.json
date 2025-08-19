@@ -168,6 +168,20 @@
             "html"
           ],
           "description": "Programming languages supported for code review"
+        },
+        "aiCodeReview.excludeFileExtensions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            ".min.js",
+            ".min.css",
+            ".map",
+            ".lock",
+            ".log"
+          ],
+          "description": "File extensions to exclude from code review (e.g., .min.js, .test.js, .spec.ts)"
         }
       }
     }

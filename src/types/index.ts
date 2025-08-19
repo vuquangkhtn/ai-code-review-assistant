@@ -90,3 +90,12 @@ export enum ChangeType {
     BRANCH = 'branch',
     ALL_FILES = 'all-files'
 }
+
+// New configuration interface
+export interface AICodeReviewConfig {
+    defaultChangeType: ChangeType;
+    autoCache: boolean;
+    severityThreshold: IssueSeverity;
+    supportedLanguages: string[];
+    excludeFileExtensions: string[];
+}
