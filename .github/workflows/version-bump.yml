@@ -23,6 +23,12 @@ on:
         default: false
         type: boolean
 
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  repository-projects: write
+
 jobs:
   bump-version:
     runs-on: ubuntu-latest

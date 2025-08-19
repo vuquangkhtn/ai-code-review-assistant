@@ -13,6 +13,10 @@ on:
         required: false
         default: 'develop'
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   test-and-publish-prerelease:
     runs-on: ubuntu-latest
