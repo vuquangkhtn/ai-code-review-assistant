@@ -2,7 +2,7 @@
   "name": "ai-code-review-assistant",
   "displayName": "AI Code Review Assistant",
   "description": "A powerful VS Code extension that automates code review using AI to provide senior-level feedback on your code changes.",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "publisher": "vuquangkhtn",
   "license": "MIT",
   "repository": {
