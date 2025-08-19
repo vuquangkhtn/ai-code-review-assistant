@@ -1,0 +1,9 @@
+<svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+  <!-- Modern W character -->
+  <path d="M3 4 L5 12 L6.5 7 L8 12 L9.5 7 L11 12 L13 4" 
+        stroke="black" 
+        stroke-width="1.5" 
+        fill="none" 
+        stroke-linecap="round" 
+        stroke-linejoin="round"/>
+</svg>

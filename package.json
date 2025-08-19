@@ -5,6 +5,7 @@
   "version": "0.3.1",
   "publisher": "vuquangkhtn",
   "license": "MIT",
+  "icon": "resources/icon.png",
   "repository": {
     "type": "git",
     "url": "https://github.com/vuquangkhtn/ai-code-review-assistant.git"
@@ -96,12 +97,12 @@
     ],
     "viewsContainers": {
       "activitybar": [
-        {
-          "id": "aiCodeReview",
-          "title": "AI Code Review",
-          "icon": "$(search-view-icon)"
-        }
-      ]
+          {
+            "id": "aiCodeReview",
+            "title": "AI Code Review",
+            "icon": "resources/sidebar-icon.svg"
+          }
+        ]
     },
     "views": {
       "aiCodeReview": [

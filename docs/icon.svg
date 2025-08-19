@@ -2,7 +2,7 @@
   <!-- Background with rounded corners -->
   <rect width="128" height="128" rx="24" fill="url(#gradient)"/>
   
-  <!-- Modern W Symbol -->
+  <!-- W Symbol -->
   <g transform="translate(64, 64)">
     <!-- Modern W character -->
     <path d="M-24 -20 L-16 20 L-8 -8 L0 20 L8 -8 L16 20 L24 -20" 
