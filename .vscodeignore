@@ -1,32 +1,75 @@
+# VS Code Extension Ignore File
+# Files and folders to exclude from the extension package
+
+# Development files
 .vscode/**
 .vscode-test/**
 src/**
 .gitignore
 .yarnrc
 vsc-extension-quickstart.md
+
+# TypeScript and build files
 **/tsconfig.json
 **/.eslintrc.js
 **/*.map
 **/*.ts
 .nyc_output
 out/
-node_modules/
-.vscode-test/
-*.vsix
 esbuild.js
 .eslintrc.js
 tsconfig.json
+
+# Dependencies and packages
+node_modules/
 package-lock.json
+*.vsix
+
+# Logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+*.log
+
+# Environment files
+.env
+.env.*
+
+# OS generated files
 .DS_Store
 Thumbs.db
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+*.tmp
+*.temp
+
+# Test files
 test-examples/**
+test-files/**
+.vscode-test/
+**/*.test.js
+**/*.test.ts
+**/*.spec.js
+**/*.spec.ts
+
+# Documentation and development
 docs/**
 CONTRIBUTING.md
+README.md
+CHANGELOG.md
+LICENSE
+
+# GitHub workflows and CI/CD
+.github/**
+
+# IDE files
+.idea/**
+*.swp
+*.swo
+*~
+
+# Coverage reports
+coverage/**
+.nyc_output/**
+
+# Temporary files
+tmp/**
+temp/**

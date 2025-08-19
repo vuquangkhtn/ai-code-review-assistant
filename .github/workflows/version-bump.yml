@@ -1,0 +1,181 @@
+name: Version Bump
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_type:
+        description: 'Version bump type'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+      create_release:
+        description: 'Create GitHub release after version bump'
+        required: false
+        default: true
+        type: boolean
+      auto_publish:
+        description: 'Automatically publish to marketplaces after version bump'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  bump-version:
+    runs-on: ubuntu-latest
+    outputs:
+      new_version: ${{ steps.bump.outputs.new_version }}
+      tag_name: ${{ steps.bump.outputs.tag_name }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Configure Git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests before version bump
+        run: |
+          npm run check-types
+          npm run lint
+          npm run package
+        continue-on-error: false
+
+      - name: Get current version
+        id: current
+        run: |
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          echo "Current version: $CURRENT_VERSION"
+
+      - name: Bump version
+        id: bump
+        run: |
+          # Bump version in package.json and package-lock.json
+          NEW_VERSION=$(npm version ${{ github.event.inputs.version_type }} --no-git-tag-version)
+          NEW_VERSION=${NEW_VERSION#v}  # Remove 'v' prefix
+          TAG_NAME="v$NEW_VERSION"
+          
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
+          echo "New version: $NEW_VERSION"
+          echo "Tag name: $TAG_NAME"
+
+      - name: Update CHANGELOG.md
+        run: |
+          # Create or update CHANGELOG.md
+          if [ ! -f CHANGELOG.md ]; then
+            cat > CHANGELOG.md << EOF
+          # Changelog
+          
+          All notable changes to this project will be documented in this file.
+          
+          ## [${{ steps.bump.outputs.new_version }}] - $(date +%Y-%m-%d)
+          
+          ### Added
+          - New features and improvements
+          
+          ### Changed
+          - Changes in existing functionality
+          
+          ### Fixed
+          - Bug fixes
+          
+          ### Removed
+          - Removed features
+          EOF
+          else
+            # Add new version entry to existing CHANGELOG.md
+            sed -i '3i\\n## [${{ steps.bump.outputs.new_version }}] - '$(date +%Y-%m-%d)'\n\n### Added\n- New features and improvements\n\n### Changed\n- Changes in existing functionality\n\n### Fixed\n- Bug fixes\n\n### Removed\n- Removed features\n' CHANGELOG.md
+          fi
+
+      - name: Commit version bump
+        run: |
+          git add package.json package-lock.json CHANGELOG.md
+          git commit -m "chore: bump version to ${{ steps.bump.outputs.new_version }}"
+          git push origin main
+
+      - name: Create and push tag
+        run: |
+          git tag -a "${{ steps.bump.outputs.tag_name }}" -m "Release ${{ steps.bump.outputs.tag_name }}"
+          git push origin "${{ steps.bump.outputs.tag_name }}"
+
+  create-release:
+    needs: bump-version
+    runs-on: ubuntu-latest
+    if: github.event.inputs.create_release == 'true'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.bump-version.outputs.tag_name }}
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ needs.bump-version.outputs.tag_name }}
+          release_name: Release ${{ needs.bump-version.outputs.tag_name }}
+          body: |
+            ## What's Changed in ${{ needs.bump-version.outputs.tag_name }}
+            
+            ### 🚀 Features
+            - New features and improvements
+            
+            ### 🐛 Bug Fixes
+            - Bug fixes and stability improvements
+            
+            ### 📚 Documentation
+            - Documentation updates and improvements
+            
+            ### 🔧 Maintenance
+            - Code quality improvements and maintenance
+            
+            **Full Changelog**: https://github.com/${{ github.repository }}/compare/v${{ needs.bump-version.outputs.new_version }}...HEAD
+            
+            ---
+            
+            ### Installation
+            
+            You can install this extension from:
+            - [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=vuquangkhtn.ai-code-review-assistant)
+            - [Open VSX Registry](https://open-vsx.org/extension/vuquangkhtn/ai-code-review-assistant)
+            
+            Or download the VSIX file from the assets below and install manually.
+          draft: false
+          prerelease: false
+
+  trigger-publish:
+    needs: [bump-version, create-release]
+    runs-on: ubuntu-latest
+    if: github.event.inputs.auto_publish == 'true'
+    steps:
+      - name: Trigger publish workflow
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'publish-extension.yml',
+              ref: '${{ needs.bump-version.outputs.tag_name }}'
+            });
+            
+            console.log('Triggered publish workflow for tag: ${{ needs.bump-version.outputs.tag_name }}');

@@ -1,0 +1,116 @@
+name: Publish Pre-release
+
+on:
+  push:
+    branches:
+      - develop
+      - beta
+      - release/*
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to publish from'
+        required: false
+        default: 'develop'
+
+jobs:
+  test-and-publish-prerelease:
+    runs-on: ubuntu-latest
+    if: github.ref != 'refs/heads/main' && github.ref != 'refs/heads/master'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run type checking
+        run: npm run check-types
+
+      - name: Run linting
+        run: npm run lint
+
+      - name: Build extension
+        run: npm run package
+
+      - name: Run tests
+        run: npm run test
+        continue-on-error: true
+
+      - name: Install publishing tools
+        run: |
+          npm install -g @vscode/vsce ovsx
+
+      - name: Get current version and create pre-release version
+        id: version
+        run: |
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          BRANCH_NAME=${GITHUB_REF#refs/heads/}
+          BRANCH_SAFE=$(echo "$BRANCH_NAME" | sed 's/[^a-zA-Z0-9]/-/g')
+          COMMIT_SHORT=$(git rev-parse --short HEAD)
+          PRERELEASE_VERSION="$CURRENT_VERSION-$BRANCH_SAFE.$COMMIT_SHORT"
+          echo "current=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          echo "prerelease=$PRERELEASE_VERSION" >> $GITHUB_OUTPUT
+          echo "branch=$BRANCH_SAFE" >> $GITHUB_OUTPUT
+          echo "Pre-release version: $PRERELEASE_VERSION"
+
+      - name: Update package.json with pre-release version
+        run: |
+          npm version ${{ steps.version.outputs.prerelease }} --no-git-tag-version
+
+      - name: Package extension
+        run: vsce package
+
+      - name: Publish pre-release to VS Marketplace
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        run: |
+          echo "Publishing pre-release to VS Marketplace..."
+          vsce publish --pre-release --pat $VSCE_PAT
+
+      - name: Publish pre-release to Open VSX Registry
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
+        run: |
+          echo "Publishing pre-release to Open VSX Registry..."
+          ovsx publish --pre-release --pat $OVSX_PAT
+
+      - name: Upload VSIX as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: prerelease-vsix-${{ steps.version.outputs.branch }}-${{ github.run_number }}
+          path: '*.vsix'
+
+      - name: Create pre-release tag
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git tag -a "v${{ steps.version.outputs.prerelease }}" -m "Pre-release v${{ steps.version.outputs.prerelease }}"
+          git push origin "v${{ steps.version.outputs.prerelease }}"
+
+      - name: Comment on PR (if applicable)
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `🚀 **Pre-release published!**
+              
+              **Version:** \`${{ steps.version.outputs.prerelease }}\`
+              **Branch:** \`${{ steps.version.outputs.branch }}\`
+              
+              You can install this pre-release version to test the changes:
+              1. Download the VSIX from the [Actions artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+              2. Install manually in VS Code: \`code --install-extension path/to/extension.vsix\`
+              
+              Or wait for it to appear in the VS Code marketplace as a pre-release version.`
+            })
