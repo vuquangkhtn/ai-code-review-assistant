@@ -86,7 +86,7 @@ export class CodeReviewTreeProvider implements vscode.TreeDataProvider<CodeRevie
                     'copy'
                 ),
                 new CodeReviewItem(
-                    'Paste Prompt to AI Chat',
+                    'Paste Prompt to AI Chat (Manual)',
                     vscode.TreeItemCollapsibleState.None,
                     {
                         command: 'aiCodeReview.pastePrompt',
@@ -96,29 +96,6 @@ export class CodeReviewTreeProvider implements vscode.TreeDataProvider<CodeRevie
                     'action',
                     'send'
                 ),
-                new CodeReviewItem(
-                    'Generate Code Review Result',
-                    vscode.TreeItemCollapsibleState.None,
-                    {
-                        command: 'aiCodeReview.checkReviewResult',
-                        title: 'Generate Code Review Result',
-                        arguments: []
-                    },
-                    'action',
-                    'check',
-                    'Generate Code Review results'
-                ),
-                // new CodeReviewItem(
-                //     'View Code Review Report',
-                //     vscode.TreeItemCollapsibleState.None,
-                //     {
-                
-                //         title: 'Open Panel',
-                //         arguments: []
-                //     },
-                //     'action',
-                //     'eye'
-                // ),
             ]);
         } else if (element.contextValue === 'defaultChangeTypeGroup') {
             // Default Change Type options
