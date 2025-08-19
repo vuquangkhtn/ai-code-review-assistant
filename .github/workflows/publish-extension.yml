@@ -86,24 +86,32 @@ jobs:
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
         run: |
-          if [ "${{ github.event.inputs.prerelease }}" = "true" ]; then
-            echo "Publishing pre-release to VS Marketplace..."
-            vsce publish --pre-release --pat $VSCE_PAT
+          if [ -n "$VSCE_PAT" ]; then
+            if [ "${{ github.event.inputs.prerelease }}" = "true" ]; then
+              echo "Publishing pre-release to VS Marketplace..."
+              vsce publish --pre-release --pat $VSCE_PAT
+            else
+              echo "Publishing stable release to VS Marketplace..."
+              vsce publish --pat $VSCE_PAT
+            fi
           else
-            echo "Publishing stable release to VS Marketplace..."
-            vsce publish --pat $VSCE_PAT
+            echo "VSCE_PAT not set, skipping VS Marketplace publishing"
           fi
 
       - name: Publish to Open VSX Registry (Eclipse Marketplace)
         env:
           OVSX_PAT: ${{ secrets.OVSX_PAT }}
         run: |
-          if [ "${{ github.event.inputs.prerelease }}" = "true" ]; then
-            echo "Publishing pre-release to Open VSX Registry..."
-            ovsx publish --pre-release --pat $OVSX_PAT
+          if [ -n "$OVSX_PAT" ]; then
+            if [ "${{ github.event.inputs.prerelease }}" = "true" ]; then
+              echo "Publishing pre-release to Open VSX Registry..."
+              ovsx publish --pre-release --pat $OVSX_PAT
+            else
+              echo "Publishing stable release to Open VSX Registry..."
+              ovsx publish --pat $OVSX_PAT
+            fi
           else
-            echo "Publishing stable release to Open VSX Registry..."
-            ovsx publish --pat $OVSX_PAT
+            echo "OVSX_PAT not set, skipping Open VSX Registry publishing"
           fi
 
       - name: Upload VSIX as artifact
@@ -114,12 +122,12 @@ jobs:
 
       - name: Create GitHub Release
         if: startsWith(github.ref, 'refs/tags/')
-        uses: actions/create-release@v1
+        uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref_name }}
-          release_name: Release ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
           body: |
             ## Changes in ${{ github.ref_name }}
             
@@ -135,14 +143,5 @@ jobs:
             **Full Changelog**: https://github.com/${{ github.repository }}/compare/v${{ steps.package-version.outputs.version }}...HEAD
           draft: false
           prerelease: ${{ github.event.inputs.prerelease == 'true' }}
-
-      - name: Upload VSIX to Release
-        if: startsWith(github.ref, 'refs/tags/')
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./ai-code-review-assistant-${{ steps.package-version.outputs.version }}.vsix
-          asset_name: ai-code-review-assistant-${{ steps.package-version.outputs.version }}.vsix
-          asset_content_type: application/zip
+          files: |
+            *.vsix

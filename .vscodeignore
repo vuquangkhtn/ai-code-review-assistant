@@ -55,7 +55,6 @@ docs/**
 CONTRIBUTING.md
 README.md
 CHANGELOG.md
-LICENSE
 
 # GitHub workflows and CI/CD
 .github/**
