@@ -23,8 +23,8 @@ export class InlineAnnotationsProvider {
             borderWidth: '0 0 0 3px',
             overviewRulerColor: '#ff4444',
             overviewRulerLane: vscode.OverviewRulerLane.Right,
-            after: {
-                contentText: ' ⚠️ Critical',
+            before: {
+                contentText: '⚠️ Critical ',
                 color: '#ff4444',
                 fontWeight: 'bold'
             }
@@ -36,8 +36,8 @@ export class InlineAnnotationsProvider {
             borderWidth: '0 0 0 3px',
             overviewRulerColor: '#ff8800',
             overviewRulerLane: vscode.OverviewRulerLane.Right,
-            after: {
-                contentText: ' ⚠️ High',
+            before: {
+                contentText: '⚠️ High ',
                 color: '#ff8800',
                 fontWeight: 'bold'
             }
@@ -49,8 +49,8 @@ export class InlineAnnotationsProvider {
             borderWidth: '0 0 0 3px',
             overviewRulerColor: '#ffcc00',
             overviewRulerLane: vscode.OverviewRulerLane.Right,
-            after: {
-                contentText: ' ⚠️ Medium',
+            before: {
+                contentText: '⚠️ Medium ',
                 color: '#ffcc00'
             }
         }));
@@ -61,8 +61,8 @@ export class InlineAnnotationsProvider {
             borderWidth: '0 0 0 3px',
             overviewRulerColor: '#00aa00',
             overviewRulerLane: vscode.OverviewRulerLane.Right,
-            after: {
-                contentText: ' ℹ️ Low',
+            before: {
+                contentText: 'ℹ️ Low ',
                 color: '#00aa00'
             }
         }));
@@ -112,12 +112,14 @@ export class InlineAnnotationsProvider {
             if (!decorationType) return;
 
             const decorations: vscode.DecorationOptions[] = issues.map(issue => {
-                const line = Math.max(0, issue.lineNumber - 1); // Convert to 0-based
+                const issueLine = Math.max(0, issue.lineNumber - 1); // Convert to 0-based
+                // If issue is on first line, display annotation on the same line
+                const annotationLine = issueLine === 0 ? 0 : issueLine - 1;
                 const range = new vscode.Range(
-                    line,
-                    issue.columnNumber || 0,
-                    line,
-                    editor.document.lineAt(line).text.length
+                    annotationLine,
+                    0,
+                    annotationLine,
+                    editor.document.lineAt(annotationLine).text.length
                 );
 
                 return {
