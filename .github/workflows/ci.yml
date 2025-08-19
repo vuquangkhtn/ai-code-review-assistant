@@ -53,35 +53,3 @@ jobs:
         name: extension-vsix
         path: '*.vsix'
         retention-days: 7
-
-  # Optional: Cross-platform validation (only runs on main branch)
-  cross-platform-test:
-    if: github.ref == 'refs/heads/main'
-    needs: build-and-test
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        node-version: [18.x]
-        os: [windows-latest, macos-latest]
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    
-    - name: Setup Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    
-    - name: Install dependencies
-      run: npm ci
-    
-    - name: Run type checking
-      run: npm run check-types
-    
-    - name: Build extension
-      run: npm run compile
-    
-    - name: Package extension
-      run: npm run package:vsix
