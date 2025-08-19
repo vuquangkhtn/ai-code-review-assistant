@@ -75,7 +75,7 @@ jobs:
       - name: Install publishing tools
         run: |
           echo "Installing publishing tools..."
-          npm install -g @vscode/vsce ovsx
+          npm install -g @vscode/vsce@2.15.0 ovsx
           echo "Installed vsce version: $(vsce --version)"
           echo "Installed ovsx version: $(ovsx --version)"
 

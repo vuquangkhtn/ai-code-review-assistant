@@ -46,7 +46,7 @@ jobs:
 
       - name: Install publishing tools
         run: |
-          npm install -g @vscode/vsce ovsx
+          npm install -g @vscode/vsce@2.15.0 ovsx
 
       - name: Get current version and create pre-release version
         id: version
