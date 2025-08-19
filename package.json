@@ -40,8 +40,6 @@
     "onCommand:aiCodeReview.copyPromptAllFiles",
     "onCommand:aiCodeReview.copyPromptCompareBranches",
     "onCommand:aiCodeReview.checkReviewResult",
-    "aiCodeReview.checkScanResult",
-    "onCommand:aiCodeReview.openPromptFile",
     "onCommand:aiCodeReview.openChangeFile",
     "onCommand:aiCodeReview.openSettings",
     "onCommand:aiCodeReview.pastePrompt"

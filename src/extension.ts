@@ -260,23 +260,6 @@ export function activate(context: vscode.ExtensionContext) {
             }
         }),
 
-        vscode.commands.registerCommand('aiCodeReview.checkScanResult', async () => {
-            try {
-                const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
-                if (!workspaceFolder) {
-                    vscode.window.showErrorMessage('No workspace folder found');
-                    return;
-                }
-                
-                const resultsPath = vscode.Uri.file(workspaceFolder.uri.fsPath + '/.ai-code-review/results');
-                
-                // Open the results folder in the explorer
-                await vscode.commands.executeCommand('revealFileInOS', resultsPath);
-            } catch (error) {
-                vscode.window.showErrorMessage(`Failed to open scan results: ${error}`);
-            }
-        }),
-
         vscode.commands.registerCommand('aiCodeReview.openWorkflowGuide', () => {
             WorkflowGuidePanel.createOrShow(context.extensionUri);
         }),
