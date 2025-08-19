@@ -17,7 +17,7 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '18'
+        node-version: '20'
         cache: 'npm'
     
     - name: Install dependencies
@@ -37,6 +37,9 @@ jobs:
       continue-on-error: true
       env:
         DISPLAY: ':99.0'
+    
+    - name: Install VSCE
+      run: npm install -g @vscode/vsce@2.15.0
     
     - name: Package extension
       run: npm run package:vsix
