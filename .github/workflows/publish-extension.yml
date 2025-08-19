@@ -39,7 +39,11 @@ jobs:
         run: npm run lint
 
       - name: Build extension
-        run: npm run package
+        run: |
+          echo "Building extension..."
+          npm run package
+          echo "Build completed. Checking dist directory:"
+          ls -la dist/ || echo "No dist directory found"
 
       - name: Run tests
         run: npm run test
@@ -70,17 +74,28 @@ jobs:
 
       - name: Install publishing tools
         run: |
+          echo "Installing publishing tools..."
           npm install -g @vscode/vsce ovsx
+          echo "Installed vsce version: $(vsce --version)"
+          echo "Installed ovsx version: $(ovsx --version)"
 
       - name: Get version from package.json
         id: package-version
         run: |
+          echo "Validating package.json..."
+          node -e "const pkg = require('./package.json'); console.log('Package name:', pkg.name); console.log('Version:', pkg.version); console.log('Publisher:', pkg.publisher); console.log('Main:', pkg.main);"
           VERSION=$(node -p "require('./package.json').version")
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Current package.json version: $VERSION"
 
       - name: Package extension
-        run: vsce package
+        run: |
+          echo "Node.js version: $(node --version)"
+          echo "NPM version: $(npm --version)"
+          echo "Current directory: $(pwd)"
+          echo "Files in directory:"
+          ls -la
+          vsce package
 
       - name: Publish to VS Marketplace
         env:
