@@ -42,6 +42,7 @@ jobs:
       - name: Run tests
         run: npm run test
         continue-on-error: true
+        if: always()
 
       - name: Install publishing tools
         run: |

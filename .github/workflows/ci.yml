@@ -39,6 +39,7 @@ jobs:
     - name: Run tests (optional)
       run: npm test || echo "Tests failed but continuing..."
       continue-on-error: true
+      if: always()
       env:
         DISPLAY: ':99.0'
     
