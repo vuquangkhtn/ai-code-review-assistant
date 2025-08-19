@@ -41,6 +41,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
+          persist-credentials: true
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -139,14 +140,12 @@ jobs:
           ref: ${{ needs.bump-version.outputs.tag_name }}
 
       - name: Create GitHub Release
-        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ needs.bump-version.outputs.tag_name }}
-          release_name: Release ${{ needs.bump-version.outputs.tag_name }}
-          body: |
-            ## What's Changed in ${{ needs.bump-version.outputs.tag_name }}
+        run: |
+          gh release create ${{ needs.bump-version.outputs.tag_name }} \
+            --title "Release ${{ needs.bump-version.outputs.tag_name }}" \
+            --notes "## What's Changed in ${{ needs.bump-version.outputs.tag_name }}
             
             ### 🚀 Features
             - New features and improvements
@@ -170,9 +169,9 @@ jobs:
             - [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=vuquangkhtn.ai-code-review-assistant)
             - [Open VSX Registry](https://open-vsx.org/extension/vuquangkhtn/ai-code-review-assistant)
             
-            Or download the VSIX file from the assets below and install manually.
-          draft: false
-          prerelease: false
+            Or download the VSIX file from the assets below and install manually." \
+            --draft=false \
+            --prerelease=false
 
   trigger-publish:
     needs: [bump-version, create-release]
