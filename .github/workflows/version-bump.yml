@@ -20,7 +20,7 @@ on:
       auto_publish:
         description: 'Automatically publish to marketplaces after version bump'
         required: false
-        default: false
+        default: true
         type: boolean
 
 permissions:
