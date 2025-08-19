@@ -12,6 +12,12 @@ This VS Code extension generates structured prompts for AI code reviews that you
 - 🔍 **Multiple Review Types** - Local changes, commits, or branch comparisons
 - 🎨 **Clean Interface** - Issues panel with severity indicators and navigation
 
+## 🎬 Demo
+
+![AI Code Review Assistant Demo](docs/sample.gif)
+
+*See the extension in action: generating prompts, reviewing code, and displaying structured feedback*
+
 ## 🛠️ Installation
 
 1. Install the extension from the VS Code marketplace
