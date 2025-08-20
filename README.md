@@ -2,6 +2,8 @@
 
 *Work with any AI provider - no API keys required!*
 
+**🌐 Homepage:** https://vuquangkhtn.github.io/ai-code-review-assistant/
+
 This VS Code extension generates structured prompts for AI code reviews that you can use with **any AI provider** of your choice (ChatGPT, Claude, Gemini, Copilot, etc.). Simply copy the generated prompt, paste it into your preferred AI tool, and get comprehensive code review feedback.
 
 ## ✨ Key Features
