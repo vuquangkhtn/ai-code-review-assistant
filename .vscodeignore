@@ -52,6 +52,7 @@ test-files/**
 
 # Documentation and development
 docs/**
+!docs/sample.gif
 CONTRIBUTING.md
 README.md
 CHANGELOG.md

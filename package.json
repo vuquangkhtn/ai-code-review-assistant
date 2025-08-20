@@ -1,7 +1,7 @@
 {
   "name": "ai-code-review-assistant",
-  "displayName": "AI Code Review Assistant",
-  "description": "A powerful VS Code extension that automates code review using AI to provide senior-level feedback on your code changes.",
+  "displayName": "AI Prompt Code Review",
+  "description": "Generating AI Code review Prompt. Work with any AI Providers",
   "version": "0.4.0",
   "publisher": "vuquangkhtn",
   "license": "MIT",
