@@ -244,7 +244,7 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand('aiCodeReview.openSettings', async () => {
             try {
                 // Open VS Code settings filtered to AI Code Review extension
-                await vscode.commands.executeCommand('workbench.action.openSettings', '@ext:ai-code-review.ai-code-review-assistant');
+                await vscode.commands.executeCommand('workbench.action.openSettings', '@ext:vuquangkhtn.ai-code-review-assistant');
             } catch (error) {
                 vscode.window.showErrorMessage(`Failed to open settings: ${error}`);
             }
