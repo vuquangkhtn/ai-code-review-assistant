@@ -80,6 +80,19 @@ MIT License - see the [LICENSE](LICENSE) file for details.
 
 Need help? Check out our [GitHub Issues](https://github.com/your-repo/issues) or [Discussions](https://github.com/your-repo/discussions).
 
+## 🌟 Love This Extension?
+
+If this extension has made your code review process easier and more efficient, we'd be thrilled to hear from you! Your feedback and support mean the world to us and help us continue improving.
+
+### Ways to Show Your Support:
+- ⭐ **Star this repository** - It helps others discover this tool
+- 💬 **Leave a review** on the VS Code Marketplace - Share your experience
+- 🐛 **Report issues or suggest features** - Help us make it even better
+- 📢 **Share with your team** - Spread the word about AI-powered code reviews
+- 🤝 **Contribute** - Check out our [Contributing Guidelines](CONTRIBUTING.md)
+
+Every star, review, and piece of feedback motivates us to keep building awesome tools for the developer community. Thank you for being part of our journey! 🚀
+
 ---
 
 *Built with ❤️ for developers who want AI-powered code reviews without the complexity*
