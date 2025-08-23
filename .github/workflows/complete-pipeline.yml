@@ -50,6 +50,7 @@ jobs:
     outputs:
       should_release: ${{ steps.check-changes.outputs.should_release }}
       version_type: ${{ steps.check-changes.outputs.version_type }}
+      vsix_name: ${{ steps.package.outputs.vsix_name }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -162,11 +163,56 @@ jobs:
           echo "version_type=$VERSION_TYPE" >> $GITHUB_OUTPUT
           echo "Will create $VERSION_TYPE release"
 
-      # Note: VSIX packaging moved to prepare-publish stage after semantic-release updates package.json
+      - name: Install publishing tools
+        if: steps.check-changes.outputs.should_release == 'true'
+        run: npm install -g @vscode/vsce@${{ env.VSCE_VERSION }} ovsx
 
-  # Stage 2: Release and Tag
-  release-and-tag:
+      - name: Package VSIX for validation
+        id: package
+        if: steps.check-changes.outputs.should_release == 'true'
+        run: |
+          echo "Packaging extension for validation..."
+          vsce package
+          VSIX_FILE=$(ls *.vsix | head -1)
+          echo "vsix_name=$VSIX_FILE" >> $GITHUB_OUTPUT
+          echo "✅ VSIX package created: $VSIX_FILE"
+          ls -la *.vsix
+
+      - name: Upload build artifacts
+        if: steps.check-changes.outputs.should_release == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: |
+            *.vsix
+            dist/
+          retention-days: 7
+
+  # Stage 2: Validate Build
+  validate-build:
     needs: build-and-test
+    runs-on: ubuntu-latest
+    if: needs.build-and-test.outputs.should_release == 'true'
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+          path: .
+
+      - name: Verify VSIX package
+        run: |
+          if [ ! -f *.vsix ]; then
+            echo "❌ VSIX file not found in artifacts"
+            exit 1
+          fi
+          
+          echo "✅ VSIX package verified"
+          ls -la *.vsix
+
+  # Stage 3: Release and Tag (after successful validation)
+  release-and-tag:
+    needs: [build-and-test, validate-build]
     runs-on: ubuntu-latest
     if: needs.build-and-test.outputs.should_release == 'true'
     outputs:
@@ -229,87 +275,26 @@ jobs:
             echo "release_created=false" >> $GITHUB_OUTPUT
           fi
 
-  # Stage 3: Prepare for Publishing
+  # Stage 4: Prepare for Publishing
   prepare-publish:
-    needs: [build-and-test, release-and-tag]
+    needs: [build-and-test, validate-build, release-and-tag]
     runs-on: ubuntu-latest
     if: needs.build-and-test.outputs.should_release == 'true' && needs.release-and-tag.outputs.release_created == 'true'
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
         with:
-          fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
-          
-      - name: Wait for tag and checkout
-        run: |
-          echo "Waiting for tag ${{ needs.release-and-tag.outputs.tag_name }} to be available..."
-          for i in {1..30}; do
-            if git ls-remote --tags origin | grep -q "${{ needs.release-and-tag.outputs.tag_name }}$"; then
-              echo "Tag found, checking out..."
-              git fetch --tags
-              git checkout ${{ needs.release-and-tag.outputs.tag_name }}
-              break
-            else
-              echo "Tag not found, waiting... (attempt $i/30)"
-              sleep 10
-            fi
-          done
-          
-          # Verify we're on the correct tag
-          CURRENT_TAG=$(git describe --tags --exact-match HEAD 2>/dev/null || echo "none")
-          if [ "$CURRENT_TAG" != "${{ needs.release-and-tag.outputs.tag_name }}" ]; then
-            echo "❌ Failed to checkout tag ${{ needs.release-and-tag.outputs.tag_name }}"
-            echo "Current tag: $CURRENT_TAG"
-            exit 1
-          fi
-          echo "✅ Successfully checked out tag ${{ needs.release-and-tag.outputs.tag_name }}"
+          name: build-artifacts
+          path: .
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Install publishing tools
-        run: npm install -g @vscode/vsce@${{ env.VSCE_VERSION }} ovsx
-
-      - name: Validate package.json version
-        run: |
-          echo "Validating package.json..."
-          VERSION=$(node -p "require('./package.json').version")
-          echo "Package version: $VERSION"
-          
-          if [ "$VERSION" != "${{ needs.release-and-tag.outputs.new_version }}" ]; then
-            echo "❌ Version mismatch: expected ${{ needs.release-and-tag.outputs.new_version }}, got $VERSION"
-            exit 1
-          fi
-          
-          echo "✅ Version validation successful"
-
-      - name: Build extension with updated version
-        run: |
-          echo "Building extension with updated package.json version..."
-          npm run package
-          
-      - name: Package VSIX with correct version
-        run: |
-          echo "Packaging extension with correct version..."
-          vsce package
-          echo "✅ VSIX package created successfully"
-          ls -la *.vsix
-
-      - name: Verify VSIX package
+      - name: Verify VSIX package for publishing
         run: |
           if [ ! -f *.vsix ]; then
             echo "❌ VSIX file not found in artifacts"
             exit 1
           fi
           
-          echo "✅ VSIX package verified"
+          echo "✅ VSIX package ready for publishing"
           ls -la *.vsix
 
       - name: Upload release artifacts
@@ -319,9 +304,9 @@ jobs:
           path: '*.vsix'
           retention-days: 30
 
-  # Stage 4: Publish to Marketplaces
+  # Stage 5: Publish to Marketplaces
   publish:
-    needs: [build-and-test, release-and-tag, prepare-publish]
+    needs: [build-and-test, validate-build, release-and-tag, prepare-publish]
     runs-on: ubuntu-latest
     if: |
       needs.build-and-test.outputs.should_release == 'true' && 
