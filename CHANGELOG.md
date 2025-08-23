@@ -1,6 +1,21 @@
 # Changelog
 
 
+## [0.5.0] - 2025-08-23
+
+### Added
+- New features and improvements
+
+### Changed
+- Changes in existing functionality
+
+### Fixed
+- Bug fixes
+
+### Removed
+- Removed features
+
+
 ## [0.4.3] - 2025-08-22
 
 ### Added
