@@ -1,3 +1,10 @@
+## [0.7.2](https://github.com/vuquangkhtn/ai-code-review-assistant/compare/v0.7.1...v0.7.2) (2025-08-23)
+
+
+### Bug Fixes
+
+* Add fetch-depth and token to checkout steps in CI/CD pipeline ([530f50c](https://github.com/vuquangkhtn/ai-code-review-assistant/commit/530f50c34c93b724cd1ba677e3a197da58018440))
+
 ## [0.7.1](https://github.com/vuquangkhtn/ai-code-review-assistant/compare/v0.7.0...v0.7.1) (2025-08-23)
 
 
