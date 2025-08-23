@@ -1,3 +1,10 @@
+## [0.6.2](https://github.com/vuquangkhtn/ai-code-review-assistant/compare/v0.6.1...v0.6.2) (2025-08-23)
+
+
+### Bug Fixes
+
+* Bump version to 0.5.2 after resolving TypeScript compilation issues ([6f5bc15](https://github.com/vuquangkhtn/ai-code-review-assistant/commit/6f5bc157ca5fa474f9205eb9ee3c0be2c85bf940))
+
 ## [0.6.1](https://github.com/vuquangkhtn/ai-code-review-assistant/compare/v0.6.0...v0.6.1) (2025-08-23)
 
 
