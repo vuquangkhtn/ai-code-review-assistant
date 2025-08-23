@@ -2,7 +2,7 @@
   "name": "ai-code-review-assistant",
   "displayName": "AI Prompt Code Review",
   "description": "Generating AI Code review Prompt. Work with any AI Providers",
-  "version": "0.6.3",
+  "version": "0.6.4",
   "publisher": "vuquangkhtn",
   "license": "MIT",
   "icon": "resources/icon.png",
