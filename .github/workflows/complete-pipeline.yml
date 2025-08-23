@@ -162,28 +162,7 @@ jobs:
           echo "version_type=$VERSION_TYPE" >> $GITHUB_OUTPUT
           echo "Will create $VERSION_TYPE release"
 
-      - name: Install publishing tools
-        if: steps.check-changes.outputs.should_release == 'true'
-        run: npm install -g @vscode/vsce@${{ env.VSCE_VERSION }} ovsx
-
-      - name: Package VSIX
-        if: steps.check-changes.outputs.should_release == 'true'
-        run: |
-          echo "Packaging extension..."
-          vsce package
-          echo "✅ VSIX package created successfully"
-          ls -la *.vsix
-
-      - name: Upload build artifacts
-        if: steps.check-changes.outputs.should_release == 'true'
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-artifacts
-          path: |
-            *.vsix
-            dist/
-            node_modules/
-          retention-days: 7
+      # Note: VSIX packaging moved to prepare-publish stage after semantic-release updates package.json
 
   # Stage 2: Release and Tag
   release-and-tag:
@@ -286,11 +265,17 @@ jobs:
           fi
           echo "✅ Successfully checked out tag ${{ needs.release-and-tag.outputs.tag_name }}"
 
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          name: build-artifacts
-          path: .
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install publishing tools
+        run: npm install -g @vscode/vsce@${{ env.VSCE_VERSION }} ovsx
 
       - name: Validate package.json version
         run: |
@@ -304,6 +289,18 @@ jobs:
           fi
           
           echo "✅ Version validation successful"
+
+      - name: Build extension with updated version
+        run: |
+          echo "Building extension with updated package.json version..."
+          npm run package
+          
+      - name: Package VSIX with correct version
+        run: |
+          echo "Packaging extension with correct version..."
+          vsce package
+          echo "✅ VSIX package created successfully"
+          ls -la *.vsix
 
       - name: Verify VSIX package
         run: |
@@ -371,9 +368,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-
-      - name: Install dependencies
-        run: npm ci
 
       - name: Install publishing tools
         run: npm install -g @vscode/vsce@${{ env.VSCE_VERSION }} ovsx
