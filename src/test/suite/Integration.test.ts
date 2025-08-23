@@ -109,21 +109,41 @@ suite('Extension Integration Test Suite', () => {
         });
         
         test('Should execute main copyPrompt command using default configuration', async () => {
-            // Test that copyPrompt uses default configuration without showing quick pick
-            const originalShowQuickPick = vscode.window.showQuickPick;
-            let quickPickCalled = false;
+            // Mock configuration to ensure default 'local' value
+            const originalGetConfiguration = vscode.workspace.getConfiguration;
+            (vscode.workspace as any).getConfiguration = (section: string) => {
+                if (section === 'aiCodeReview') {
+                    return {
+                        get: (key: string, defaultValue: any) => {
+                            if (key === 'defaultChangeType') {
+                                return 'local'; // Ensure default configuration
+                            }
+                            return defaultValue;
+                        }
+                    };
+                }
+                return originalGetConfiguration(section);
+            };
             
-            (vscode.window as any).showQuickPick = async (items: any[], options: any) => {
-                quickPickCalled = true;
-                return undefined; // Simulate user cancellation
+            // Mock the copyPromptLocalChanges command to avoid actual execution
+            const originalExecuteCommand = vscode.commands.executeCommand;
+            let localChangesCommandCalled = false;
+            
+            (vscode.commands as any).executeCommand = async (command: string, ...args: any[]) => {
+                if (command === 'aiCodeReview.copyPromptLocalChanges') {
+                    localChangesCommandCalled = true;
+                    return; // Don't execute the actual command
+                }
+                return originalExecuteCommand(command, ...args);
             };
             
             try {
                 await vscode.commands.executeCommand('aiCodeReview.copyPrompt');
-                // With default configuration (local), quick pick should NOT be called
-                assert.ok(!quickPickCalled, 'Quick pick should not be called when using default configuration');
+                // With default configuration (local), copyPromptLocalChanges should be called
+                assert.ok(localChangesCommandCalled, 'copyPromptLocalChanges command should be called when using default configuration');
             } finally {
-                (vscode.window as any).showQuickPick = originalShowQuickPick;
+                (vscode.commands as any).executeCommand = originalExecuteCommand;
+                (vscode.workspace as any).getConfiguration = originalGetConfiguration;
             }
         });
         
