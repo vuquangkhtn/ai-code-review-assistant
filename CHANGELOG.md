@@ -1,3 +1,10 @@
+# [0.8.0](https://github.com/vuquangkhtn/ai-code-review-assistant/compare/v0.7.10...v0.8.0) (2025-08-23)
+
+
+### Features
+
+* add CodeLens ([41ff0f6](https://github.com/vuquangkhtn/ai-code-review-assistant/commit/41ff0f6c155b95e1c824f0fb84ed74839608b248))
+
 ## [0.7.10](https://github.com/vuquangkhtn/ai-code-review-assistant/compare/v0.7.9...v0.7.10) (2025-08-23)
 
 
