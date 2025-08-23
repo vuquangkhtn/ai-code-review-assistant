@@ -92,33 +92,15 @@ jobs:
           echo "New version: $NEW_VERSION"
           echo "Tag name: $TAG_NAME"
 
-      - name: Update CHANGELOG.md
+      - name: Generate CHANGELOG.md
         run: |
-          # Create or update CHANGELOG.md
-          if [ ! -f CHANGELOG.md ]; then
-            cat > CHANGELOG.md << EOF
-          # Changelog
+          # Make the changelog generation script executable
+          chmod +x scripts/generate-changelog.js
           
-          All notable changes to this project will be documented in this file.
+          # Generate changelog using the new script
+          node scripts/generate-changelog.js ${{ steps.bump.outputs.new_version }}
           
-          ## [${{ steps.bump.outputs.new_version }}] - $(date +%Y-%m-%d)
-          
-          ### Added
-          - New features and improvements
-          
-          ### Changed
-          - Changes in existing functionality
-          
-          ### Fixed
-          - Bug fixes
-          
-          ### Removed
-          - Removed features
-          EOF
-          else
-            # Add new version entry to existing CHANGELOG.md
-            sed -i '3i\\n## [${{ steps.bump.outputs.new_version }}] - '$(date +%Y-%m-%d)'\n\n### Added\n- New features and improvements\n\n### Changed\n- Changes in existing functionality\n\n### Fixed\n- Bug fixes\n\n### Removed\n- Removed features\n' CHANGELOG.md
-          fi
+          echo "✅ Changelog generated successfully for version ${{ steps.bump.outputs.new_version }}"
 
       - name: Commit version bump
         run: |
@@ -141,37 +123,53 @@ jobs:
         with:
           ref: ${{ needs.bump-version.outputs.tag_name }}
 
+      - name: Extract changelog for release
+        id: changelog
+        run: |
+          # Extract the changelog entry for this version
+          VERSION="${{ needs.bump-version.outputs.new_version }}"
+          
+          # Get the changelog content for this version
+          CHANGELOG_CONTENT=$(awk "/^## \[$VERSION\]/,/^## \[/{if(/^## \[/ && !/^## \[$VERSION\]/) exit; print}" CHANGELOG.md | head -n -1)
+          
+          # If changelog content is empty, use a fallback
+          if [ -z "$CHANGELOG_CONTENT" ]; then
+            CHANGELOG_CONTENT="## [$VERSION] - $(date +%Y-%m-%d)\n\n### Changed\n- Version bump to $VERSION"
+          fi
+          
+          # Save to file for multiline output
+          echo "$CHANGELOG_CONTENT" > /tmp/changelog.md
+          
+          # Set output for use in release notes
+          echo "changelog_file=/tmp/changelog.md" >> $GITHUB_OUTPUT
+
       - name: Create GitHub Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # Read the changelog content
+          CHANGELOG_CONTENT=$(cat ${{ steps.changelog.outputs.changelog_file }})
+          
+          # Create release notes with changelog and installation info
+          cat > /tmp/release_notes.md << EOF
+          $CHANGELOG_CONTENT
+          
+          **Full Changelog**: https://github.com/${{ github.repository }}/compare/v${{ needs.bump-version.outputs.new_version }}...HEAD
+          
+          ---
+          
+          ### Installation
+          
+          You can install this extension from:
+          - [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=vuquangkhtn.ai-code-review-assistant)
+          - [Open VSX Registry](https://open-vsx.org/extension/vuquangkhtn/ai-code-review-assistant)
+          
+          Or download the VSIX file from the assets below and install manually.
+          EOF
+          
           gh release create ${{ needs.bump-version.outputs.tag_name }} \
             --title "Release ${{ needs.bump-version.outputs.tag_name }}" \
-            --notes "## What's Changed in ${{ needs.bump-version.outputs.tag_name }}
-            
-            ### 🚀 Features
-            - New features and improvements
-            
-            ### 🐛 Bug Fixes
-            - Bug fixes and stability improvements
-            
-            ### 📚 Documentation
-            - Documentation updates and improvements
-            
-            ### 🔧 Maintenance
-            - Code quality improvements and maintenance
-            
-            **Full Changelog**: https://github.com/${{ github.repository }}/compare/v${{ needs.bump-version.outputs.new_version }}...HEAD
-            
-            ---
-            
-            ### Installation
-            
-            You can install this extension from:
-            - [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=vuquangkhtn.ai-code-review-assistant)
-            - [Open VSX Registry](https://open-vsx.org/extension/vuquangkhtn/ai-code-review-assistant)
-            
-            Or download the VSIX file from the assets below and install manually." \
+            --notes-file /tmp/release_notes.md \
             --draft=false \
             --prerelease=false
 
