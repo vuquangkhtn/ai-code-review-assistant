@@ -15,7 +15,7 @@
     "url": "https://github.com/vuquangkhtn/ai-code-review-assistant/issues"
   },
   "engines": {
-    "vscode": "^1.103.0",
+    "vscode": "^1.96.0",
     "node": ">=18.0.0"
   },
   "categories": [
@@ -267,7 +267,7 @@
     "@types/mocha": "^10.0.10",
     "@types/node": "^16.18.126",
     "@types/uuid": "^10.0.0",
-    "@types/vscode": "^1.103.0",
+    "@types/vscode": "^1.96.0",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.0.0",
     "@vscode/test-electron": "^2.5.2",
