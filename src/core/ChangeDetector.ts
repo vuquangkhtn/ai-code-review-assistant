@@ -51,12 +51,13 @@ export class ChangeDetector {
                 }
                 
                 const diff = await this.git.diff([file]);
+                const enhancedDiff = this.enhanceDiffWithLineNumbers(diff);
                 changedFiles.push({
                     path: file,
                     status: 'modified',
                     additions: this.countAdditions(diff),
                     deletions: this.countDeletions(diff),
-                    diff
+                    diff: enhancedDiff
                 });
             }
 
@@ -72,12 +73,15 @@ export class ChangeDetector {
                     const content = fs.readFileSync(filePath, 'utf8');
                     const lines = content.split('\n');
                     
+                    // Add line numbers to new file content for better AI indexing
+                    const numberedContent = lines.map((line, index) => `${index + 1}: ${line}`).join('\n');
+                    
                     changedFiles.push({
                         path: file,
                         status: 'added',
                         additions: lines.length,
                         deletions: 0,
-                        diff: content
+                        diff: numberedContent
                     });
                 } catch (error) {
                     // If we can't read the file, add it without content
@@ -126,12 +130,15 @@ export class ChangeDetector {
                     const content = fs.readFileSync(filePath, 'utf8');
                     const lines = content.split('\n');
                     
+                    // Add line numbers to new file content for better AI indexing
+                    const numberedContent = lines.map((line, index) => `${index + 1}: ${line}`).join('\n');
+                    
                     changedFiles.push({
                         path: file,
                         status: 'added',
                         additions: lines.length,
                         deletions: 0,
-                        diff: content
+                        diff: numberedContent
                     });
                 } catch (error) {
                     // If we can't read the file, add it without content
@@ -175,12 +182,15 @@ export class ChangeDetector {
                 const relativePath = path.relative(this.workspacePath, file);
                 const lines = content.split('\n');
                 
+                // Add line numbers to file content for better AI indexing
+                const numberedContent = lines.map((line, index) => `${index + 1}: ${line}`).join('\n');
+                
                 changedFiles.push({
                     path: relativePath,
                     status: 'summary',
                     additions: lines.length,
                     deletions: 0,
-                    diff: content
+                    diff: numberedContent
                 });
             } catch (error) {
                 // Skip files that can't be read
@@ -750,12 +760,16 @@ export class ChangeDetector {
                         vscode.Uri.file(path.join(this.workspacePath, file))
                     );
                     
+                    // Add line numbers to file content for better AI indexing
+                    const lines = content.toString().split('\n');
+                    const numberedContent = lines.map((line, index) => `${index + 1}: ${line}`).join('\n');
+                    
                     changedFiles.push({
                         path: file,
                         status: 'modified',
                         additions: 0,
                         deletions: 0,
-                        diff: content.toString()
+                        diff: numberedContent
                     });
                 } catch (error) {
                     continue;
@@ -800,12 +814,16 @@ export class ChangeDetector {
                         vscode.Uri.file(path.join(this.workspacePath, file))
                     );
                     
+                    // Add line numbers to file content for better AI indexing
+                    const lines = content.toString().split('\n');
+                    const numberedContent = lines.map((line, index) => `${index + 1}: ${line}`).join('\n');
+                    
                     changedFiles.push({
                         path: file,
                         status: 'modified',
                         additions: 0,
                         deletions: 0,
-                        diff: content.toString()
+                        diff: numberedContent
                     });
                 } catch (error) {
                     continue;
@@ -840,12 +858,16 @@ export class ChangeDetector {
                         vscode.Uri.file(path.join(this.workspacePath, file))
                     );
                     
+                    // Add line numbers to file content for better AI indexing
+                    const lines = content.toString().split('\n');
+                    const numberedContent = lines.map((line, index) => `${index + 1}: ${line}`).join('\n');
+                    
                     changedFiles.push({
                         path: file,
                         status: 'modified',
                         additions: 0,
                         deletions: 0,
-                        diff: content.toString()
+                        diff: numberedContent
                     });
                 } catch (error) {
                     continue;
