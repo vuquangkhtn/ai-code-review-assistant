@@ -7,6 +7,8 @@ export class IssuesPanelProvider implements vscode.TreeDataProvider<IssueItem> {
 
     private issues: CodeIssue[] = [];
     private groupBy: 'severity' | 'category' | 'file' = 'severity';
+    private filterType: 'all' | 'issues' | 'resolved' = 'all';
+    private resolvedIssues: Set<string> = new Set();
 
     constructor() {}
 
@@ -22,6 +24,41 @@ export class IssuesPanelProvider implements vscode.TreeDataProvider<IssueItem> {
     setGroupBy(groupBy: 'severity' | 'category' | 'file'): void {
         this.groupBy = groupBy;
         this.refresh();
+    }
+
+    setFilter(filterType: 'all' | 'issues' | 'resolved'): void {
+        this.filterType = filterType;
+        this.refresh();
+    }
+
+    markIssueResolved(issueId: string): void {
+        this.resolvedIssues.add(issueId);
+        this.refresh();
+    }
+
+    markIssueUnresolved(issueId: string): void {
+        this.resolvedIssues.delete(issueId);
+        this.refresh();
+    }
+
+    isIssueResolved(issueId: string): boolean {
+        return this.resolvedIssues.has(issueId);
+    }
+
+    openFilterDialog(): void {
+        const options = [
+            { label: 'All', value: 'all' },
+            { label: 'Issues Only', value: 'issues' },
+            { label: 'Resolved Only', value: 'resolved' }
+        ];
+
+        vscode.window.showQuickPick(options, {
+            placeHolder: 'Select filter type'
+        }).then(selected => {
+            if (selected) {
+                this.setFilter(selected.value as 'all' | 'issues' | 'resolved');
+            }
+        });
     }
 
     getTreeItem(element: IssueItem): vscode.TreeItem {
@@ -55,8 +92,23 @@ export class IssuesPanelProvider implements vscode.TreeDataProvider<IssueItem> {
     private getGroupedItems(): IssueItem[] {
         const groups = new Map<string, CodeIssue[]>();
 
-        // Group issues
-        this.issues.forEach(issue => {
+        // Filter issues based on resolved status
+        const filteredIssues = this.issues.filter(issue => {
+            const isResolved = this.isIssueResolved(issue.id);
+            
+            switch (this.filterType) {
+                case 'issues':
+                    return !isResolved;
+                case 'resolved':
+                    return isResolved;
+                case 'all':
+                default:
+                    return true;
+            }
+        });
+
+        // Group filtered issues
+        filteredIssues.forEach(issue => {
             let groupKey: string;
             switch (this.groupBy) {
                 case 'severity':
@@ -106,6 +158,7 @@ export class IssuesPanelProvider implements vscode.TreeDataProvider<IssueItem> {
         const groupKey = groupItem.groupKey!;
         let filteredIssues: CodeIssue[];
 
+        // First filter by group
         switch (this.groupBy) {
             case 'severity':
                 filteredIssues = this.issues.filter(issue => issue.severity === groupKey);
@@ -120,11 +173,28 @@ export class IssuesPanelProvider implements vscode.TreeDataProvider<IssueItem> {
                 filteredIssues = [];
         }
 
+        // Then apply resolved status filter
+        filteredIssues = filteredIssues.filter(issue => {
+            const isResolved = this.isIssueResolved(issue.id);
+            
+            switch (this.filterType) {
+                case 'issues':
+                    return !isResolved;
+                case 'resolved':
+                    return isResolved;
+                case 'all':
+                default:
+                    return true;
+            }
+        });
+
         return filteredIssues.map(issue => {
-            const iconName = issue.resolved ? 'check' : this.getSeverityIcon(issue.severity);
-            const label = issue.resolved ? `✓ ${issue.title}` : issue.title;
-            const description = `${this.getFileName(issue.filePath)}:${issue.lineNumber}${issue.resolved ? ' (Resolved)' : ''}`;
-            const color = issue.resolved ? new vscode.ThemeColor('charts.green') : this.getSeverityColor(issue.severity);
+            const isResolved = this.isIssueResolved(issue.id);
+            const iconName = isResolved ? 'check' : this.getSeverityIcon(issue.severity);
+            const label = isResolved ? `✓ ${issue.title}` : issue.title;
+            const description = `${this.getFileName(issue.filePath)}:${issue.lineNumber}${isResolved ? ' (Resolved)' : ''}`;
+            const color = isResolved ? new vscode.ThemeColor('charts.green') : this.getSeverityColor(issue.severity);
+            const contextValue = isResolved ? 'resolvedIssue' : 'unresolvedIssue';
             
             // Create URI for the file
             const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
@@ -157,7 +227,7 @@ export class IssuesPanelProvider implements vscode.TreeDataProvider<IssueItem> {
                     ]
                 },
                 `${issue.severity} - ${issue.description}`,
-                issue.resolved ? 'resolvedIssue' : 'unresolvedIssue',
+                contextValue,
                 undefined,
                 description,
                 color,

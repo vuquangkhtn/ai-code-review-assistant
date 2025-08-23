@@ -89,6 +89,12 @@
         "icon": "$(gear)"
       },
       {
+        "command": "aiCodeReview.openIssuesFilter",
+        "title": "Filter Issues",
+        "category": "AI Code Review",
+        "icon": "$(gear)"
+      },
+      {
         "command": "aiCodeReview.pastePrompt",
         "title": "Paste Prompt to AI Chat",
         "category": "AI Code Review",
@@ -135,6 +141,11 @@
         {
           "command": "aiCodeReview.openSettings",
           "when": "view == aiCodeReviewPanel",
+          "group": "navigation"
+        },
+        {
+          "command": "aiCodeReview.openIssuesFilter",
+          "when": "view == aiCodeReviewIssues",
           "group": "navigation"
         }
       ],

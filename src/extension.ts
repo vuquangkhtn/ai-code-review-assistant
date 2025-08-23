@@ -296,6 +296,14 @@ export function activate(context: vscode.ExtensionContext) {
             }
         }),
 
+        vscode.commands.registerCommand('aiCodeReview.openIssuesFilter', async () => {
+            try {
+                issuesPanelProvider.openFilterDialog();
+            } catch (error) {
+                vscode.window.showErrorMessage(`Failed to open filter dialog: ${error}`);
+            }
+        }),
+
         vscode.commands.registerCommand('aiCodeReview.markIssueResolved', async (treeItem?: any, issueId?: string) => {
             try {
                 // Handle both tree view context and direct command calls
@@ -305,7 +313,7 @@ export function activate(context: vscode.ExtensionContext) {
                     return;
                 }
                 inlineAnnotationsProvider.markIssueAsResolved(id);
-                issuesPanelProvider.refresh();
+                issuesPanelProvider.markIssueResolved(id);
                 vscode.window.showInformationMessage('Issue marked as resolved');
             } catch (error) {
                 vscode.window.showErrorMessage(`Failed to mark issue as resolved: ${error}`);
@@ -321,7 +329,7 @@ export function activate(context: vscode.ExtensionContext) {
                     return;
                 }
                 inlineAnnotationsProvider.markIssueAsUnresolved(id);
-                issuesPanelProvider.refresh();
+                issuesPanelProvider.markIssueUnresolved(id);
                 vscode.window.showInformationMessage('Issue marked as unresolved');
             } catch (error) {
                 vscode.window.showErrorMessage(`Failed to mark issue as unresolved: ${error}`);
