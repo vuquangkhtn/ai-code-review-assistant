@@ -39,6 +39,17 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ## [0.5.1] - 2025-08-23
 
+### Added
+
+- Add automatic changelog generation for version bumps.
+
+### Fixed
+
+- Cannot read AI result.
+
+
+## [0.5.1] - 2025-08-23
+
 ### Changed
 
 - Version bump to 0.5.1.
