@@ -5,6 +5,8 @@
     "target": "ES2020",
     "outDir": "out",
     "lib": ["ES2020", "DOM"],
+    "types": ["node", "vscode"],
+    "moduleResolution": "node",
     "sourceMap": true,
     "rootDir": "src",
     "strict": true,
