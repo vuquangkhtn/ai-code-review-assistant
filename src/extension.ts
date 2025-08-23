@@ -6,6 +6,7 @@ import { WorkflowGuidePanel } from './ui/WorkflowGuidePanel';
 import { InlineAnnotationsProvider } from './ui/InlineAnnotationsProvider';
 import { CodeReviewTreeProvider } from './ui/CodeReviewTreeProvider';
 import { IssuesPanelProvider } from './ui/IssuesPanelProvider';
+import { CodeLensProvider } from './ui/CodeLensProvider';
 import { CleanupManager } from './utils/CleanupManager';
 import { ReviewRequest, ChangeType, CodeIssue } from './types';
 
@@ -15,6 +16,7 @@ let changeDetector: ChangeDetector;
 let inlineAnnotationsProvider: InlineAnnotationsProvider;
 let codeReviewTreeProvider: CodeReviewTreeProvider;
 let issuesPanelProvider: IssuesPanelProvider;
+let codeLensProvider: CodeLensProvider;
 let resultFileWatcher: vscode.FileSystemWatcher | undefined;
 
 export function activate(context: vscode.ExtensionContext) {
@@ -37,10 +39,21 @@ export function activate(context: vscode.ExtensionContext) {
     inlineAnnotationsProvider = new InlineAnnotationsProvider();
     codeReviewTreeProvider = new CodeReviewTreeProvider();
     issuesPanelProvider = new IssuesPanelProvider();
+    codeLensProvider = new CodeLensProvider();
 
     // Register tree data providers for sidebar
     vscode.window.registerTreeDataProvider('aiCodeReviewPanel', codeReviewTreeProvider);
     vscode.window.registerTreeDataProvider('aiCodeReviewIssues', issuesPanelProvider);
+
+    // Register CodeLens provider for supported languages
+    const config = vscode.workspace.getConfiguration('aiCodeReview');
+    const supportedLanguages = config.get('codeLens.selector', ['javascript', 'typescript', 'html', 'css', 'json', 'jsx', 'tsx']);
+    
+    const codeLensDisposable = vscode.languages.registerCodeLensProvider(
+        supportedLanguages.map(lang => ({ language: lang })),
+        codeLensProvider
+    );
+    context.subscriptions.push(codeLensDisposable);
 
     // Setup file watcher for .ai-code-review/results directory
     setupResultFileWatcher(context);
@@ -209,6 +222,9 @@ export function activate(context: vscode.ExtensionContext) {
                     // Update issues panel
                     issuesPanelProvider.updateIssues(result.issues);
                     
+                    // Update CodeLens provider
+                    codeLensProvider.updateIssues(result.issues);
+                    
                     vscode.window.showInformationMessage('Code review result processed successfully!');
                 }
             } catch (error) {
@@ -314,7 +330,7 @@ export function activate(context: vscode.ExtensionContext) {
                 }
                 inlineAnnotationsProvider.markIssueAsResolved(id);
                 issuesPanelProvider.markIssueResolved(id);
-                vscode.window.showInformationMessage('Issue marked as resolved');
+                codeLensProvider.markIssueResolved(id);
             } catch (error) {
                 vscode.window.showErrorMessage(`Failed to mark issue as resolved: ${error}`);
             }
@@ -330,7 +346,7 @@ export function activate(context: vscode.ExtensionContext) {
                 }
                 inlineAnnotationsProvider.markIssueAsUnresolved(id);
                 issuesPanelProvider.markIssueUnresolved(id);
-                vscode.window.showInformationMessage('Issue marked as unresolved');
+                codeLensProvider.markIssueUnresolved(id);
             } catch (error) {
                 vscode.window.showErrorMessage(`Failed to mark issue as unresolved: ${error}`);
             }

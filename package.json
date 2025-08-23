@@ -226,6 +226,27 @@
             ".log"
           ],
           "description": "File extensions to exclude from code review (e.g., .min.js, .test.js, .spec.ts)"
+        },
+        "aiCodeReview.codeLens.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable CodeLens to show resolve actions above code lines with issues"
+        },
+        "aiCodeReview.codeLens.selector": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "javascript",
+            "typescript",
+            "html",
+            "css",
+            "json",
+            "jsx",
+            "tsx"
+          ],
+          "description": "File types where CodeLens should be displayed"
         }
       }
     }
