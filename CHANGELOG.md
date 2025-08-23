@@ -1,3 +1,10 @@
+## [0.6.4](https://github.com/vuquangkhtn/ai-code-review-assistant/compare/v0.6.3...v0.6.4) (2025-08-23)
+
+
+### Bug Fixes
+
+* Add npm ci step before publishing to resolve TypeScript compilation errors ([832a228](https://github.com/vuquangkhtn/ai-code-review-assistant/commit/832a228ac8bd9571863d8f1904eaafed6708eb30))
+
 ## [0.6.3](https://github.com/vuquangkhtn/ai-code-review-assistant/compare/v0.6.2...v0.6.3) (2025-08-23)
 
 
