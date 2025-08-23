@@ -275,34 +275,18 @@ jobs:
             echo "release_created=false" >> $GITHUB_OUTPUT
           fi
 
-  # Stage 4: Prepare for Publishing
+  # Stage 4: Prepare for Publishing (Simplified - VSIX will be built fresh in publish job)
   prepare-publish:
     needs: [build-and-test, validate-build, release-and-tag]
     runs-on: ubuntu-latest
     if: needs.build-and-test.outputs.should_release == 'true' && needs.release-and-tag.outputs.release_created == 'true'
     steps:
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: build-artifacts
-          path: .
-
-      - name: Verify VSIX package for publishing
+      - name: Preparation complete
         run: |
-          if [ ! -f *.vsix ]; then
-            echo "❌ VSIX file not found in artifacts"
-            exit 1
-          fi
-          
-          echo "✅ VSIX package ready for publishing"
-          ls -la *.vsix
-
-      - name: Upload release artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: release-artifacts-${{ needs.release-and-tag.outputs.new_version }}
-          path: '*.vsix'
-          retention-days: 30
+          echo "✅ Release preparation complete"
+          echo "Version: ${{ needs.release-and-tag.outputs.new_version }}"
+          echo "Tag: ${{ needs.release-and-tag.outputs.tag_name }}"
+          echo "VSIX will be built fresh in publish job with correct version"
 
   # Stage 5: Publish to Marketplaces
   publish:
@@ -343,28 +327,46 @@ jobs:
           fi
           echo "✅ Successfully checked out tag ${{ needs.release-and-tag.outputs.tag_name }}"
 
-      - name: Download release artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: release-artifacts-${{ needs.release-and-tag.outputs.new_version }}
-          path: .
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
 
       - name: Install publishing tools
         run: npm install -g @vscode/vsce@${{ env.VSCE_VERSION }} ovsx
 
-      - name: Verify VSIX package
+      - name: Build and package VSIX with correct version
         run: |
-          if [ ! -f *.vsix ]; then
+          echo "📦 Building extension with version ${{ needs.release-and-tag.outputs.new_version }}..."
+          npm run package
+          vsce package
+          VSIX_FILE=$(ls *.vsix | head -1)
+          echo "✅ VSIX package created with correct version: $VSIX_FILE"
+          ls -la *.vsix
+
+      - name: Verify VSIX package version
+        run: |
+          VSIX_FILE=$(ls *.vsix | head -1)
+          if [ ! -f "$VSIX_FILE" ]; then
             echo "❌ VSIX file not found"
             exit 1
           fi
-          echo "✅ VSIX package ready for publishing"
-          ls -la *.vsix
+          
+          # Extract and verify version from VSIX filename
+          VSIX_VERSION=$(echo "$VSIX_FILE" | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+')
+          EXPECTED_VERSION="${{ needs.release-and-tag.outputs.new_version }}"
+          
+          if [ "$VSIX_VERSION" != "$EXPECTED_VERSION" ]; then
+            echo "❌ VSIX version mismatch: found $VSIX_VERSION, expected $EXPECTED_VERSION"
+            exit 1
+          fi
+          
+          echo "✅ VSIX package version verified: $VSIX_VERSION"
+          echo "✅ VSIX package ready for publishing: $VSIX_FILE"
 
       - name: Publish to VS Code Marketplace
         env:
@@ -399,13 +401,26 @@ jobs:
           path: '*.vsix'
           retention-days: 90
 
+      - name: Install GitHub CLI
+        run: |
+          if ! command -v gh &> /dev/null; then
+            echo "Installing GitHub CLI..."
+            curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+            echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+            sudo apt update
+            sudo apt install gh
+          else
+            echo "GitHub CLI already installed"
+          fi
+
       - name: Update GitHub release with VSIX
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "📎 Uploading VSIX to GitHub release..."
-          gh release upload ${{ needs.release-and-tag.outputs.tag_name }} *.vsix
-          echo "✅ VSIX uploaded to GitHub release"
+          VSIX_FILE=$(ls *.vsix | head -1)
+          gh release upload ${{ needs.release-and-tag.outputs.tag_name }} "$VSIX_FILE" --clobber
+          echo "✅ VSIX uploaded to GitHub release: $VSIX_FILE"
 
   # Stage 5: Summary and Notifications
   summary:
