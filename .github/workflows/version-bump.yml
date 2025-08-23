@@ -79,12 +79,20 @@ jobs:
           echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
           echo "Current version: $CURRENT_VERSION"
 
-      - name: Bump version
+      - name: Bump version with Lerna
         id: bump
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Bump version in package.json and package-lock.json
-          NEW_VERSION=$(npm version ${{ github.event.inputs.version_type }} --no-git-tag-version)
-          NEW_VERSION=${NEW_VERSION#v}  # Remove 'v' prefix
+          # Configure git for Lerna
+          git config user.name "GitHub Action"
+          git config user.email "action@github.com"
+          
+          # Use Lerna to bump version with conventional commits
+          npx lerna version ${{ github.event.inputs.version_type }} --conventional-commits --create-release github --yes
+          
+          # Get the new version
+          NEW_VERSION=$(node -p "require('./package.json').version")
           TAG_NAME="v$NEW_VERSION"
           
           echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
@@ -94,11 +102,9 @@ jobs:
 
       - name: Generate CHANGELOG.md
         run: |
-          # Make the changelog generation script executable
-          chmod +x scripts/generate-changelog.js
-          
-          # Generate changelog using the new script
-          node scripts/generate-changelog.js ${{ steps.bump.outputs.new_version }}
+          # Lerna already generated the changelog during version bump
+          # But we can also generate a comprehensive changelog if needed
+          npm run changelog:all || echo "Changelog generation completed by Lerna"
           
           echo "✅ Changelog generated successfully for version ${{ steps.bump.outputs.new_version }}"
 

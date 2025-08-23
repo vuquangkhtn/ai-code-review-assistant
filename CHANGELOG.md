@@ -1,3 +1,40 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [0.6.0](https://github.com/vuquangkhtn/ai-code-review-assistant/compare/v0.5.0...v0.6.0) (2025-08-23)
+
+
+### Bug Fixes
+
+* cannot read AI result ([cfdbff8](https://github.com/vuquangkhtn/ai-code-review-assistant/commit/cfdbff8238010428d51e69de854851dee43299f6))
+
+
+### Features
+
+* add automatic changelog generation for version bumps ([35c202f](https://github.com/vuquangkhtn/ai-code-review-assistant/commit/35c202f438dc22a63af936cca2a55c50fd4ef277))
+
+
+
+
+
+# [0.6.0](https://github.com/vuquangkhtn/ai-code-review-assistant/compare/v0.5.0...v0.6.0) (2025-08-23)
+
+
+### Bug Fixes
+
+* cannot read AI result ([cfdbff8](https://github.com/vuquangkhtn/ai-code-review-assistant/commit/cfdbff8238010428d51e69de854851dee43299f6))
+
+
+### Features
+
+* add automatic changelog generation for version bumps ([35c202f](https://github.com/vuquangkhtn/ai-code-review-assistant/commit/35c202f438dc22a63af936cca2a55c50fd4ef277))
+
+
+
+
+
 # Changelog
 
 ## [0.5.1] - 2025-08-23

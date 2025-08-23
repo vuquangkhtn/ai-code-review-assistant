@@ -1,0 +1,47 @@
+{
+  "$schema": "node_modules/lerna/schemas/lerna-schema.json",
+  "version": "0.6.0",
+  "npmClient": "npm",
+  "command": {
+    "version": {
+      "allowBranch": [
+        "main",
+        "master",
+        "develop"
+      ],
+      "conventionalCommits": true,
+      "message": "chore(release): publish %s",
+      "createRelease": "github",
+      "push": true,
+      "exact": true
+    },
+    "publish": {
+      "conventionalCommits": true,
+      "message": "chore(release): publish %s",
+      "registry": "https://registry.npmjs.org/",
+      "ignoreChanges": [
+        "**/*.md",
+        "**/*.test.js",
+        "**/*.test.ts",
+        "**/*.spec.js",
+        "**/*.spec.ts",
+        "**/test/**",
+        "**/tests/**",
+        "**/__tests__/**",
+        "**/.github/**",
+        "**/docs/**"
+      ]
+    }
+  },
+  "changelog": {
+    "repo": "vuquangkhtn/ai-code-review-assistant",
+    "labels": {
+      "feature": ":rocket: New Feature",
+      "bug": ":bug: Bug Fix",
+      "docs": ":memo: Documentation",
+      "internal": ":house: Internal",
+      "breaking": ":boom: Breaking Change"
+    },
+    "cacheDir": ".changelog"
+  }
+}

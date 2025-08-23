@@ -1,0 +1,433 @@
+name: Complete CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+    paths-ignore:
+      - 'docs/**'
+      - '*.md'
+      - '.gitignore'
+      - '.vscode/**'
+  workflow_dispatch:
+    inputs:
+      force_release:
+        description: 'Force a release even without significant changes'
+        required: false
+        default: false
+        type: boolean
+      version_type:
+        description: 'Override version bump type (leave empty for auto-detection)'
+        required: false
+        type: choice
+        options:
+          - auto
+          - patch
+          - minor
+          - major
+      skip_publish:
+        description: 'Skip marketplace publishing'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  repository-projects: write
+  actions: write
+  id-token: write
+  pages: write
+
+env:
+  NODE_VERSION: '20'
+  VSCE_VERSION: '2.15.0'
+
+jobs:
+  # Stage 1: Build and Test
+  build-and-test:
+    runs-on: ubuntu-latest
+    outputs:
+      should_release: ${{ steps.check-changes.outputs.should_release }}
+      version_type: ${{ steps.check-changes.outputs.version_type }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run type checking
+        run: npm run check-types
+
+      - name: Run linting
+        run: npm run lint
+
+      - name: Build extension
+        run: npm run package
+
+      - name: Run tests
+        run: npm test
+        continue-on-error: true
+        env:
+          DISPLAY: ':99.0'
+
+      - name: Run security audit
+        run: |
+          npm audit --audit-level=moderate || echo "Moderate vulnerabilities found"
+          npm audit --audit-level=high || echo "High vulnerabilities found"
+        continue-on-error: true
+
+      - name: Check for release-worthy changes
+        id: check-changes
+        run: |
+          # Get the last release tag
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          
+          if [ -z "$LAST_TAG" ]; then
+            echo "No previous tags found, will create initial release"
+            echo "should_release=true" >> $GITHUB_OUTPUT
+            echo "version_type=minor" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          # Check commits since last tag for conventional commit types
+          COMMITS_SINCE_TAG=$(git log $LAST_TAG..HEAD --oneline)
+          
+          if [ -z "$COMMITS_SINCE_TAG" ]; then
+            echo "No commits since last tag"
+            if [ "${{ github.event.inputs.force_release }}" = "true" ]; then
+              echo "Forcing release due to manual trigger"
+              echo "should_release=true" >> $GITHUB_OUTPUT
+              echo "version_type=patch" >> $GITHUB_OUTPUT
+            else
+              echo "should_release=false" >> $GITHUB_OUTPUT
+            fi
+            exit 0
+          fi
+          
+          # Analyze commit types for version bump
+          HAS_BREAKING=$(echo "$COMMITS_SINCE_TAG" | grep -i "BREAKING CHANGE" || true)
+          HAS_FEAT=$(echo "$COMMITS_SINCE_TAG" | grep -E "^[a-f0-9]+ feat" || true)
+          HAS_FIX=$(echo "$COMMITS_SINCE_TAG" | grep -E "^[a-f0-9]+ fix" || true)
+          
+          # Determine version type
+          if [ -n "$HAS_BREAKING" ]; then
+            VERSION_TYPE="major"
+          elif [ -n "$HAS_FEAT" ]; then
+            VERSION_TYPE="minor"
+          elif [ -n "$HAS_FIX" ]; then
+            VERSION_TYPE="patch"
+          else
+            # Check for other significant changes
+            HAS_SIGNIFICANT=$(echo "$COMMITS_SINCE_TAG" | grep -E "^[a-f0-9]+ (perf|refactor|build|ci)" || true)
+            if [ -n "$HAS_SIGNIFICANT" ]; then
+              VERSION_TYPE="patch"
+            else
+              echo "No significant changes found for release"
+              if [ "${{ github.event.inputs.force_release }}" = "true" ]; then
+                echo "Forcing release due to manual trigger"
+                VERSION_TYPE="patch"
+              else
+                echo "should_release=false" >> $GITHUB_OUTPUT
+                exit 0
+              fi
+            fi
+          fi
+          
+          # Override with manual input if provided
+          if [ -n "${{ github.event.inputs.version_type }}" ] && [ "${{ github.event.inputs.version_type }}" != "auto" ]; then
+            VERSION_TYPE="${{ github.event.inputs.version_type }}"
+          fi
+          
+          echo "should_release=true" >> $GITHUB_OUTPUT
+          echo "version_type=$VERSION_TYPE" >> $GITHUB_OUTPUT
+          echo "Will create $VERSION_TYPE release"
+
+      - name: Install publishing tools
+        if: steps.check-changes.outputs.should_release == 'true'
+        run: npm install -g @vscode/vsce@${{ env.VSCE_VERSION }} ovsx
+
+      - name: Package VSIX
+        if: steps.check-changes.outputs.should_release == 'true'
+        run: |
+          echo "Packaging extension..."
+          vsce package
+          echo "✅ VSIX package created successfully"
+          ls -la *.vsix
+
+      - name: Upload build artifacts
+        if: steps.check-changes.outputs.should_release == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: |
+            *.vsix
+            dist/
+            node_modules/
+          retention-days: 7
+
+  # Stage 2: Release and Tag
+  release-and-tag:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: needs.build-and-test.outputs.should_release == 'true'
+    outputs:
+      new_version: ${{ steps.release.outputs.new_version }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+      release_created: ${{ steps.release.outputs.release_created }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Configure Git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Create release with Lerna
+        id: release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Use Lerna to create version, changelog, tag, and GitHub release
+          VERSION_TYPE="${{ needs.build-and-test.outputs.version_type }}"
+          
+          echo "Creating $VERSION_TYPE release with Lerna..."
+          npx lerna version $VERSION_TYPE --conventional-commits --create-release github --yes
+          
+          # Get the new version and tag
+          NEW_VERSION=$(node -p "require('./package.json').version")
+          TAG_NAME="v$NEW_VERSION"
+          
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
+          echo "release_created=true" >> $GITHUB_OUTPUT
+          
+          echo "✅ Released version $NEW_VERSION with tag $TAG_NAME"
+
+      - name: Generate comprehensive changelog
+        run: |
+          # Generate a comprehensive changelog as backup
+          npm run changelog:all || echo "Changelog already generated by Lerna"
+          
+          echo "✅ Changelog updated for version ${{ steps.release.outputs.new_version }}"
+
+  # Stage 3: Prepare for Publishing
+  prepare-publish:
+    needs: [build-and-test, release-and-tag]
+    runs-on: ubuntu-latest
+    if: needs.build-and-test.outputs.should_release == 'true' && needs.release-and-tag.outputs.release_created == 'true'
+    steps:
+      - name: Checkout code at tag
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.release-and-tag.outputs.tag_name }}
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+          path: .
+
+      - name: Validate package.json version
+        run: |
+          echo "Validating package.json..."
+          VERSION=$(node -p "require('./package.json').version")
+          echo "Package version: $VERSION"
+          
+          if [ "$VERSION" != "${{ needs.release-and-tag.outputs.new_version }}" ]; then
+            echo "❌ Version mismatch: expected ${{ needs.release-and-tag.outputs.new_version }}, got $VERSION"
+            exit 1
+          fi
+          
+          echo "✅ Version validation successful"
+
+      - name: Verify VSIX package
+        run: |
+          if [ ! -f *.vsix ]; then
+            echo "❌ VSIX file not found in artifacts"
+            exit 1
+          fi
+          
+          echo "✅ VSIX package verified"
+          ls -la *.vsix
+
+      - name: Upload release artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-artifacts-${{ needs.release-and-tag.outputs.new_version }}
+          path: '*.vsix'
+          retention-days: 30
+
+  # Stage 4: Publish to Marketplaces
+  publish:
+    needs: [build-and-test, release-and-tag, prepare-publish]
+    runs-on: ubuntu-latest
+    if: |
+      needs.build-and-test.outputs.should_release == 'true' && 
+      needs.release-and-tag.outputs.release_created == 'true' &&
+      github.event.inputs.skip_publish != 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.release-and-tag.outputs.tag_name }}
+
+      - name: Download release artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: release-artifacts-${{ needs.release-and-tag.outputs.new_version }}
+          path: .
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install publishing tools
+        run: npm install -g @vscode/vsce@${{ env.VSCE_VERSION }} ovsx
+
+      - name: Verify VSIX package
+        run: |
+          if [ ! -f *.vsix ]; then
+            echo "❌ VSIX file not found"
+            exit 1
+          fi
+          echo "✅ VSIX package ready for publishing"
+          ls -la *.vsix
+
+      - name: Publish to VS Code Marketplace
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        run: |
+          if [ -n "$VSCE_PAT" ]; then
+            echo "📦 Publishing to VS Code Marketplace..."
+            vsce publish --pat $VSCE_PAT
+            echo "✅ Published to VS Code Marketplace"
+          else
+            echo "⚠️ VSCE_PAT not set, skipping VS Code Marketplace publishing"
+          fi
+
+      - name: Publish to Open VSX Registry
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
+        run: |
+          if [ -n "$OVSX_PAT" ]; then
+            echo "📦 Publishing to Open VSX Registry..."
+            ovsx publish --pat $OVSX_PAT
+            echo "✅ Published to Open VSX Registry"
+          else
+            echo "⚠️ OVSX_PAT not set, skipping Open VSX Registry publishing"
+          fi
+
+      - name: Upload final VSIX
+        uses: actions/upload-artifact@v4
+        with:
+          name: published-extension-${{ needs.release-and-tag.outputs.new_version }}
+          path: '*.vsix'
+          retention-days: 90
+
+      - name: Update GitHub release with VSIX
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "📎 Uploading VSIX to GitHub release..."
+          gh release upload ${{ needs.release-and-tag.outputs.tag_name }} *.vsix
+          echo "✅ VSIX uploaded to GitHub release"
+
+  # Stage 5: Summary and Notifications
+  summary:
+    needs: [build-and-test, release-and-tag, prepare-publish, publish]
+    runs-on: ubuntu-latest
+    if: always() && needs.build-and-test.outputs.should_release == 'true'
+    steps:
+      - name: Pipeline Summary
+        run: |
+          echo "🎉 **Complete CI/CD Pipeline Summary**"
+          echo ""
+          echo "**Build & Test:** ${{ needs.build-and-test.result }}"
+          echo "**Release & Tag:** ${{ needs.release-and-tag.result }}"
+          echo "**Prepare Publish:** ${{ needs.prepare-publish.result }}"
+          echo "**Publish:** ${{ needs.publish.result }}"
+          echo ""
+          
+          if [ "${{ needs.release-and-tag.outputs.release_created }}" = "true" ]; then
+            echo "📦 **New Version:** ${{ needs.release-and-tag.outputs.new_version }}"
+            echo "🏷️ **Git Tag:** ${{ needs.release-and-tag.outputs.tag_name }}"
+            echo "📝 **GitHub Release:** Created with automated changelog"
+            echo ""
+            
+            if [ "${{ needs.publish.result }}" = "success" ]; then
+              echo "🚀 **Published to:**"
+              echo "  - VS Code Marketplace"
+              echo "  - Open VSX Registry"
+              echo "  - GitHub Releases (with VSIX)"
+            elif [ "${{ github.event.inputs.skip_publish }}" = "true" ]; then
+              echo "⏭️ **Publishing skipped** (manual override)"
+            else
+              echo "❌ **Publishing failed** - Check logs above"
+            fi
+          else
+            echo "ℹ️ **No release created** - No significant changes detected"
+          fi
+          
+          echo ""
+          echo "**Repository:** https://github.com/${{ github.repository }}"
+          if [ "${{ needs.release-and-tag.outputs.release_created }}" = "true" ]; then
+            echo "**Release Notes:** https://github.com/${{ github.repository }}/releases/tag/${{ needs.release-and-tag.outputs.tag_name }}"
+          fi
+
+  # Conditional job: Skip notification
+  skip-notification:
+    runs-on: ubuntu-latest
+    if: needs.build-and-test.outputs.should_release != 'true'
+    needs: build-and-test
+    steps:
+      - name: No Release Notification
+        run: |
+          echo "ℹ️ **Pipeline completed without release**"
+          echo ""
+          echo "**Reason:** No significant changes detected since last release"
+          echo "**Build & Test:** ${{ needs.build-and-test.result }}"
+          echo ""
+          echo "To force a release, use the manual workflow trigger with 'force_release' enabled."
