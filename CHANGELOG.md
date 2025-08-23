@@ -1,3 +1,10 @@
+## [0.7.1](https://github.com/vuquangkhtn/ai-code-review-assistant/compare/v0.7.0...v0.7.1) (2025-08-23)
+
+
+### Bug Fixes
+
+* bump version ([977c3c7](https://github.com/vuquangkhtn/ai-code-review-assistant/commit/977c3c70e72a7f10c73e63305e124d1ea4698ed0))
+
 # [0.7.0](https://github.com/vuquangkhtn/ai-code-review-assistant/compare/v0.6.4...v0.7.0) (2025-08-23)
 
 
