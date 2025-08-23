@@ -1,3 +1,10 @@
+## [0.7.3](https://github.com/vuquangkhtn/ai-code-review-assistant/compare/v0.7.2...v0.7.3) (2025-08-23)
+
+
+### Bug Fixes
+
+* add tag availability check and retry logic for CI/CD checkout steps ([5c22751](https://github.com/vuquangkhtn/ai-code-review-assistant/commit/5c227513bc2fddca79674f2216ccf8fad5fd4552))
+
 ## [0.7.2](https://github.com/vuquangkhtn/ai-code-review-assistant/compare/v0.7.1...v0.7.2) (2025-08-23)
 
 
