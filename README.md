@@ -38,6 +38,8 @@ This VS Code extension generates structured prompts for AI code reviews that you
 - **`AI Code Review: All Files`** - Review entire codebase
 - **`AI Code Review: Compare Branches`** - Compare between branches
 
+📖 **For detailed usage instructions and all features, see our [Complete Features Guide](FEATURES.md)**
+
 ### How It Works
 1. **Choose what to review**: Local changes, specific commits, or branch comparisons
 2. **Get your prompt**: Extension generates a detailed prompt with your code context
@@ -75,6 +77,11 @@ We welcome contributions! See our [Contributing Guidelines](CONTRIBUTING.md) for
 ## 📝 License
 
 MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 📖 Documentation
+
+- **[Complete Features Guide](FEATURES.md)** - Comprehensive documentation of all features and usage instructions
+- **[Contributing Guidelines](CONTRIBUTING.md)** - How to contribute to the project
 
 ## 📞 Support
 
