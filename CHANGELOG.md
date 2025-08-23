@@ -1,3 +1,11 @@
+## [0.6.1](https://github.com/vuquangkhtn/ai-code-review-assistant/compare/v0.6.0...v0.6.1) (2025-08-23)
+
+
+### Bug Fixes
+
+* Add Node.js and VS Code types to TypeScript configuration ([f204615](https://github.com/vuquangkhtn/ai-code-review-assistant/commit/f204615b2a608d2c57bf63e9260db65365339b8f))
+* Update VS Code engine version to match @types/vscode ([2a3db63](https://github.com/vuquangkhtn/ai-code-review-assistant/commit/2a3db633e12184530ed2f2cd47eee229d9914899))
+
 # [0.6.0](https://github.com/vuquangkhtn/ai-code-review-assistant/compare/v0.5.1...v0.6.0) (2025-08-23)
 
 
