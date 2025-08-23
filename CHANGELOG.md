@@ -1,3 +1,10 @@
+## [0.7.5](https://github.com/vuquangkhtn/ai-code-review-assistant/compare/v0.7.4...v0.7.5) (2025-08-23)
+
+
+### Bug Fixes
+
+* sync package.json version with semantic-release tag v0.7.4 ([9a99ffc](https://github.com/vuquangkhtn/ai-code-review-assistant/commit/9a99ffc0c7051bd9caae843572c1fabdbb09aef8))
+
 ## [0.7.4](https://github.com/vuquangkhtn/ai-code-review-assistant/compare/v0.7.3...v0.7.4) (2025-08-23)
 
 
