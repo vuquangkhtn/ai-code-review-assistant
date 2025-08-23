@@ -1,3 +1,10 @@
+## [0.7.9](https://github.com/vuquangkhtn/ai-code-review-assistant/compare/v0.7.8...v0.7.9) (2025-08-23)
+
+
+### Bug Fixes
+
+* improve prompt template ([14b8746](https://github.com/vuquangkhtn/ai-code-review-assistant/commit/14b8746d9d5404b23688fc51ebbbdb5a16dc08e9))
+
 ## [0.7.8](https://github.com/vuquangkhtn/ai-code-review-assistant/compare/v0.7.7...v0.7.8) (2025-08-23)
 
 
