@@ -1,3 +1,10 @@
+## [0.7.7](https://github.com/vuquangkhtn/ai-code-review-assistant/compare/v0.7.6...v0.7.7) (2025-08-23)
+
+
+### Bug Fixes
+
+* restructure CI workflow to run semantic-release AFTER build validation ([14f0123](https://github.com/vuquangkhtn/ai-code-review-assistant/commit/14f0123f39b050a35777fe38dfd100dc568fc6c4))
+
 ## [0.7.6](https://github.com/vuquangkhtn/ai-code-review-assistant/compare/v0.7.5...v0.7.6) (2025-08-23)
 
 
