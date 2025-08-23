@@ -1,3 +1,10 @@
+## [0.8.1](https://github.com/vuquangkhtn/ai-code-review-assistant/compare/v0.8.0...v0.8.1) (2025-08-23)
+
+
+### Bug Fixes
+
+* ci not auto publish ([f7cca9f](https://github.com/vuquangkhtn/ai-code-review-assistant/commit/f7cca9feb7fb89dd6b1a695bb09cd94416beaf6a))
+
 # [0.8.0](https://github.com/vuquangkhtn/ai-code-review-assistant/compare/v0.7.10...v0.8.0) (2025-08-23)
 
 
