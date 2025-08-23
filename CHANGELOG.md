@@ -1,3 +1,10 @@
+## [0.7.10](https://github.com/vuquangkhtn/ai-code-review-assistant/compare/v0.7.9...v0.7.10) (2025-08-23)
+
+
+### Bug Fixes
+
+* resolve CI publish workflow conflict ([c1be719](https://github.com/vuquangkhtn/ai-code-review-assistant/commit/c1be7194fe2a753c07ef4312f2d275d7f9a52d15))
+
 ## [0.7.9](https://github.com/vuquangkhtn/ai-code-review-assistant/compare/v0.7.8...v0.7.9) (2025-08-23)
 
 
