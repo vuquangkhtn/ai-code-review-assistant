@@ -93,6 +93,18 @@
         "title": "Paste Prompt to AI Chat",
         "category": "AI Code Review",
         "icon": "$(send)"
+      },
+      {
+        "command": "aiCodeReview.markIssueResolved",
+        "title": "Mark as Resolved",
+        "category": "AI Code Review",
+        "icon": "$(check)"
+      },
+      {
+        "command": "aiCodeReview.markIssueUnresolved",
+        "title": "Mark as Unresolved",
+        "category": "AI Code Review",
+        "icon": "$(close)"
       }
     ],
     "viewsContainers": {
@@ -124,6 +136,18 @@
           "command": "aiCodeReview.openSettings",
           "when": "view == aiCodeReviewPanel",
           "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "aiCodeReview.markIssueResolved",
+          "when": "view == aiCodeReviewIssues && viewItem == unresolvedIssue",
+          "group": "inline"
+        },
+        {
+          "command": "aiCodeReview.markIssueUnresolved",
+          "when": "view == aiCodeReviewIssues && viewItem == resolvedIssue",
+          "group": "inline"
         }
       ]
     },

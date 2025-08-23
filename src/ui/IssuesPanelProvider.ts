@@ -121,10 +121,10 @@ export class IssuesPanelProvider implements vscode.TreeDataProvider<IssueItem> {
         }
 
         return filteredIssues.map(issue => {
-            const iconName = this.getSeverityIcon(issue.severity);
-            const label = issue.title;
-            const description = `${this.getFileName(issue.filePath)}:${issue.lineNumber}`;
-            const color = this.getSeverityColor(issue.severity);
+            const iconName = issue.resolved ? 'check' : this.getSeverityIcon(issue.severity);
+            const label = issue.resolved ? `✓ ${issue.title}` : issue.title;
+            const description = `${this.getFileName(issue.filePath)}:${issue.lineNumber}${issue.resolved ? ' (Resolved)' : ''}`;
+            const color = issue.resolved ? new vscode.ThemeColor('charts.green') : this.getSeverityColor(issue.severity);
             
             // Create URI for the file
             const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
@@ -157,10 +157,11 @@ export class IssuesPanelProvider implements vscode.TreeDataProvider<IssueItem> {
                     ]
                 },
                 `${issue.severity} - ${issue.description}`,
-                'issue',
+                issue.resolved ? 'resolvedIssue' : 'unresolvedIssue',
                 undefined,
                 description,
-                color
+                color,
+                issue.id
             );
         });
     }
@@ -258,7 +259,8 @@ export class IssueItem extends vscode.TreeItem {
         public readonly contextValue?: string,
         public readonly groupKey?: string,
         public readonly description?: string,
-        public readonly iconColor?: vscode.ThemeColor
+        public readonly iconColor?: vscode.ThemeColor,
+        public readonly issueId?: string
     ) {
         super(label, collapsibleState);
         

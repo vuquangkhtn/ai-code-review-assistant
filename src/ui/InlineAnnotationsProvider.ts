@@ -3,12 +3,14 @@ import { CodeIssue, IssueSeverity } from '../types';
 
 export class InlineAnnotationsProvider {
     private _decorationTypes: Map<IssueSeverity, vscode.TextEditorDecorationType> = new Map();
+    private _resolvedDecorationType!: vscode.TextEditorDecorationType;
     private _issues: CodeIssue[] = [];
     private _diagnosticCollection: vscode.DiagnosticCollection;
 
     constructor() {
         this._diagnosticCollection = vscode.languages.createDiagnosticCollection('aiCodeReview');
         this._initializeDecorationTypes();
+        this._initializeResolvedDecorationType();
         
         // Listen for active editor changes to update decorations
         vscode.window.onDidChangeActiveTextEditor(() => {
@@ -24,7 +26,6 @@ export class InlineAnnotationsProvider {
             overviewRulerColor: '#ff4444',
             overviewRulerLane: vscode.OverviewRulerLane.Right,
             before: {
-                contentText: '⚠️ Critical ',
                 color: '#ff4444',
                 fontWeight: 'bold'
             }
@@ -37,7 +38,6 @@ export class InlineAnnotationsProvider {
             overviewRulerColor: '#ff8800',
             overviewRulerLane: vscode.OverviewRulerLane.Right,
             before: {
-                contentText: '⚠️ High ',
                 color: '#ff8800',
                 fontWeight: 'bold'
             }
@@ -50,7 +50,6 @@ export class InlineAnnotationsProvider {
             overviewRulerColor: '#ffcc00',
             overviewRulerLane: vscode.OverviewRulerLane.Right,
             before: {
-                contentText: '⚠️ Medium ',
                 color: '#ffcc00'
             }
         }));
@@ -62,10 +61,39 @@ export class InlineAnnotationsProvider {
             overviewRulerColor: '#00aa00',
             overviewRulerLane: vscode.OverviewRulerLane.Right,
             before: {
-                contentText: 'ℹ️ Low ',
                 color: '#00aa00'
             }
         }));
+    }
+
+    private _initializeResolvedDecorationType() {
+        this._resolvedDecorationType = vscode.window.createTextEditorDecorationType({
+            backgroundColor: 'rgba(128, 128, 128, 0.1)',
+            border: '1px solid #808080',
+            borderWidth: '0 0 0 3px',
+            opacity: '0.6',
+            after: {
+                color: '#808080'
+            }
+        });
+    }
+
+    public markIssueAsResolved(issueId: string) {
+        const issue = this._issues.find(i => i.id === issueId);
+        if (issue) {
+            issue.resolved = true;
+            this._updateDecorations();
+            this._updateDiagnostics();
+        }
+    }
+
+    public markIssueAsUnresolved(issueId: string) {
+        const issue = this._issues.find(i => i.id === issueId);
+        if (issue) {
+            issue.resolved = false;
+            this._updateDecorations();
+            this._updateDiagnostics();
+        }
     }
 
     public updateIssues(issues: CodeIssue[]) {
@@ -90,6 +118,7 @@ export class InlineAnnotationsProvider {
         this._decorationTypes.forEach(decorationType => {
             editor.setDecorations(decorationType, []);
         });
+        editor.setDecorations(this._resolvedDecorationType, []);
 
         // Group issues by severity for the current file
         const currentFileIssues = this._issues.filter(issue => 
@@ -98,8 +127,12 @@ export class InlineAnnotationsProvider {
             issue.filePath.endsWith(editor.document.uri.fsPath.split('/').pop() || '')
         );
 
+        // Separate resolved and unresolved issues
+        const unresolvedIssues = currentFileIssues.filter(issue => !issue.resolved);
+        const resolvedIssues = currentFileIssues.filter(issue => issue.resolved);
+
         const issuesBySeverity = new Map<IssueSeverity, CodeIssue[]>();
-        currentFileIssues.forEach(issue => {
+        unresolvedIssues.forEach(issue => {
             if (!issuesBySeverity.has(issue.severity)) {
                 issuesBySeverity.set(issue.severity, []);
             }
@@ -112,20 +145,19 @@ export class InlineAnnotationsProvider {
             if (!decorationType) return;
 
             const decorations: vscode.DecorationOptions[] = issues.map(issue => {
-                const issueLine = Math.max(0, issue.lineNumber - 1); // Convert to 0-based
-                // If issue is on first line, display annotation on the same line
-                const annotationLine = issueLine === 0 ? 0 : issueLine - 1;
+                // Convert from 1-based line number to 0-based for VS Code
+                const issueLine = Math.max(0, issue.lineNumber - 1);
                 const range = new vscode.Range(
-                    annotationLine,
+                    issueLine,
                     0,
-                    annotationLine,
-                    editor.document.lineAt(annotationLine).text.length
+                    issueLine,
+                    editor.document.lineAt(issueLine).text.length
                 );
 
                 return {
                     range,
                     hoverMessage: new vscode.MarkdownString(
-                        `**${issue.title}** (${issue.severity})\n\n${issue.description}\n\n` +
+                        `**${issue.title}** (${issue.severity} | [Mark as Resolved](command:aiCodeReview.markIssueResolved?${encodeURIComponent(JSON.stringify([issue.id]))}))\n\n${issue.description}\n\n` +
                         (issue.suggestions.length > 0 ? 
                             `**Suggestions:**\n${issue.suggestions.map(s => `• ${s.description}`).join('\n')}` : '')
                     )
@@ -134,12 +166,39 @@ export class InlineAnnotationsProvider {
 
             editor.setDecorations(decorationType, decorations);
         });
+
+        // Apply decorations for resolved issues
+        if (resolvedIssues.length > 0) {
+            const resolvedDecorations: vscode.DecorationOptions[] = resolvedIssues.map(issue => {
+                // Convert from 1-based line number to 0-based for VS Code
+                const issueLine = Math.max(0, issue.lineNumber - 1);
+                const range = new vscode.Range(
+                    issueLine,
+                    0,
+                    issueLine,
+                    editor.document.lineAt(issueLine).text.length
+                );
+
+                return {
+                    range,
+                    hoverMessage: new vscode.MarkdownString(
+                        `**${issue.title}** (${issue.severity} | [Mark as Unresolved](command:aiCodeReview.markIssueUnresolved?${encodeURIComponent(JSON.stringify([issue.id]))})) - RESOLVED\n\n${issue.description}\n\n` +
+                        (issue.suggestions.length > 0 ? 
+                            `**Suggestions:**\n${issue.suggestions.map(s => `• ${s.description}`).join('\n')}` : '')
+                    )
+                };
+            });
+
+            editor.setDecorations(this._resolvedDecorationType, resolvedDecorations);
+        }
     }
 
     private _updateDiagnostics() {
         const diagnosticMap = new Map<string, vscode.Diagnostic[]>();
 
-        this._issues.forEach(issue => {
+        // Only show diagnostics for unresolved issues
+        const unresolvedIssues = this._issues.filter(issue => !issue.resolved);
+        unresolvedIssues.forEach(issue => {
             // Ensure file path is absolute
             let absolutePath = issue.filePath;
             if (!absolutePath.startsWith('/') && !absolutePath.match(/^[a-zA-Z]:/)) {
@@ -157,7 +216,8 @@ export class InlineAnnotationsProvider {
                 diagnosticMap.set(uriString, []);
             }
 
-            const line = Math.max(0, issue.lineNumber - 1); // Convert to 0-based
+            // Convert from 1-based line number to 0-based for VS Code
+            const line = Math.max(0, issue.lineNumber - 1);
             const range = new vscode.Range(
                 line,
                 issue.columnNumber || 0,
@@ -210,12 +270,14 @@ export class InlineAnnotationsProvider {
         this._decorationTypes.forEach(decorationType => {
             editor.setDecorations(decorationType, []);
         });
+        editor.setDecorations(this._resolvedDecorationType, []);
     }
 
     public dispose() {
         this._decorationTypes.forEach(decorationType => {
             decorationType.dispose();
         });
+        this._resolvedDecorationType.dispose();
         this._diagnosticCollection.dispose();
     }
 }

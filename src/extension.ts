@@ -294,6 +294,38 @@ export function activate(context: vscode.ExtensionContext) {
             } catch (error) {
                 vscode.window.showErrorMessage(`Failed to show paste instructions: ${error}`);
             }
+        }),
+
+        vscode.commands.registerCommand('aiCodeReview.markIssueResolved', async (treeItem?: any, issueId?: string) => {
+            try {
+                // Handle both tree view context and direct command calls
+                const id = treeItem?.issueId || issueId;
+                if (!id) {
+                    vscode.window.showErrorMessage('No issue ID provided');
+                    return;
+                }
+                inlineAnnotationsProvider.markIssueAsResolved(id);
+                issuesPanelProvider.refresh();
+                vscode.window.showInformationMessage('Issue marked as resolved');
+            } catch (error) {
+                vscode.window.showErrorMessage(`Failed to mark issue as resolved: ${error}`);
+            }
+        }),
+
+        vscode.commands.registerCommand('aiCodeReview.markIssueUnresolved', async (treeItem?: any, issueId?: string) => {
+            try {
+                // Handle both tree view context and direct command calls
+                const id = treeItem?.issueId || issueId;
+                if (!id) {
+                    vscode.window.showErrorMessage('No issue ID provided');
+                    return;
+                }
+                inlineAnnotationsProvider.markIssueAsUnresolved(id);
+                issuesPanelProvider.refresh();
+                vscode.window.showInformationMessage('Issue marked as unresolved');
+            } catch (error) {
+                vscode.window.showErrorMessage(`Failed to mark issue as unresolved: ${error}`);
+            }
         })
      ];
 

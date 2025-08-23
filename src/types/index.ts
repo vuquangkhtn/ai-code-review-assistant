@@ -10,6 +10,7 @@ export interface CodeIssue {
     columnNumber?: number;
     codeSnippet?: string;
     timestamp: Date;
+    resolved?: boolean;
 }
 
 export interface CodeSuggestion {
