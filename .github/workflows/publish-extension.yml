@@ -1,10 +1,11 @@
 name: Publish Extension
 
 on:
-  push:
-    tags:
-      - 'v*.*.*'  # Triggers on version tags like v1.0.0, v1.2.3
-  workflow_dispatch:  # Manual trigger
+  # Disabled automatic tag trigger to avoid conflict with complete-pipeline.yml
+  # push:
+  #   tags:
+  #     - 'v*.*.*'  # Triggers on version tags like v1.0.0, v1.2.3
+  workflow_dispatch:  # Manual trigger only
     inputs:
       version:
         description: 'Version to publish (leave empty to use current package.json version)'
