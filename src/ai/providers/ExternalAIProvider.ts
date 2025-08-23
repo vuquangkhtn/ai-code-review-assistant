@@ -1,4 +1,4 @@
-import { ReviewRequest, ReviewResult } from '../../types';
+import { ReviewRequest, ReviewResult, ChangeType } from '../../types';
 import { AbstractAIProvider } from './BaseAIProvider';
 import { PromptGenerator } from '../PromptGenerator';
 import { ResponseParser } from '../ResponseParser';
@@ -19,7 +19,7 @@ export class ExternalAIProvider extends AbstractAIProvider {
             await vscode.env.clipboard.writeText(prompt);
             
             // Show prompt to user and ask for response
-            const response = await this.getExternalResponse(prompt);
+            const response = await this.getExternalResponse(prompt, request.changeInfo.type);
             
             if (!response) {
                 throw new Error('No response provided from external AI');
@@ -53,7 +53,22 @@ export class ExternalAIProvider extends AbstractAIProvider {
         };
     }
 
-    private async getExternalResponse(prompt: string): Promise<string | undefined> {
+    private getChangeTypeLabel(changeType: ChangeType): string {
+        switch (changeType) {
+            case ChangeType.LOCAL:
+                return 'Local Changes';
+            case ChangeType.COMMIT:
+                return 'Commit Changes';
+            case ChangeType.BRANCH:
+                return 'Branch Changes';
+            case ChangeType.ALL_FILES:
+                return 'All Files';
+            default:
+                return 'Changes';
+        }
+    }
+
+    private async getExternalResponse(prompt: string, changeType: ChangeType): Promise<string | undefined> {
         // Show the prompt in a webview and ask user to paste response
         const panel = vscode.window.createWebviewPanel(
             'externalAIPrompt',
@@ -79,10 +94,12 @@ export class ExternalAIProvider extends AbstractAIProvider {
                             resolve(undefined);
                             panel.dispose();
                             break;
-                        case 'copyPrompt':
+                        case 'copyPrompt': {
                             vscode.env.clipboard.writeText(prompt);
-                            vscode.window.showInformationMessage('Prompt copied to clipboard!');
+                            const changeTypeLabel = this.getChangeTypeLabel(changeType);
+                            vscode.window.showInformationMessage(`Prompt For ${changeTypeLabel} copied to clipboard!`);
                             break;
+                        }
                     }
                 },
                 undefined

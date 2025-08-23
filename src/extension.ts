@@ -188,7 +188,7 @@ export function activate(context: vscode.ExtensionContext) {
                 };
 
                 await externalAIManager.copyPromptToClipboard(request);
-                vscode.window.showInformationMessage(`Comparing changes from ${sourceBranch} to ${targetBranch}`);
+                // vscode.window.showInformationMessage(`Comparing changes from ${sourceBranch} to ${targetBranch}`);
             } catch (error) {
                 vscode.window.showErrorMessage(`Failed to copy prompt for branch comparison: ${error}`);
             }
@@ -258,7 +258,7 @@ export function activate(context: vscode.ExtensionContext) {
                 // Update the tree provider to reflect the change
                 codeReviewTreeProvider.updateDefaultChangeType(changeType);
                 
-                vscode.window.showInformationMessage(`Default change type set to: ${changeType}`);
+                // vscode.window.showInformationMessage(`Default change type set to: ${changeType}`);
             } catch (error) {
                 vscode.window.showErrorMessage(`Failed to set default change type: ${error}`);
             }
@@ -271,8 +271,8 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand('aiCodeReview.pastePrompt', async () => {
             try {
                 // Show information message with instructions
-                const message = 'Copy the prompt from clipboard and paste it into your AI chat (e.g., ChatGPT, Claude, Copilot Chat). The prompt has been generated and is ready to use!';
-                const action = await vscode.window.showInformationMessage(
+                const message = 'You need to paste the prompt into your AI chat manually';
+                const action = await vscode.window.showWarningMessage(
                     message,
                     { modal: false },
                     'Open AI Chat Instructions'

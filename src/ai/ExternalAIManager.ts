@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { ReviewRequest, ReviewResult, ChangeInfo } from '../types';
+import { ReviewRequest, ReviewResult, ChangeInfo, ChangeType } from '../types';
 import { PromptGenerator, PromptResult } from './PromptGenerator';
 import { ResponseParser } from './ResponseParser';
 import { CleanupManager } from '../utils/CleanupManager';
@@ -25,6 +25,21 @@ export class ExternalAIManager {
 
     public setChangeDetector(changeDetector: any): void {
         this.changeDetector = changeDetector;
+    }
+
+    private getChangeTypeLabel(changeType: ChangeType): string {
+        switch (changeType) {
+            case ChangeType.LOCAL:
+                return 'Local Changes';
+            case ChangeType.COMMIT:
+                return 'Commit Changes';
+            case ChangeType.BRANCH:
+                return 'Branch Changes';
+            case ChangeType.ALL_FILES:
+                return 'All Files';
+            default:
+                return 'Changes';
+        }
     }
 
     /**
@@ -79,7 +94,8 @@ export class ExternalAIManager {
             await vscode.env.clipboard.writeText(promptResult.content);
             
             // Show simple information message with no action buttons
-            vscode.window.showInformationMessage('Prompt copied to clipboard!');
+            const changeTypeLabel = this.getChangeTypeLabel(request.changeInfo.type);
+            vscode.window.showInformationMessage(`Prompt For ${changeTypeLabel} copied to clipboard!`);
         } catch (error) {
             vscode.window.showErrorMessage(`Failed to copy prompt: ${error}`);
         }
