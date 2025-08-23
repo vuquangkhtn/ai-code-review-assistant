@@ -1,3 +1,10 @@
+## [0.6.3](https://github.com/vuquangkhtn/ai-code-review-assistant/compare/v0.6.2...v0.6.3) (2025-08-23)
+
+
+### Bug Fixes
+
+* Bump version to 0.6.3 for proper patch release ([bbb9e4c](https://github.com/vuquangkhtn/ai-code-review-assistant/commit/bbb9e4c9ba376386a74569bb2aa62c1762efc488))
+
 ## [0.6.2](https://github.com/vuquangkhtn/ai-code-review-assistant/compare/v0.6.1...v0.6.2) (2025-08-23)
 
 
