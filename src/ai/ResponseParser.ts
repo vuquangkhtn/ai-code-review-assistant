@@ -14,7 +14,19 @@ export interface ExternalAIResponse {
         description: string;
         suggestion: string;
     }[];
-    summary?: string;
+    summary?: string | {
+        totalIssues?: number;
+        criticalIssues?: number;
+        highIssues?: number;
+        mediumIssues?: number;
+        lowIssues?: number;
+        overallAssessment?: string;
+    };
+    metadata?: {
+        aiProvider?: string;
+        timestamp?: string;
+        filesReviewed?: string[];
+    };
 }
 
 export class ResponseParser {
@@ -56,7 +68,8 @@ export class ResponseParser {
             if (parsed.review && parsed.review.issues) {
                 return {
                     issues: parsed.review.issues,
-                    summary: parsed.review.summary?.overall_quality || parsed.review.summary
+                    summary: parsed.review.summary?.overall_quality || parsed.review.summary,
+                    metadata: parsed.review.metadata
                 };
             }
             
@@ -76,7 +89,8 @@ export class ResponseParser {
                         if (parsed.review && parsed.review.issues) {
                             return {
                                 issues: parsed.review.issues,
-                                summary: parsed.review.summary?.overall_quality || parsed.review.summary
+                                summary: parsed.review.summary?.overall_quality || parsed.review.summary,
+                                metadata: parsed.review.metadata
                             };
                         }
                         
@@ -109,8 +123,47 @@ export class ResponseParser {
             }
         }
 
-        const summary = this.generateSummary(issues);
-        const metadata = this.generateMetadata(aiProvider, filesReviewed);
+        // Handle both string and object summary formats
+        let summary: ReviewSummary;
+        if (typeof response.summary === 'object' && response.summary !== null) {
+            // Use provided summary structure if available
+            summary = {
+                totalIssues: response.summary.totalIssues ?? issues.length,
+                criticalIssues: response.summary.criticalIssues ?? issues.filter(i => i.severity === 'critical').length,
+                highIssues: response.summary.highIssues ?? issues.filter(i => i.severity === 'high').length,
+                mediumIssues: response.summary.mediumIssues ?? issues.filter(i => i.severity === 'medium').length,
+                lowIssues: response.summary.lowIssues ?? issues.filter(i => i.severity === 'low').length,
+                categories: {
+                     [IssueCategory.SECURITY]: issues.filter(i => i.category === IssueCategory.SECURITY).length,
+                     [IssueCategory.PERFORMANCE]: issues.filter(i => i.category === IssueCategory.PERFORMANCE).length,
+                     [IssueCategory.CODE_QUALITY]: issues.filter(i => i.category === IssueCategory.CODE_QUALITY).length,
+                     [IssueCategory.BEST_PRACTICES]: issues.filter(i => i.category === IssueCategory.BEST_PRACTICES).length,
+                     [IssueCategory.STYLE]: issues.filter(i => i.category === IssueCategory.STYLE).length,
+                     [IssueCategory.MAINTAINABILITY]: issues.filter(i => i.category === IssueCategory.MAINTAINABILITY).length,
+                     [IssueCategory.TESTING]: issues.filter(i => i.category === IssueCategory.TESTING).length,
+                     [IssueCategory.DOCUMENTATION]: issues.filter(i => i.category === IssueCategory.DOCUMENTATION).length,
+                     [IssueCategory.OTHER]: issues.filter(i => i.category === IssueCategory.OTHER).length
+                 }
+            };
+        } else {
+            // Generate summary from issues if not provided or if it's a string
+            summary = this.generateSummary(issues);
+        }
+
+        // Use provided metadata if available, otherwise generate it
+        let metadata: ReviewMetadata;
+        if (response.metadata) {
+            metadata = {
+                changeType: 'local' as any, // Default change type
+                source: 'external',
+                aiProvider: response.metadata.aiProvider || aiProvider,
+                timestamp: response.metadata.timestamp ? new Date(response.metadata.timestamp) : new Date(),
+                duration: 0, // Not tracked for external responses
+                filesReviewed: response.metadata.filesReviewed || filesReviewed
+            };
+        } else {
+            metadata = this.generateMetadata(aiProvider, filesReviewed);
+        }
 
         return {
             issues,

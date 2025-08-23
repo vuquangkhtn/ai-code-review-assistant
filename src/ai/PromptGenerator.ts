@@ -124,7 +124,19 @@ export class PromptGenerator {
         prompt.push('      "suggestion": "Suggested fix or improvement"');
         prompt.push("    }");
         prompt.push("  ],");
-        prompt.push('  "summary": "Overall review summary"');
+        prompt.push('  "summary": {');
+        prompt.push('    "totalIssues": 0,');
+        prompt.push('    "criticalIssues": 0,');
+        prompt.push('    "highIssues": 0,');
+        prompt.push('    "mediumIssues": 0,');
+        prompt.push('    "lowIssues": 0,');
+        prompt.push('    "overallAssessment": "Overall review summary"');
+        prompt.push('  },');
+        prompt.push('  "metadata": {');
+        prompt.push('    "aiProvider": "external",');
+        prompt.push('    "timestamp": "' + new Date().toISOString() + '",');
+        prompt.push('    "filesReviewed": []');
+        prompt.push('  }');
         prompt.push("}");
         prompt.push("```");
         prompt.push("");
@@ -343,7 +355,19 @@ export class PromptGenerator {
             '      "suggestion": "Suggested fix or improvement"',
             "    }",
             "  ],",
-            '  "summary": "Overall review summary"',
+            '  "summary": {',
+            '    "totalIssues": 0,',
+            '    "criticalIssues": 0,',
+            '    "highIssues": 0,',
+            '    "mediumIssues": 0,',
+            '    "lowIssues": 0,',
+            '    "overallAssessment": "Overall review summary"',
+            '  },',
+            '  "metadata": {',
+            '    "aiProvider": "external",',
+            '    "timestamp": "' + new Date().toISOString() + '",',
+            '    "filesReviewed": []',
+            '  }',
             "}",
             "```",
             "",
