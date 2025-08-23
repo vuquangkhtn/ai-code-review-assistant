@@ -93,9 +93,16 @@ export class ExternalAIManager {
             
             await vscode.env.clipboard.writeText(promptResult.content);
             
-            // Show simple information message with no action buttons
+            // Show information message with Open Changes button
             const changeTypeLabel = this.getChangeTypeLabel(request.changeInfo.type);
-            vscode.window.showInformationMessage(`Prompt For ${changeTypeLabel} copied to clipboard!`);
+            vscode.window.showInformationMessage(
+                `Prompt For ${changeTypeLabel} copied to clipboard!`,
+                'Open Changes'
+            ).then(selection => {
+                if (selection === 'Open Changes') {
+                    vscode.commands.executeCommand('aiCodeReview.openChangeFile');
+                }
+            });
         } catch (error) {
             vscode.window.showErrorMessage(`Failed to copy prompt: ${error}`);
         }

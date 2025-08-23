@@ -97,7 +97,14 @@ export class ExternalAIProvider extends AbstractAIProvider {
                         case 'copyPrompt': {
                             vscode.env.clipboard.writeText(prompt);
                             const changeTypeLabel = this.getChangeTypeLabel(changeType);
-                            vscode.window.showInformationMessage(`Prompt For ${changeTypeLabel} copied to clipboard!`);
+                            vscode.window.showInformationMessage(
+                                `Prompt For ${changeTypeLabel} copied to clipboard!`,
+                                'Open Changes'
+                            ).then(selection => {
+                                if (selection === 'Open Changes') {
+                                    vscode.commands.executeCommand('aiCodeReview.openChangeFile');
+                                }
+                            });
                             break;
                         }
                     }
