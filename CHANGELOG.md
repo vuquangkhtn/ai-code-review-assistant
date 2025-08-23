@@ -1,3 +1,18 @@
+# [0.6.0](https://github.com/vuquangkhtn/ai-code-review-assistant/compare/v0.5.1...v0.6.0) (2025-08-23)
+
+
+### Bug Fixes
+
+* Remove npm publishing from semantic-release configuration ([fff0af6](https://github.com/vuquangkhtn/ai-code-review-assistant/commit/fff0af6eda77108871617dbbad51fc39e6982352))
+
+
+### Features
+
+* Add optimized CI/CD pipeline with consolidated workflows ([c6a5a90](https://github.com/vuquangkhtn/ai-code-review-assistant/commit/c6a5a90deca2be96ac655753bf1329e96bb0c88f))
+* Disable redundant CI workflows, keep only complete pipeline active ([2ae3f4d](https://github.com/vuquangkhtn/ai-code-review-assistant/commit/2ae3f4db9a19164d51a03fbdca417a0e78055d2d))
+* Disable tests in all CI workflows to prevent pipeline failures ([eceb425](https://github.com/vuquangkhtn/ai-code-review-assistant/commit/eceb425af6d6ad07e18f57a4742c8b43f67b8ee8))
+* Replace Lerna with semantic-release for single-package versioning ([274086d](https://github.com/vuquangkhtn/ai-code-review-assistant/commit/274086d647b8e3a421d9514958a85d89952c0944))
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
