@@ -372,7 +372,8 @@ jobs:
         run: |
           if [ -n "$VSCE_PAT" ]; then
             echo "📦 Publishing to VS Code Marketplace..."
-            vsce publish --pat $VSCE_PAT
+            VSIX_FILE=$(ls *.vsix | head -1)
+            vsce publish --packagePath "$VSIX_FILE" --pat $VSCE_PAT
             echo "✅ Published to VS Code Marketplace"
           else
             echo "⚠️ VSCE_PAT not set, skipping VS Code Marketplace publishing"
@@ -384,7 +385,8 @@ jobs:
         run: |
           if [ -n "$OVSX_PAT" ]; then
             echo "📦 Publishing to Open VSX Registry..."
-            ovsx publish --pat $OVSX_PAT
+            VSIX_FILE=$(ls *.vsix | head -1)
+            ovsx publish "$VSIX_FILE" --pat $OVSX_PAT
             echo "✅ Published to Open VSX Registry"
           else
             echo "⚠️ OVSX_PAT not set, skipping Open VSX Registry publishing"
