@@ -256,12 +256,35 @@ jobs:
     runs-on: ubuntu-latest
     if: needs.build-and-test.outputs.should_release == 'true' && needs.release-and-tag.outputs.release_created == 'true'
     steps:
-      - name: Checkout code at tag
+      - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: ${{ needs.release-and-tag.outputs.tag_name }}
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Wait for tag and checkout
+        run: |
+          echo "Waiting for tag ${{ needs.release-and-tag.outputs.tag_name }} to be available..."
+          for i in {1..30}; do
+            if git ls-remote --tags origin | grep -q "${{ needs.release-and-tag.outputs.tag_name }}$"; then
+              echo "Tag found, checking out..."
+              git fetch --tags
+              git checkout ${{ needs.release-and-tag.outputs.tag_name }}
+              break
+            else
+              echo "Tag not found, waiting... (attempt $i/30)"
+              sleep 10
+            fi
+          done
+          
+          # Verify we're on the correct tag
+          CURRENT_TAG=$(git describe --tags --exact-match HEAD 2>/dev/null || echo "none")
+          if [ "$CURRENT_TAG" != "${{ needs.release-and-tag.outputs.tag_name }}" ]; then
+            echo "❌ Failed to checkout tag ${{ needs.release-and-tag.outputs.tag_name }}"
+            echo "Current tag: $CURRENT_TAG"
+            exit 1
+          fi
+          echo "✅ Successfully checked out tag ${{ needs.release-and-tag.outputs.tag_name }}"
 
       - name: Download build artifacts
         uses: actions/download-artifact@v4
@@ -311,9 +334,32 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: ${{ needs.release-and-tag.outputs.tag_name }}
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Wait for tag and checkout
+        run: |
+          echo "Waiting for tag ${{ needs.release-and-tag.outputs.tag_name }} to be available..."
+          for i in {1..30}; do
+            if git ls-remote --tags origin | grep -q "${{ needs.release-and-tag.outputs.tag_name }}$"; then
+              echo "Tag found, checking out..."
+              git fetch --tags
+              git checkout ${{ needs.release-and-tag.outputs.tag_name }}
+              break
+            else
+              echo "Tag not found, waiting... (attempt $i/30)"
+              sleep 10
+            fi
+          done
+          
+          # Verify we're on the correct tag
+          CURRENT_TAG=$(git describe --tags --exact-match HEAD 2>/dev/null || echo "none")
+          if [ "$CURRENT_TAG" != "${{ needs.release-and-tag.outputs.tag_name }}" ]; then
+            echo "❌ Failed to checkout tag ${{ needs.release-and-tag.outputs.tag_name }}"
+            echo "Current tag: $CURRENT_TAG"
+            exit 1
+          fi
+          echo "✅ Successfully checked out tag ${{ needs.release-and-tag.outputs.tag_name }}"
 
       - name: Download release artifacts
         uses: actions/download-artifact@v4
