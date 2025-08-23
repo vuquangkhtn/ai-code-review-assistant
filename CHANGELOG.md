@@ -1,3 +1,10 @@
+## [0.7.6](https://github.com/vuquangkhtn/ai-code-review-assistant/compare/v0.7.5...v0.7.6) (2025-08-23)
+
+
+### Bug Fixes
+
+* resolve CI version mismatch by rebuilding VSIX after semantic-release updates package.json ([86323e1](https://github.com/vuquangkhtn/ai-code-review-assistant/commit/86323e17154b2484253c46a5775c76ac46a40f61))
+
 ## [0.7.5](https://github.com/vuquangkhtn/ai-code-review-assistant/compare/v0.7.4...v0.7.5) (2025-08-23)
 
 
