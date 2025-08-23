@@ -1,3 +1,10 @@
+# [0.7.0](https://github.com/vuquangkhtn/ai-code-review-assistant/compare/v0.6.4...v0.7.0) (2025-08-23)
+
+
+### Features
+
+* Update VS Code engine to v1.96.0 for modern IDE compatibility ([fd54626](https://github.com/vuquangkhtn/ai-code-review-assistant/commit/fd5462624cc77c64ac09298f85f4eeec012b23f4))
+
 ## [0.6.4](https://github.com/vuquangkhtn/ai-code-review-assistant/compare/v0.6.3...v0.6.4) (2025-08-23)
 
 
