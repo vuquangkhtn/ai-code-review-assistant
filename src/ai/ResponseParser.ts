@@ -50,7 +50,17 @@ export class ResponseParser {
     private static extractJSON(text: string): ExternalAIResponse | null {
         try {
             // Try to parse the entire text as JSON first
-            return JSON.parse(text);
+            const parsed = JSON.parse(text);
+            
+            // Handle nested structure with 'review' wrapper
+            if (parsed.review && parsed.review.issues) {
+                return {
+                    issues: parsed.review.issues,
+                    summary: parsed.review.summary?.overall_quality || parsed.review.summary
+                };
+            }
+            
+            return parsed;
         } catch {
             // Look for JSON blocks in the text
             const jsonMatches = text.match(/```json\s*([\s\S]*?)\s*```/g) ||
@@ -60,7 +70,17 @@ export class ResponseParser {
                 for (const match of jsonMatches) {
                     try {
                         const cleanMatch = match.replace(/```json\s*|\s*```/g, '').trim();
-                        return JSON.parse(cleanMatch);
+                        const parsed = JSON.parse(cleanMatch);
+                        
+                        // Handle nested structure with 'review' wrapper
+                        if (parsed.review && parsed.review.issues) {
+                            return {
+                                issues: parsed.review.issues,
+                                summary: parsed.review.summary?.overall_quality || parsed.review.summary
+                            };
+                        }
+                        
+                        return parsed;
                     } catch {
                         continue;
                     }
