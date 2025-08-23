@@ -1,3 +1,10 @@
+## [0.7.8](https://github.com/vuquangkhtn/ai-code-review-assistant/compare/v0.7.7...v0.7.8) (2025-08-23)
+
+
+### Bug Fixes
+
+* use pre-built VSIX for publishing instead of rebuilding ([2df81c2](https://github.com/vuquangkhtn/ai-code-review-assistant/commit/2df81c2e90e86269084fbaec8a6ce8164d34d1e9))
+
 ## [0.7.7](https://github.com/vuquangkhtn/ai-code-review-assistant/compare/v0.7.6...v0.7.7) (2025-08-23)
 
 
