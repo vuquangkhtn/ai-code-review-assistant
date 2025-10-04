@@ -70,8 +70,7 @@ export function activate(context: vscode.ExtensionContext) {
             const commandMap: Record<string, string> = {
                 'local': 'aiCodeReview.copyPromptLocalChanges',
                 'commit': 'aiCodeReview.copyPromptCompareBranches', // Use branch comparison for commit-like workflow
-                'branch': 'aiCodeReview.copyPromptCompareBranches',
-                'all-files': 'aiCodeReview.copyPromptAllFiles'
+                'branch': 'aiCodeReview.copyPromptCompareBranches'
             };
             
             const command = commandMap[defaultChangeType];
@@ -84,11 +83,6 @@ export function activate(context: vscode.ExtensionContext) {
                         label: '$(git-branch) Local Changes',
                         description: 'Only local changes',
                         command: 'aiCodeReview.copyPromptLocalChanges'
-                    },
-                    {
-                        label: '$(folder) All Files',
-                        description: 'Scan all Files in workspace',
-                        command: 'aiCodeReview.copyPromptAllFiles'
                     },
                     {
                         label: '$(git-compare) Compare Branches',
@@ -188,6 +182,16 @@ export function activate(context: vscode.ExtensionContext) {
                 }
 
                 const targetBranch = selectedTarget.label;
+
+                // Attempt to checkout to the target branch automatically
+                try {
+                    await changeDetector.checkoutBranch(targetBranch);
+                } catch (checkoutError) {
+                    vscode.window.showErrorMessage(
+                        `Failed to checkout to target branch '${targetBranch}'. If you have local changes, please reset or stash them and try again.\nDetails: ${checkoutError}`
+                    );
+                    return;
+                }
 
                 // Create request for branch comparison
                 const request: ReviewRequest = {

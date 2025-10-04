@@ -364,6 +364,14 @@ export class ChangeDetector {
         return status.current || '';
     }
 
+    public async checkoutBranch(branch: string): Promise<void> {
+        try {
+            await this.git.checkout(branch);
+        } catch (error) {
+            throw new Error(`Failed to checkout branch '${branch}': ${error}`);
+        }
+    }
+
     public async getFileContent(filePath: string, commitHash?: string): Promise<string> {
         try {
             if (commitHash) {

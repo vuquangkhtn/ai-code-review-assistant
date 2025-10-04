@@ -113,18 +113,6 @@ export class CodeReviewTreeProvider implements vscode.TreeDataProvider<CodeRevie
                     this.currentDefaultChangeType === 'local' ? 'Currently selected' : 'Click to set as default'
                 ),
                 new CodeReviewItem(
-                    'All Files',
-                    vscode.TreeItemCollapsibleState.None,
-                    {
-                        command: 'aiCodeReview.setDefaultChangeType',
-                        title: 'Set Default to All Files',
-                        arguments: ['all-files']
-                    },
-                    'changeTypeOption',
-                    this.currentDefaultChangeType === 'all-files' ? 'check' : 'circle-outline',
-                    this.currentDefaultChangeType === 'all-files' ? 'Currently selected' : 'Click to set as default'
-                ),
-                new CodeReviewItem(
                     'Compare Branches',
                     vscode.TreeItemCollapsibleState.None,
                     {

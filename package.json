@@ -38,7 +38,6 @@
   "activationEvents": [
     "onCommand:aiCodeReview.copyPrompt",
     "onCommand:aiCodeReview.copyPromptLocalChanges",
-    "onCommand:aiCodeReview.copyPromptAllFiles",
     "onCommand:aiCodeReview.copyPromptCompareBranches",
     "onCommand:aiCodeReview.checkReviewResult",
     "onCommand:aiCodeReview.openChangeFile",
@@ -55,11 +54,6 @@
       {
         "command": "aiCodeReview.copyPromptLocalChanges",
         "title": "Local Changes - Only local changes (use git diff to check)",
-        "category": "AI Code Review"
-      },
-      {
-        "command": "aiCodeReview.copyPromptAllFiles",
-        "title": "All Files - Scan all Files in repo (existing logic)",
         "category": "AI Code Review"
       },
       {
@@ -179,8 +173,7 @@
           "enum": [
             "local",
             "commit",
-            "branch",
-            "all-files"
+            "branch"
           ],
           "default": "local",
           "description": "Default change type for code reviews"
