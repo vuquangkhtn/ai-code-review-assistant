@@ -1,3 +1,10 @@
+# [0.9.0](https://github.com/vuquangkhtn/ai-code-review-assistant/compare/v0.8.1...v0.9.0) (2025-10-04)
+
+
+### Features
+
+* **option:** remove All Files option ([c5fe40c](https://github.com/vuquangkhtn/ai-code-review-assistant/commit/c5fe40c2294e373dca7661fed557713de74a3a33))
+
 ## [0.8.1](https://github.com/vuquangkhtn/ai-code-review-assistant/compare/v0.8.0...v0.8.1) (2025-08-23)
 
 
