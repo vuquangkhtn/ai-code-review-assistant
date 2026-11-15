@@ -85,7 +85,7 @@ MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 📞 Support
 
-Need help? Check out our [GitHub Issues](https://github.com/your-repo/issues) or [Discussions](https://github.com/your-repo/discussions).
+Need help? Check out our [GitHub Issues](https://github.com/vuquangkhtn/ai-code-review-assistant/issues) or [Discussions](https://github.com/vuquangkhtn/ai-code-review-assistant/discussions).
 
 ## 🌟 Love This Extension?
 
