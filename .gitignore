@@ -27,7 +27,7 @@ dist/
 .claude/super-board/upgrade.json
 
 # super-board runtime state
-.claude/super-board/github-halt.json
+.claude/super-board/github-halt*.json
 .claude/worktrees/
 docs/super-board/runs/
 

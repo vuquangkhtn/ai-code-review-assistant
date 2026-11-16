@@ -41,6 +41,10 @@ FORMS = {
     'body': 'pr view <N> --json body,headRefOid',
     'metadata': 'pr view <N> --json files,labels,body,additions,deletions,changedFiles',
     'state': 'issue view <N> --json state --jq .state',
+    'prs-open': 'pr list --state open --json url,number,title,body,headRefName,files --limit 100',
+    'prs-merged': 'pr list --state merged --json url,number,title,body,headRefName,files --limit 100',
+    'issues-closed': 'issue list --state closed --json url,number,title,body,stateReason --limit 100',
+    'diff': 'pr view <N> --json files,additions,deletions,changedFiles  (save as meta) then: --kind diff --meta <meta.json> -- pr diff <N>',
 }
 
 
@@ -254,10 +258,10 @@ def validate(text, kind, meta=None):
             require(isinstance(entry, dict) and type(entry.get('number')) is int and entry['number'] > 0
                     and isinstance(entry.get('title'), str) and isinstance(entry.get('body'), str), 'issue/PR identity or body missing')
             if kind.startswith('prs-'):
-                require(isinstance(entry.get('url'), str), 'PR URL missing')
+                require(isinstance(entry.get('url'), str), 'PR URL missing (valid: --kind prs-open -- pr list --state open --json url,number,title,body,headRefName,files --limit 100)')
             if kind == 'prs-open':
                 require(isinstance(entry.get('headRefName'), str) and entry['headRefName'] and isinstance(entry.get('files'), list)
-                        and all(isinstance(f, dict) and isinstance(f.get('path'), str) and f['path'] for f in entry['files']), 'open PR branch/files missing')
+                        and all(isinstance(f, dict) and isinstance(f.get('path'), str) and f['path'] for f in entry['files']), 'open PR branch/files missing (valid: --kind prs-open -- pr list --state open --json url,number,title,body,headRefName,files --limit 100)')
             if kind == 'issues-closed':
                 require(entry.get('stateReason') in ('COMPLETED', 'NOT_PLANNED', 'REOPENED', None) and 'stateReason' in entry, 'closed issue reason missing')
     elif kind == 'object':
