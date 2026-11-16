@@ -1,0 +1,180 @@
+v20.19.4
+[watch] build started
+[watch] build finished
+
+> ai-code-review-assistant@0.9.0 check-types
+> tsc --noEmit
+
+
+> ai-code-review-assistant@0.9.0 lint
+> eslint src --ext ts
+
+
+/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-2-qa/src/ai/ExternalAIManager.ts
+  3:27  warning  'PromptResult' is defined but never used  no-unused-vars
+
+/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-2-qa/src/ai/PromptGenerator.ts
+    5:13  warning  'os' is defined but never used       no-unused-vars
+  243:75  warning  'request' is defined but never used  no-unused-vars
+
+/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-2-qa/src/ai/providers/AmazonQProvider.ts
+  91:43  warning  '_prompt' is defined but never used  no-unused-vars
+
+/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-2-qa/src/ai/providers/BaseAIProvider.ts
+   8:19  warning  'request' is defined but never used           no-unused-vars
+  18:35  warning  'request' is defined but never used           no-unused-vars
+  23:29  warning  'options' is assigned a value but never used  no-unused-vars
+
+/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-2-qa/src/ai/providers/CopilotProvider.ts
+  108:43  warning  '_prompt' is defined but never used  no-unused-vars
+
+/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-2-qa/src/ai/providers/CursorAIProvider.ts
+  91:44  warning  '_prompt' is defined but never used  no-unused-vars
+
+/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-2-qa/src/core/ChangeDetector.ts
+  5:13  warning  'os' is defined but never used  no-unused-vars
+
+/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-2-qa/src/extension.ts
+  12:10  warning  'CleanupManager' is defined but never used  no-unused-vars
+  13:37  warning  'CodeIssue' is defined but never used       no-unused-vars
+
+/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-2-qa/src/test/suite/ChangeDetector.test.ts
+  3:13  warning  'path' is defined but never used        no-unused-vars
+  4:13  warning  'fs' is defined but never used          no-unused-vars
+  5:31  warning  'after' is defined but never used       no-unused-vars
+  7:22  warning  'ChangeInfo' is defined but never used  no-unused-vars
+
+/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-2-qa/src/test/suite/CleanupManager.test.ts
+  7:9  warning  'workspaceFolder' is assigned a value but never used  no-unused-vars
+
+/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-2-qa/src/test/suite/ExternalAIManager.test.ts
+  2:13  warning  'vscode' is defined but never used  no-unused-vars
+  3:31  warning  'after' is defined but never used   no-unused-vars
+
+/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-2-qa/src/test/suite/Integration.test.ts
+    6:10  warning  'CodeReviewPanel' is defined but never used  no-unused-vars
+    7:37  warning  'CodeIssue' is defined but never used        no-unused-vars
+    7:48  warning  'IssueSeverity' is defined but never used    no-unused-vars
+    7:63  warning  'IssueCategory' is defined but never used    no-unused-vars
+    8:13  warning  'path' is defined but never used             no-unused-vars
+    9:13  warning  'fs' is defined but never used               no-unused-vars
+  171:59  warning  'items' is defined but never used            no-unused-vars
+  171:73  warning  'options' is defined but never used          no-unused-vars
+
+/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-2-qa/src/test/suite/TestExamples.test.ts
+  8:22  warning  'ChangeInfo' is defined but never used     no-unused-vars
+  8:47  warning  'ReviewRequest' is defined but never used  no-unused-vars
+
+/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-2-qa/src/test/suite/UIComponents.test.ts
+  3:31  warning  'after' is defined but never used  no-unused-vars
+
+/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-2-qa/src/test/suite/extension.test.ts
+  1:13  warning  'assert' is defined but never used  no-unused-vars
+  2:13  warning  'vscode' is defined but never used  no-unused-vars
+
+/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-2-qa/src/types/index.ts
+  70:5  warning  'LOW' is defined but never used              no-unused-vars
+  71:5  warning  'MEDIUM' is defined but never used           no-unused-vars
+  72:5  warning  'HIGH' is defined but never used             no-unused-vars
+  73:5  warning  'CRITICAL' is defined but never used         no-unused-vars
+  77:5  warning  'SECURITY' is defined but never used         no-unused-vars
+  78:5  warning  'PERFORMANCE' is defined but never used      no-unused-vars
+  79:5  warning  'CODE_QUALITY' is defined but never used     no-unused-vars
+  80:5  warning  'BEST_PRACTICES' is defined but never used   no-unused-vars
+  81:5  warning  'STYLE' is defined but never used            no-unused-vars
+  82:5  warning  'MAINTAINABILITY' is defined but never used  no-unused-vars
+  83:5  warning  'TESTING' is defined but never used          no-unused-vars
+  84:5  warning  'DOCUMENTATION' is defined but never used    no-unused-vars
+  85:5  warning  'OTHER' is defined but never used            no-unused-vars
+  89:5  warning  'LOCAL' is defined but never used            no-unused-vars
+  90:5  warning  'COMMIT' is defined but never used           no-unused-vars
+  91:5  warning  'BRANCH' is defined but never used           no-unused-vars
+  92:5  warning  'ALL_FILES' is defined but never used        no-unused-vars
+
+/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-2-qa/src/ui/CodeLensProvider.ts
+   48:61  warning  'token' is defined but never used  no-unused-vars
+  109:56  warning  'token' is defined but never used  no-unused-vars
+
+/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-2-qa/src/ui/CodeReviewPanel.ts
+  198:32  warning  'webview' is defined but never used  no-unused-vars
+
+/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-2-qa/src/ui/CodeReviewTreeProvider.ts
+  137:25  warning  'command' is defined but never used  no-unused-vars
+
+/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-2-qa/src/ui/IssuesPanelProvider.ts
+  327:25  warning  'command' is defined but never used   no-unused-vars
+  330:25  warning  'groupKey' is defined but never used  no-unused-vars
+  333:25  warning  'issueId' is defined but never used   no-unused-vars
+
+/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-2-qa/src/ui/ReviewHistoryProvider.ts
+   16:34  warning  '_extensionUri' is defined but never used  no-unused-vars
+   20:9   warning  'context' is defined but never used        no-unused-vars
+   21:9   warning  '_token' is defined but never used         no-unused-vars
+  122:32  warning  'webview' is defined but never used        no-unused-vars
+
+/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-2-qa/src/ui/WorkflowGuidePanel.ts
+  39:53  warning  'extensionUri' is defined but never used  no-unused-vars
+  51:13  warning  'e' is defined but never used             no-unused-vars
+  94:32  warning  'webview' is defined but never used       no-unused-vars
+
+✖ 63 problems (0 errors, 63 warnings)
+
+
+> ai-code-review-assistant@0.9.0 test:cli
+> tsc && node --test src/test/node/*.cjs
+
+TAP version 13
+# Subtest: real CLI receives stdin and handles clean output
+ok 1 - real CLI receives stdin and handles clean output
+  ---
+  duration_ms: 25.774875
+  ...
+# Subtest: real CLI receives stdin and handles noisy output
+ok 2 - real CLI receives stdin and handles noisy output
+  ---
+  duration_ms: 21.80975
+  ...
+# Subtest: real CLI receives stdin and handles fail output
+ok 3 - real CLI receives stdin and handles fail output
+  ---
+  duration_ms: 19.760875
+  ...
+# Subtest: real CLI receives stdin and handles invalid output
+ok 4 - real CLI receives stdin and handles invalid output
+  ---
+  duration_ms: 19.898291
+  ...
+# Subtest: resolves Code without changing the signed bundle
+ok 5 - resolves Code without changing the signed bundle
+  ---
+  duration_ms: 2.068
+  ...
+# Subtest: resolves Electron without changing the signed bundle
+ok 6 - resolves Electron without changing the signed bundle
+  ---
+  duration_ms: 0.827209
+  ...
+# Subtest: preserves non-macOS executable paths
+ok 7 - preserves non-macOS executable paths
+  ---
+  duration_ms: 0.045166
+  ...
+1..7
+# tests 7
+# suites 0
+# pass 7
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 113.185416
+
+> ai-code-review-assistant@0.9.0 compile
+> npm run check-types && node esbuild.js
+
+
+> ai-code-review-assistant@0.9.0 check-types
+> tsc --noEmit
+
+[watch] build started
+[watch] build finished
