@@ -1,3 +1,5 @@
+import { runCLIReview } from './ai/CLIReview';
+import { PromptGenerator } from './ai/PromptGenerator';
 import * as vscode from 'vscode';
 import { ExternalAIManager } from './ai/ExternalAIManager';
 import { ChangeDetector } from './core/ChangeDetector';
@@ -98,6 +100,24 @@ export function activate(context: vscode.ExtensionContext) {
                 if (selected) {
                     await vscode.commands.executeCommand(selected.command);
                 }
+            }
+        }),
+
+        vscode.commands.registerCommand('aiCodeReview.runCLIReview', async () => {
+            try {
+                const workspace = vscode.workspace.workspaceFolders?.[0];
+                if (!workspace || !vscode.workspace.isTrusted) {
+                    throw new Error('CLI review requires a trusted workspace.');
+                }
+                const command = vscode.workspace.getConfiguration('aiCodeReview', workspace.uri)
+                    .get<string>('cli.customCommand', '').trim();
+                if (!command) { throw new Error('Set aiCodeReview.cli.customCommand before running a CLI review.'); }
+                const changes = await changeDetector.detectAndStoreLocalChanges();
+                const prompt = PromptGenerator.generateFileReferencePrompt(changes.filePath, 'cli').content;
+                await runCLIReview({ command, cwd: workspace.uri.fsPath, prompt });
+            } catch (error) {
+                vscode.window.showErrorMessage(`CLI review failed: ${error}`);
+                throw error;
             }
         }),
 

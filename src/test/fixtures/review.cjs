@@ -11,6 +11,7 @@ process.stdin.on('end', () => {
     assert.match(fs.readFileSync(changes, 'utf8'), /sample.js/);
     fs.writeFileSync('received-prompt.txt', prompt);
     if (process.argv.includes('fail')) { process.exit(7); }
+    if (process.argv.includes('invalid')) { console.log('No review available'); return; }
     const result = { issues: [{ type: 'bug', severity: 'high', file: 'sample.js', line: 1,
         title: 'Fixture CLI issue', description: 'Fixture result from stdin', suggestion: 'Use const' }] };
     if (process.argv.includes('noisy')) { console.log('Starting {not JSON} banner'); }
