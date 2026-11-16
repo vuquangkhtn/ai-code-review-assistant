@@ -1,3 +1,4 @@
+import { selectCLICommand } from './ai/CLIPresets';
 import { runCLIReview } from './ai/CLIReview';
 import { PromptGenerator } from './ai/PromptGenerator';
 import * as vscode from 'vscode';
@@ -109,9 +110,15 @@ export function activate(context: vscode.ExtensionContext) {
                 if (!workspace || !vscode.workspace.isTrusted) {
                     throw new Error('CLI review requires a trusted workspace.');
                 }
-                const command = vscode.workspace.getConfiguration('aiCodeReview', workspace.uri)
+                const customCommand = vscode.workspace.getConfiguration('aiCodeReview', workspace.uri)
                     .get<string>('cli.customCommand', '').trim();
-                if (!command) { throw new Error('Set aiCodeReview.cli.customCommand before running a CLI review.'); }
+                const command = await selectCLICommand({
+                    customCommand,
+                    savedProvider: context.globalState.get<string>('aiCodeReview.cli.defaultProvider'),
+                    choose: providers => vscode.window.showQuickPick(providers, { placeHolder: 'Choose a CLI for AI reviews' }),
+                    save: provider => context.globalState.update('aiCodeReview.cli.defaultProvider', provider)
+                });
+                if (!command) { return; }
                 const changes = await changeDetector.detectAndStoreLocalChanges();
                 const prompt = PromptGenerator.generateFileReferencePrompt(changes.filePath, 'cli').content;
                 await runCLIReview({ command, cwd: workspace.uri.fsPath, prompt });

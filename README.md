@@ -60,10 +60,10 @@ This extension is designed to work with **any AI provider** you prefer:
 - **Any other AI that accepts text prompts**
 
 ### Why No API Keys?
-- **Privacy**: Your code never leaves your machine automatically
+- **Privacy**: Manual copy-paste mode makes no outbound AI calls. CLI mode sends code through the CLI’s own backend only when you explicitly run **Run AI Review with CLI**
 - **Flexibility**: Use any AI provider, switch anytime
 - **Cost Control**: Use your existing AI subscriptions
-- **Reliability**: No API rate limits or service dependencies
+- **Reliability**: Manual copy-paste mode has no extension-managed API limits; CLI mode uses the CLI’s account and service limits
 
 ## 🎯 Supported Languages
 
@@ -103,3 +103,11 @@ Every star, review, and piece of feedback motivates us to keep building awesome 
 ---
 
 *Built with ❤️ for developers who want AI-powered code reviews without the complexity*
+### CLI provider defaults
+
+Run **AI Code Review: Run AI Review with CLI** in a trusted workspace. With no
+`aiCodeReview.cli.customCommand`, the extension detects `codex`, `claude`, and
+`copilot` on PATH. One provider is selected silently; with several, pick once.
+The choice persists in VS Code across sessions. A custom command always overrides
+the preset. CLIs must already be installed and authenticated. Native executables
+are detected on Windows; shell wrappers need a custom command.

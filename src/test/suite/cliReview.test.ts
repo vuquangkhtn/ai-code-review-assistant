@@ -5,6 +5,8 @@ import * as assert from 'assert';
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as os from 'os';
+import { execFileSync } from 'child_process';
 
 suite('CLI review tracer', () => {
     test('manual prompt including its tail matches the pre-feature baseline', () => {
@@ -18,9 +20,10 @@ suite('CLI review tracer', () => {
             .replace(/\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d{3}Z/g, '<timestamp>');
         assert.ok(cli.startsWith(content.split('**IMPORTANT: File Output Instructions**')[0]));
     });
-    for (const mode of ['clean', 'noisy']) {
+    for (const mode of ['clean', 'noisy', 'preset']) {
         test(`palette command delivers stdin and displays ${mode} results via watcher`, async function () {
             this.timeout(20000);
+            if (mode === 'preset' && process.platform === 'win32') { this.skip(); }
             const extension = vscode.extensions.getExtension('vuquangkhtn.ai-code-review-assistant');
             assert.ok(extension);
             await extension.activate();
@@ -37,7 +40,15 @@ suite('CLI review tracer', () => {
             const previousIds = new Set(previousLenses?.map(lens => lens.command?.arguments?.[1]));
             const clipboard = await vscode.env.clipboard.readText();
             const command = `"${node}" "${fixture}" ${mode}`;
-            await config.update('cli.customCommand', command, vscode.ConfigurationTarget.Global);
+            const previousPATH = process.env.PATH;
+            const bin = mode === 'preset' ? fs.mkdtempSync(path.join(os.tmpdir(), 'cli-path-')) : undefined;
+            if (bin) {
+                const git = execFileSync('/usr/bin/which', ['git'], { encoding: 'utf8' }).trim();
+                fs.symlinkSync(git, path.join(bin, 'git'));
+                fs.writeFileSync(path.join(bin, 'codex'), `#!${node}\nrequire(${JSON.stringify(fixture)});`, { mode: 0o755 });
+                process.env.PATH = bin;
+            }
+            await config.update('cli.customCommand', bin ? '' : command, vscode.ConfigurationTarget.Global);
             try {
                 await vscode.commands.executeCommand('aiCodeReview.runCLIReview');
                 const resultsDir = path.join(workspace.uri.fsPath, '.ai-code-review/results');
@@ -57,6 +68,8 @@ suite('CLI review tracer', () => {
                 assert.ok(displayed, 'watcher propagated result to review UI');
                 assert.ok(vscode.window.tabGroups.all.flatMap(group => group.tabs).some(tab => tab.label === 'AI Code Review'));
             } finally {
+                process.env.PATH = previousPATH;
+                if (bin) { fs.rmSync(bin, { recursive: true, force: true }); }
                 await config.update('cli.customCommand', previousCommand, vscode.ConfigurationTarget.Global);
             }
         });

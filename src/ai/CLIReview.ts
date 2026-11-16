@@ -1,16 +1,20 @@
-import { exec } from 'child_process';
+import { exec, execFile } from 'child_process';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { randomUUID } from 'crypto';
+import { CLIInvocation } from '../types';
 import { extractReviewJSON } from './ReviewJSON';
 
-export async function runCLIReview(options: { command: string; cwd: string; prompt: string }): Promise<string> {
+export async function runCLIReview(options: { command: CLIInvocation; cwd: string; prompt: string }): Promise<string> {
     const stdout = await new Promise<string>((resolve, reject) => {
-        const child = exec(options.command, {
-            cwd: options.cwd, maxBuffer: 4 * 1024 * 1024, timeout: 300000
-        }, (error, output) => error ? reject(error) : resolve(output));
+        const settings = { cwd: options.cwd, maxBuffer: 4 * 1024 * 1024, timeout: 300000 };
+        const done = (error: Error | null, output: string) => error ? reject(error) : resolve(output);
+        const command = options.command;
+        const child = typeof command === 'string'
+            ? exec(command, settings, done)
+            : execFile(command.file, command.promptArgument ? [...command.args, options.prompt] : command.args, settings, done);
         child.stdin?.on('error', reject);
-        child.stdin?.end(options.prompt);
+        child.stdin?.end(typeof command !== 'string' && command.promptArgument ? undefined : options.prompt);
     });
     const json = extractReviewJSON(stdout);
     const directory = path.join(options.cwd, '.ai-code-review', 'results');
