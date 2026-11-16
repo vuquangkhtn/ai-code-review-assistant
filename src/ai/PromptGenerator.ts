@@ -312,7 +312,7 @@ export class PromptGenerator {
      * @param changesFilePath Path to the file containing the stored changes
      * @returns A prompt that instructs AI to read the changes from the specified file
      */
-    public static generateFileReferencePrompt(changesFilePath: string): PromptResult {
+    public static generateFileReferencePrompt(changesFilePath: string, mode: 'manual' | 'cli' = 'manual'): PromptResult {
         // Convert absolute path to relative path for better AI understanding
         const relativePath = changesFilePath.includes('.ai-code-review') 
             ? changesFilePath.substring(changesFilePath.indexOf('.ai-code-review'))
@@ -408,6 +408,15 @@ export class PromptGenerator {
             "",
             "The extension will automatically load your review results and display them in the Code Review Panel with inline annotations and issue summaries."
         ];
+
+        if (mode === 'cli') {
+            const tail = prompt.indexOf("**IMPORTANT: File Output Instructions**");
+            const content = prompt.slice(0, tail).concat([
+                'Respond with a JSON object only on stdout. Do not write a results file or include a usage guide.',
+                'Read the changes file first; use its exact file paths and diff line numbers.'
+            ]).join('\n');
+            return { content, isFileBased: false, length: content.length };
+        }
 
         const content = prompt.join('\n');
         const length = content.length;

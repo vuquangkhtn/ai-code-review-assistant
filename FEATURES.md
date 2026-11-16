@@ -314,3 +314,10 @@ You can add custom keybindings in VS Code settings:
 - Check the [Workflow Guide Panel](command:aiCodeReview.openWorkflowGuide)
 - Visit our [GitHub Repository](https://github.com/vuquangkhtn/ai-code-review-assistant)
 - Open [Extension Settings](command:aiCodeReview.openSettings)
+### Run AI Review with CLI
+
+Set `aiCodeReview.cli.customCommand` to a shell command, then run **AI Code Review: Run AI Review with CLI** in a trusted workspace. The command receives the local-changes prompt on stdin, runs in the workspace folder, and must print a JSON object containing an `issues` array. The configured CLI may send code to its provider.
+
+The extension extracts JSON from stdout, including banner-wrapped output, and writes it to `.ai-code-review/results/` for the existing watcher. The clipboard is unchanged. Nonzero exit or invalid JSON creates no result. Output is limited to 4 MiB and execution to five minutes. Manual copy-paste prompts retain their existing instructions.
+
+Run fixture integration tests with `npm run test:cli`. On a host that can launch VS Code, run `npm run compile && npx tsc && CLI_REVIEW_TEST=1 npm test` for the palette-command and watcher tests.

@@ -47,6 +47,12 @@
   "contributes": {
     "commands": [
       {
+        "command": "aiCodeReview.runCLIReview",
+        "title": "Run AI Review with CLI",
+        "category": "AI Code Review",
+        "enablement": "isWorkspaceTrusted"
+      },
+      {
         "command": "aiCodeReview.copyPrompt",
         "title": "Copy AI Prompt",
         "category": "AI Code Review"
@@ -168,6 +174,11 @@
     "configuration": {
       "title": "AI Code Review Assistant",
       "properties": {
+        "aiCodeReview.cli.customCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Shell command for CLI review. Receives the prompt on stdin and must return review JSON on stdout. Runs in the trusted workspace; may send code to the configured provider."
+        },
         "aiCodeReview.defaultChangeType": {
           "type": "string",
           "enum": [
@@ -255,6 +266,7 @@
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
     "test": "node ./out/test/runTest.js",
+    "test:cli": "tsc && node --test src/test/node/*.cjs",
     "test:examples": "node test-examples/run-review-test.js",
     "package:vsix": "vsce package",
     "publish:vscode": "vsce publish",
