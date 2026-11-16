@@ -32,6 +32,7 @@ suite('CLI review tracer', () => {
             assert.ok(node, 'runner supplies Node executable');
             const previousCommand = config.inspect<string>('cli.customCommand')?.globalValue;
             const sample = vscode.Uri.joinPath(workspace.uri, 'sample.js');
+            await vscode.window.showTextDocument(sample);
             const previousLenses = await vscode.commands.executeCommand<vscode.CodeLens[]>('vscode.executeCodeLensProvider', sample);
             const previousIds = new Set(previousLenses?.map(lens => lens.command?.arguments?.[1]));
             const clipboard = await vscode.env.clipboard.readText();
@@ -46,7 +47,6 @@ suite('CLI review tracer', () => {
                 assert.strictEqual(result.issues[0].title, 'Fixture CLI issue');
                 assert.match(fs.readFileSync(path.join(workspace.uri.fsPath, 'received-prompt.txt'), 'utf8'), /Respond with a JSON object only/);
                 assert.strictEqual(await vscode.env.clipboard.readText(), clipboard);
-                await vscode.window.showTextDocument(sample);
                 const deadline = Date.now() + 10000;
                 let displayed = false;
                 while (Date.now() < deadline && !displayed) {
