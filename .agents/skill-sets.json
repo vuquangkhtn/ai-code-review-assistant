@@ -1,0 +1,328 @@
+{
+  "version": 1,
+  "hosts": [
+    "claude",
+    "zcode"
+  ],
+  "installed_at": "2026-11-15T17:32:41",
+  "sets": [
+    {
+      "name": "mattpocock",
+      "title": "Matt Pocock skills",
+      "source": "https://github.com/mattpocock/skills",
+      "pinned_ref": "vendored 2026-10-29 (repo commit 282a125)",
+      "license": "MIT",
+      "installed": [
+        "ask-matt",
+        "code-review",
+        "codebase-design",
+        "diagnosing-bugs",
+        "domain-modeling",
+        "grill-me",
+        "grill-with-docs",
+        "grilling",
+        "handoff",
+        "implement",
+        "implement-spec",
+        "improve-codebase-architecture",
+        "pr",
+        "prototype",
+        "research",
+        "retro",
+        "setup-matt-pocock-skills",
+        "tdd",
+        "teach",
+        "to-questionnaire",
+        "to-spec",
+        "to-tickets",
+        "triage",
+        "wait-what",
+        "wayfinder",
+        "wizard",
+        "writing-for-agents"
+      ],
+      "skipped": [],
+      "steps": {
+        "plan": [
+          "research",
+          "grilling",
+          "grill-me",
+          "grill-with-docs",
+          "to-questionnaire",
+          "to-tickets",
+          "wayfinder"
+        ],
+        "design": [
+          "codebase-design",
+          "domain-modeling",
+          "to-spec"
+        ],
+        "build": [
+          "implement",
+          "implement-spec",
+          "tdd",
+          "prototype",
+          "wizard"
+        ],
+        "test": [
+          "diagnosing-bugs",
+          "triage",
+          "wait-what",
+          "code-review"
+        ],
+        "deploy": [
+          "pr",
+          "handoff"
+        ],
+        "maintain": [
+          "retro",
+          "teach",
+          "improve-codebase-architecture",
+          "writing-for-agents"
+        ]
+      },
+      "anytime": [
+        "ask-matt",
+        "setup-matt-pocock-skills"
+      ],
+      "maintain_fallback": ""
+    },
+    {
+      "name": "pstack",
+      "title": "pstack (Claude port)",
+      "source": "https://github.com/michael-denyer/pstack-claude",
+      "pinned_ref": "190fc9a009491cbcfc04e25ef5b3c2d1fcf5ca8a",
+      "license": "MIT (+ LICENSE-cursor-team-kit, LICENSE-thermos; see NOTICE.md, NOTICE-skills.md)",
+      "installed": [
+        "architect",
+        "arena",
+        "automate-me",
+        "babysit",
+        "benchmark-checklist",
+        "blast-radius",
+        "bro",
+        "correct",
+        "create-formal-verification-skill",
+        "create-verification-skill",
+        "deslop",
+        "figure-it-out",
+        "fix-ci",
+        "fix-merge-conflicts",
+        "get-pr-comments",
+        "how",
+        "in-your-own-words",
+        "interrogate",
+        "ketchup",
+        "ketchup-video",
+        "maintain-formal-verification-skill",
+        "maintain-verification-skill",
+        "make-pr-easy-to-review",
+        "no-comments",
+        "poteto-help",
+        "poteto-mode",
+        "principle-attack-the-premise",
+        "principle-boundary-discipline",
+        "principle-build-the-lever",
+        "principle-encode-lessons-in-structure",
+        "principle-exhaust-the-design-space",
+        "principle-experience-first",
+        "principle-explain-the-number",
+        "principle-fix-root-causes",
+        "principle-foundational-thinking",
+        "principle-guard-the-context-window",
+        "principle-laziness-protocol",
+        "principle-make-operations-idempotent",
+        "principle-migrate-callers-then-delete-legacy-apis",
+        "principle-minimize-reader-load",
+        "principle-model-the-domain",
+        "principle-never-block-on-the-human",
+        "principle-outcome-oriented-execution",
+        "principle-prove-it-works",
+        "principle-redesign-from-first-principles",
+        "principle-separate-before-serializing-shared-state",
+        "principle-sequence-verifiable-units",
+        "principle-subtract-before-you-add",
+        "principle-test-behavior-not-implementation",
+        "principle-type-system-discipline",
+        "recall",
+        "reflect",
+        "setup-pstack",
+        "sharpen",
+        "show-me-your-work",
+        "statechart",
+        "swarm",
+        "technical-writing",
+        "thermo-nuclear-code-quality-review",
+        "thermo-nuclear-review",
+        "thermos",
+        "typescript-best-practices",
+        "unslop",
+        "what-did-i-get-done",
+        "why"
+      ],
+      "skipped": [
+        "tdd",
+        "teach"
+      ],
+      "steps": {
+        "plan": [
+          "how",
+          "why",
+          "figure-it-out",
+          "show-me-your-work"
+        ],
+        "design": [
+          "architect",
+          "arena",
+          "interrogate"
+        ],
+        "build": [
+          "typescript-best-practices",
+          "deslop",
+          "no-comments"
+        ],
+        "test": [
+          "create-verification-skill",
+          "swarm",
+          "blast-radius",
+          "benchmark-checklist",
+          "interrogate",
+          "thermo-nuclear-code-quality-review"
+        ],
+        "deploy": [
+          "make-pr-easy-to-review",
+          "babysit",
+          "fix-merge-conflicts",
+          "get-pr-comments",
+          "fix-ci"
+        ],
+        "maintain": []
+      },
+      "anytime": [
+        "poteto-mode",
+        "setup-pstack",
+        "poteto-help",
+        "recall",
+        "ketchup",
+        "ketchup-video",
+        "bro",
+        "what-did-i-get-done",
+        "in-your-own-words",
+        "technical-writing",
+        "unslop",
+        "sharpen",
+        "statechart",
+        "thermos",
+        "thermo-nuclear-review",
+        "reflect",
+        "correct",
+        "automate-me",
+        "maintain-verification-skill",
+        "create-formal-verification-skill",
+        "maintain-formal-verification-skill",
+        "principle-attack-the-premise",
+        "principle-boundary-discipline",
+        "principle-build-the-lever",
+        "principle-encode-lessons-in-structure",
+        "principle-exhaust-the-design-space",
+        "principle-experience-first",
+        "principle-explain-the-number",
+        "principle-fix-root-causes",
+        "principle-foundational-thinking",
+        "principle-guard-the-context-window",
+        "principle-laziness-protocol",
+        "principle-make-operations-idempotent",
+        "principle-migrate-callers-then-delete-legacy-apis",
+        "principle-minimize-reader-load",
+        "principle-model-the-domain",
+        "principle-never-block-on-the-human",
+        "principle-outcome-oriented-execution",
+        "principle-prove-it-works",
+        "principle-redesign-from-first-principles",
+        "principle-separate-before-serializing-shared-state",
+        "principle-sequence-verifiable-units",
+        "principle-subtract-before-you-add",
+        "principle-test-behavior-not-implementation",
+        "principle-type-system-discipline"
+      ],
+      "maintain_fallback": "pstack has no Maintain skills; super-board's own loop (super-collect, calibration) covers it."
+    },
+    {
+      "name": "agent-skills",
+      "title": "Addy Osmani's agent-skills",
+      "source": "https://github.com/addyosmani/agent-skills",
+      "pinned_ref": "eb07f19f52c2669f2364897aaa293e2aaddd7b1c",
+      "license": "MIT",
+      "installed": [
+        "api-and-interface-design",
+        "browser-testing-with-devtools",
+        "ci-cd-and-automation",
+        "code-review-and-quality",
+        "code-simplification",
+        "constraint-driven-development",
+        "context-engineering",
+        "debugging-and-error-recovery",
+        "deprecation-and-migration",
+        "documentation-and-adrs",
+        "doubt-driven-development",
+        "frontend-ui-engineering",
+        "git-workflow-and-versioning",
+        "idea-refine",
+        "incremental-implementation",
+        "interview-me",
+        "observability-and-instrumentation",
+        "performance-optimization",
+        "planning-and-task-breakdown",
+        "security-and-hardening",
+        "shipping-and-launch",
+        "source-driven-development",
+        "spec-driven-development",
+        "test-driven-development",
+        "using-agent-skills"
+      ],
+      "skipped": [],
+      "steps": {
+        "plan": [
+          "interview-me",
+          "idea-refine",
+          "spec-driven-development",
+          "constraint-driven-development",
+          "planning-and-task-breakdown"
+        ],
+        "design": [
+          "api-and-interface-design",
+          "frontend-ui-engineering"
+        ],
+        "build": [
+          "incremental-implementation",
+          "test-driven-development",
+          "context-engineering",
+          "source-driven-development",
+          "doubt-driven-development"
+        ],
+        "test": [
+          "browser-testing-with-devtools",
+          "debugging-and-error-recovery",
+          "code-review-and-quality",
+          "security-and-hardening",
+          "performance-optimization",
+          "code-simplification"
+        ],
+        "deploy": [
+          "git-workflow-and-versioning",
+          "ci-cd-and-automation",
+          "shipping-and-launch"
+        ],
+        "maintain": [
+          "deprecation-and-migration",
+          "documentation-and-adrs",
+          "observability-and-instrumentation"
+        ]
+      },
+      "anytime": [
+        "using-agent-skills"
+      ],
+      "maintain_fallback": ""
+    }
+  ]
+}

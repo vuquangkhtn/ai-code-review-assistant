@@ -16,3 +16,25 @@ yarn-error.log*
 # AI Code Review temporary files
 .ai-code-review/
 dist/
+
+# super-board (onboard)
+.claude/super-board/active
+.claude/super-board/onboard-answers.json
+.claude/super-board/onboard-staged/
+.claude/super-board/backup/
+.claude/super-board/inflight/
+.claude/super-board/migrations/
+.claude/super-board/upgrade.json
+
+# super-board runtime state
+.claude/super-board/github-halt.json
+.claude/worktrees/
+docs/super-board/runs/
+
+# teaching workspace (maintainer learning track — see AGENTS.md)
+MISSION.md
+NOTES.md
+RESOURCES.md
+lessons/
+reference/
+assets/

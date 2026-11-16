@@ -1,0 +1,417 @@
+// This file is a REFERENCE DOC, not parsed by the skill at runtime. It uses
+// JSON5-style `//` line comments to inline field notes from spec §4 alongside
+// the schema. Strip comments before validating an actual config file as JSON.
+//
+// One config per GitHub project this repo drives, written to
+// `.claude/super-board/configs/<slug>.json` (committed). The active
+// pointer `.claude/super-board/active` is gitignored and per-machine.
+
+{
+  "version": 1,
+
+  // Short scannable label shown when multiple configs are listed.
+  // E.g. "staging QA" or "admin build pipeline".
+  "description": "<short scannable label, e.g. 'staging QA' or 'admin build pipeline'>",
+
+  "project": {
+    "owner": "<github-owner>",
+    "title": "<project title on GitHub>",
+    // Required; `gh project` CLI takes number, not title (titles aren't unique).
+    "number": 0
+  },
+
+  // No `variant` (removed in v3.0.0). Every board has the same columns, and a
+  // card's label picks its lane — see `labels` below. Onboard's upgrade deletes a
+  // leftover `variant`; the wave planner refuses "qa-only" until it is gone.
+
+  // Worker dispatch backend. "workflow" (default) drains waves in-session via
+  // the super-board-wave dynamic workflow (references/run-workflow.md);
+  // requires dynamic workflows enabled in /config. "claude-p" is the legacy
+  // headless dispatcher (.claude/bin/super-board-run.sh) — explicit opt-in
+  // only; the dispatcher refuses to run (exit 78) unless set here.
+  "worker_backend": "workflow",
+
+  // ── This fork (suber-super-board): vendored skill sets ──────────────────
+  // Which skill set guides the six lifecycle steps (Plan · Design · Build ·
+  // Test · Deploy · Maintain), chosen at onboard step 2. "named" = one set for
+  // every step; "custom" = per-step set, "" on a step means the super-board
+  // loop covers it. The rendered map lives in .claude/super-board/skill-map.json
+  // and the AGENTS.md `super-board:skill-map` block; the raw install record is
+  // .agents/skill-sets.json.
+  "skill_sets": {
+    "mode": "named",            // "named" | "custom"
+    "named": "pstack",          // mattpocock | pstack | agent-skills (mode "named")
+    "steps": null               // mode "custom": {"plan": "mattpocock", …, "maintain": ""}
+  },
+
+  // Agent CLIs the skills must reach (onboard step 3). claude is always on —
+  // the board pack itself lives in .claude/. zcode/codex/opencode read
+  // .agents/skills natively; copilot and any "other" agent get the AGENTS.md
+  // pass-through notes.
+  "agents": ["claude", "codex"],
+  "other_agents": "",           // free-text agent names from onboard's "Other" box
+
+  // Default model ladder for lane workers, indexed by card complexity from
+  // the classify router. Overridden per run by `super-board run --low|--high`.
+  //   "low"    — haiku (low) / sonnet (medium) / opus (high)
+  //   "medium" — (default) sonnet / opus / session model
+  //   "high"   — opus for every card
+  "model_tier": "medium",
+
+  // Optional Codex lane settings. Used by explicit `run --codex` and usage
+  // fallback; never selects the backend or grants Review/merge ownership.
+  "codex": {
+    // Optional model name passed to `codex exec -m` for every card, over the
+    // Codex ladder. `--codex=<model>` wins; absent/null lets the ladder pick
+    // (run tier x card grade, see scripts/super-board-codex-lane.sh).
+    "model": null
+  },
+
+  "target": {
+    // "repo" | "repo+url". A board always drives a repo; `url` is the live or
+    // preview site the Tester may also hit. Testing a live site with no repo is
+    // not a board: run `/super-qa <url>` on its own.
+    "type": "repo",
+    "url": null
+  },
+
+  // `{path, remote}`. `remote` can be `null` for local-only (no pull requests).
+  "repo": { "path": ".", "remote": "https://github.com/<owner>/<repo>" },
+
+  // The branch all per-issue branches are cut from and squash-merged back into.
+  // Default `"main"`. Onboard warns and suggests `"staging"` or `"develop"` if
+  // `main` appears to be production.
+  "base_branch": "main",
+
+  // IANA time zone for the times super-board writes (the PR body's Iteration
+  // history, via `super-board-pr-body.sh --time`). GitHub markdown cannot run
+  // JavaScript, so a time is fixed when a lane writes it — in this zone.
+  // Onboard sets it to the machine's zone. Absent → the machine's local zone.
+  "timezone": "America/Toronto",
+
+  // Names of the Status options on the project, always all seven (v3.0.0).
+  // Aliases tolerated; canonicalized at read time. There is no Skipped column:
+  // a card dropped on purpose is closed as not planned and moved to Done with a
+  // 🤷 comment. Onboard adds any missing option and keeps every card.
+  "columns": ["Backlog", "Ready", "Building", "QA", "Review", "Blocked", "Done"],
+
+  // The three type labels (v3.0.0). Onboard creates them on the repo. Routing:
+  //   qa      → Ready → QA → Review → Done (skips Building: test what exists)
+  //   bug     → Ready → Building → QA → Review → Done
+  //   feature → same as bug
+  //   none    → built, like feature; the classifier adds feature or bug
+  // Fixed, not configurable; listed here so a reader sees the whole contract.
+  "labels": ["qa", "bug", "feature"],
+
+  "paths": {
+    // `null` when the project has no PROJECT.md.
+    "project_md": null,
+    "pre_flight_md": "docs/super-board/pre-flight.md",
+    "runs_dir": "docs/super-board/runs"
+  },
+
+  // When `true`, Reviewer marks the PR ready but does NOT squash-merge; a
+  // human must click merge. Card auto-moves to Done when the PR is merged
+  // externally. Default `false`. Legacy switch: new configs leave it `false`
+  // and use `merge_policy` (default "human" = the same thing).
+  //
+  // On the workflow backend, `false` ALSO requires
+  // "Bash(bash .claude/bin/super-board-merge-gate.sh:*)" and "Bash(gh pr merge:*)"
+  // in the session allowlist (onboard offers both as a diff) — without it every Reviewer stalls on an approval prompt
+  // and nothing lands. See references/run-workflow.md → "Mid-run permission prompts".
+  "human_approves_merge": false,
+
+  // Who merges what (v2.6.0). Evaluated by super-board-merge-gate.sh (via
+  // super-board-merge-policy.py) on every merge; `human_approves_merge: true`
+  // still overrides it and makes the Reviewer stop before the gate.
+  // Absent → the defaults below apply.
+  "merge_policy": {
+    // "auto" (default): normal changes merge on a clean review.
+    // "human": every PR waits for a human click (the old human_approves_merge).
+    // Onboard recommends "human" when base_branch is production-detected.
+    "default": "auto",
+    // Small PRs by design. A PR with more changed lines (additions +
+    // deletions) than this waits for a human: Blocked 🙋 "big PR — please
+    // review". Default 400; 0 = no size cap. Files matching size_exclude and
+    // migration files (migrations.globs) do not count; migration lines are
+    // reported separately. Builders keep PRs under this cap and lint flags
+    // tickets likely to exceed it (references/lint.md → "Too big").
+    "auto_max_lines": 400,
+    // Globs left out of the size count. Setting this replaces the defaults
+    // below; [] counts every file.
+    "size_exclude": [
+      "**/package-lock.json", "**/yarn.lock", "**/pnpm-lock.yaml", "**/bun.lockb", "**/bun.lock",
+      "**/npm-shrinkwrap.json", "**/Cargo.lock", "**/poetry.lock", "**/uv.lock", "**/Pipfile.lock",
+      "**/Gemfile.lock", "**/composer.lock", "**/go.sum", "**/Podfile.lock", "**/pubspec.lock",
+      "**/generated/**", "**/__generated__/**", "**/*.generated.*", "**/*.gen.*",
+      "**/*.min.js", "**/*.min.css", "**/*.map", "**/*.pb.go", "**/*_pb2.py",
+      "**/__snapshots__/**", "**/*.snap"
+    ],
+    // ALWAYS human, whatever `default` says. A PR matching ANY label, path glob
+    // or keyword (case-insensitive, searched in the diff's ADDED lines only) of
+    // a category exits the gate 7: no merge, card → Blocked 🙋 (the human merges
+    // it, or comments "done" to approve and the next wave merges).
+    // Setting this key replaces the whole default set; {} turns it off.
+    // Globs: `**/` = any dirs (incl. none), `**` = anything, `*` = one segment.
+    "always_human": {
+      "money":  { "labels": ["money", "payments", "billing", "pricing"],
+                  "paths": ["**/billing/**", "**/payments/**", "**/stripe/**", "**/checkout/**"],
+                  "keywords": ["stripe.", "payment_intent", "price_id", "invoice.create"] },
+      "auth":   { "labels": ["auth", "security"],
+                  "paths": ["**/auth/**", "**/authz/**", "**/permissions/**"],
+                  "keywords": ["jwt.sign", "bcrypt", "password_hash", "service_role"] },
+      // Destructive schema changes ONLY (DROP / TRUNCATE / RENAME, or the
+      // `schema` label) need a human. Additive migrations (new table, new
+      // column, new index) are not "schema": they follow the `migrations` DB-env
+      // rule below. A live database is always human, whatever the change.
+      "schema": { "labels": ["schema", "destructive"],
+                  "paths": [],
+                  "keywords": ["drop table", "drop column", "truncate table", "rename column", "drop schema"] }
+    },
+    // true only when the user explicitly chose auto-merge onto a
+    // production-detected base in onboard. run.md's production-merge guard
+    // refuses to start otherwise.
+    "allow_auto_on_production": false
+  },
+
+  // Database migrations at merge time (v2.6.0). A PR touching `globs` is a
+  // migration PR. Inside the merge lock, after verify_commands pass, the gate
+  // runs commands[env] for every env in allowed_envs, then merges. It exits 8
+  // (🙋 needs you → Blocked, block-template.md) instead when: target_env is not
+  // in allowed_envs, an allowed command fails, target_env is allowed but has no
+  // command, or human_steps is non-empty. A `needs-you: <command>` line in the
+  // PR body does the same for any PR. A trusted human comments "done" after a
+  // pinned approval request for the current head and steps (block-template.md).
+  // The gate rechecks that evidence; needs-you:done labels never authorize it.
+  // In one line, for the user: the robot migrates the DBs you allow to test its
+  // work; a live database, or a destructive schema change, waits for you.
+  "migrations": {
+    "globs": ["supabase/migrations/**", "prisma/migrations/**", "drizzle/**",
+              "**/migrations/*.sql", "db/migrate/**", "alembic/versions/**"],
+    // Which databases the robot may migrate. Any of "test", "staging", "live".
+    // Default ["test", "staging"]. Onboard asks (multi-select).
+    "allowed_envs": ["test", "staging"],
+    // The env that merging into base_branch deploys to. Default: "live" when
+    // base_branch is main/master, else "staging".
+    "target_env": "staging",
+    // Run from the root of the verified scratch worktree. "-" = the deploy
+    // pipeline applies it, nothing to run. Secrets never go in this file. Nor
+    // can they come from the session's environment: every lane agent's Bash
+    // call is a fresh shell and nothing loads .env. Resolve the URL from the
+    // project's own .env, with an absolute path (the gate runs in a scratch
+    // worktree), falling back from the variable to the file:
+    //   "${LIVE_DB_URL:-$(sed -n 's/^LIVE_DB_URL=//p' /abs/repo/.env)}"
+    "commands": {
+      "test": "npm run db:migrate -- --env test",
+      "staging": "supabase db push --db-url \"$STAGING_DB_URL\"",
+      "live": "supabase db push --db-url \"${LIVE_DB_URL:-$(sed -n 's/^LIVE_DB_URL=//p' /abs/repo/.env)}\""
+    },
+    // Read-only proof per env that the command above can reach its database,
+    // resolved the same way. The run preconditions run each one before the
+    // first wave (run-workflow.md → Preconditions); a failure halts the run
+    // there, not at merge time after a whole wave of work.
+    "checks": {
+      "live": "supabase migration list --db-url \"${LIVE_DB_URL:-$(sed -n 's/^LIVE_DB_URL=//p' /abs/repo/.env)}\""
+    },
+    // Extra human-only steps every migration PR needs (e.g. a backfill).
+    "human_steps": []
+  },
+
+  // ── Runaway controls (v2.0.0).
+  // Halt after this many consecutive dispatch cycles in which NO card reached
+  // Done. Progress is measured by landed work, never by lane
+  // occupancy: a pipeline that is 100% busy and lands nothing is precisely the
+  // runaway this gate exists to catch. Default `6`.
+  "no_progress_cycles": 6,
+
+  // LEGACY `claude-p` backend only — the workflow backend never reads it.
+  // Hard ceiling on total worker dispatches for one run; the loop halts with a
+  // runaway summary when it is reached. `0` disables the ceiling. Bounds
+  // worst-case spend even when a board trickles just enough Done movement to
+  // keep resetting `no_progress_cycles`. Default `0`.
+  "max_dispatches": 0,
+
+  // Controls Reviewer's adversarial mode (folded-in super-truth pattern).
+  //   "off"          — never adversarial.
+  //   "non-trivial"  — (default) activates on cards with diff ≥10 lines OR
+  //                    labels in {security, migration, payments, auth}.
+  //   "always"       — every card gets adversarial review
+  //                    (cost: 2 sub-agent dispatches per card).
+  "truth_gate": "non-trivial",
+
+  // Minimum aggregated sub-agent confidence (0-100) required to approve.
+  // Default `70`. Below threshold, Reviewer must NOT approve; card moves to
+  // Blocked with `🛡 truth-check failed (confidence X/100)`. See §7.
+  "truth_threshold": 70,
+
+  // Shell commands proving the branch still BUILDS against the base branch as it
+  // is right now. Run by super-board-merge-gate.sh from the root of a scratch
+  // worktree that already has the current base merged in, inside the merge lock,
+  // immediately before the squash-merge. Any non-zero exit sends the card back
+  // to Build for a rebase pass; it never Blocks.
+  //
+  // Not optional in practice. GitHub's `mergeable: CLEAN` only answers "does the
+  // text conflict" — it says nothing about whether the result compiles. On
+  // 2026-08-20 two PRs read CLEAN and failed `tsc` against their own base,
+  // because a shared interface had grown after they were tested. Leave this
+  // empty and the gate still merges the base in and reports conflicts, but it
+  // says loudly that nothing proved the result builds.
+  //
+  // A fresh worktree has no node_modules, so install as part of the command.
+  // Claude plan-usage guard (workflow backend). Before each wave the
+  // orchestrator runs super-board-usage.sh check; if the 5-hour or weekly
+  // window is at or above this percentage, no new wave launches until it
+  // resets. Default 95. See references/run-workflow.md → wave loop step 1.
+  // Explicit `run --codex` skips this Claude-only guard.
+  "usage_pause_pct": 95,
+
+  // What the orchestrator does while the usage guard pauses (exit 10).
+  //   "none"  — (default) launch nothing; wait for the reset.
+  //   "codex" — keep Build and QA moving one card at a time on Codex, headless
+  //             (super-board-codex-lane.sh without --codex). Review stays on
+  //             Claude: cards that reach Review wait there for the next Claude
+  //             wave. The launcher refuses a fallback lane without this value.
+  "usage_fallback": "none",
+
+  "verify_commands": [
+    "cd server && npm ci --silent && npm run typecheck && npm test"
+  ],
+
+  // Optional throttle on how many cards a single wave dispatches. ABSENT OR 0
+  // MEANS UNLIMITED, which is the default and is usually what you want.
+  //
+  // It is also the GitHub-limit valve. A wave that hits the hourly GraphQL
+  // limit steps it down for the next wave — unlimited → 3 → 2 → 1, floor 1 —
+  // written back here by super-board-throttle.sh (run-workflow.md → Reconcile).
+  // One 14-card wave spent the whole 5000/hr bucket in ~40 minutes (2026-10-03).
+  //
+  // Wave width is decided by the dependency graph, not by this number: the
+  // planner picks every Ready card whose `## Blocked by` issues have all closed,
+  // plus whatever is already in flight. The workflow runtime caps CONCURRENT
+  // agents at min(16, cpus-2) and queues the rest, so a 19-card wave is normal.
+  // Codex waves also cap concurrent cards at a positive max_workers; absent/0
+  // uses max(1, min(16, cpus-2)), with each card's lanes running sequentially.
+  //
+  // Set it only to deliberately throttle a machine. A fixed cap used to do the
+  // wave sizing, and it sized it badly: on a board where 23 of 32 Ready cards
+  // were waiting on an open blocker, the cap spent its slots on cards that would
+  // hit their own preflight and park.
+  "max_workers": 0,
+
+  // Max consecutive failures in the same lane on the same root-cause hash
+  // before the card auto-moves to Blocked. Default `2`. Root-cause hash
+  // defined in §7 Halt gates.
+  "rebuild_cap": 2,
+
+  // When the count of Blocked cards exceeds this percent of the initial Ready
+  // count, post a mid-run breakdown in the run report. Default `30`. Set to `0`
+  // to disable.
+  "block_rate_alert_pct": 30,
+
+  // Optional. Settings for the standalone /ui-refine-loop skill (the board never
+  // runs it). Every key is optional; refine-setup.sh detect
+  // resolves config key → auto-detection → default. Full notes and the auth
+  // script contract: skills/ui-refine-loop/references/config.md.
+  "refine": {
+    "dev_command": "npm run dev -- --port $PORT",
+    "ready_path": "/",
+    "check_commands": ["npm run typecheck", "npm run lint"],
+    "env_files": [".env.local"],
+    "auth_script": "scripts/refine-auth.mjs",
+    "states": [{ "name": "main" }],
+    "taste_file": "docs/design/taste.md",
+    // Impeccable skill folder, launcher, or scripts/ file; v4.0.x and v4.4+ both work.
+    "impeccable": ".agents/skills/impeccable",
+    // Fix rounds (default 5); a closing check follows the last.
+    "rounds": 5
+  },
+
+  // Optional. super-collect sources for THIS project (skills/super-collect/SKILL.md).
+  // Written by `super-board onboard` (collect step). IDs and hosts only: secrets
+  // live in .env — SENTRY_AUTH_TOKEN, POSTHOG_PERSONAL_API_KEY — never here.
+  "collect": {
+    // Sources `/super-collect` runs with no argument. Any of:
+    // "sentry", "posthog", "github", "prs", "architecture", plus the `name` of
+    // any entry in `custom` below.
+    "sources": ["sentry", "posthog", "github", "prs", "architecture", "linear"],
+    // Default window in days when no --since is given. Default 14.
+    "window_days": 14,
+    "sentry": {
+      "org": "<sentry-org-slug>",
+      "project": "<sentry-project-slug>",
+      // Region host, e.g. https://us.sentry.io or https://de.sentry.io. Default https://sentry.io.
+      "host": "https://sentry.io",
+      // Filter to this environment; "" for all. Default "production".
+      "environment": "production",
+      // Drop issues under these window counts. Defaults 1 / 1.
+      "min_events": 1,
+      "min_users": 1
+    },
+    "posthog": {
+      // App host (us.posthog.com / eu.posthog.com or self-hosted), not the ingest host.
+      "host": "https://us.posthog.com",
+      "project_id": 0,
+      // Distinct people a group needs before it becomes a ticket. Default 5
+      // (signals carry their own default: survey themes need 3).
+      "min_users": 5,
+      // Optional: narrow the built-in signal table (collect_posthog.py SIGNALS):
+      // exception, rageclick, dead_click, web_vitals, survey. Absent = all.
+      "signals": ["exception", "rageclick", "dead_click", "web_vitals", "survey"],
+      // Project-defined app failure events. `fail` is a HogQL condition; omit it
+      // when every occurrence is a failure. Filed at >= min_users people, or when
+      // failing people / all people on that event >= failure_rate.
+      "failure_events": [
+        { "event": "push_completed", "fail": "properties.status = 'failed'" },
+        { "event": "payment_failed" }
+      ],
+      "failure_rate": 0.10,
+      // Optional event property holding the app version / SHA; the verifier
+      // uses it to confirm zero hits on versions after a fix.
+      "version_property": "app_version",
+      // Optional funnel steps for the drop-off REPORT (never tickets).
+      "funnel": ["$pageview", "signup_started", "setup_completed"]
+    },
+    "prs": {
+      // Cap on merged PRs read per run. Default 200.
+      "max_prs": 200
+    },
+    "architecture": {
+      // Cap on refactor findings filed per run. Default 5.
+      "max_findings": 5
+    },
+    // Extra sources added in onboard's "➕ Add another source" (v3.0.0). Each
+    // was pinged read-only before it was saved. `/super-collect` runs them with
+    // skills/super-collect/scripts/collect_custom.py, turns the output into
+    // candidates and sends them through the same verifier as every other source.
+    //   name     — short slug; also what `sources` lists. Fingerprint custom|<name>|<key>.
+    //   kind     — "mcp" (an MCP server Claude Code has; the agent calls its read
+    //              tool), "http" (GET returning JSON), "cli" (a read-only command
+    //              printing JSON or lines), "app" (a known app name resolved to
+    //              one of the three at setup).
+    //   target   — the MCP server name, the URL, or the command.
+    //   auth_env — optional env var holding a token (http: sent as Bearer). The
+    //              name only; the value stays in .env.
+    //   map      — optional dot-paths into each record: items (the list), id,
+    //              title, body, url, count. Absent = best guess per record.
+    "custom": [
+      { "name": "linear", "kind": "mcp", "target": "linear", "map": { "items": "issues" } },
+      { "name": "statuspage", "kind": "http", "target": "https://status.example.com/api/v2/incidents.json",
+        "map": { "items": "incidents", "id": "id", "title": "name", "url": "shortlink" } },
+      { "name": "vercel-logs", "kind": "cli", "target": "vercel logs --output json" }
+    ]
+  },
+
+  "notifications": {
+    // super-board sends no messages of its own: reports go to the session and to
+    // the issue/PR timeline. `channel` and `chat_id` are reserved and unused.
+    "channel": "session",
+    "chat_id": null,
+
+    // The assignee identity used as the claim mutex. Read by
+    // `super-board status` and `super-board run`. Recorded during onboard
+    // step 11 as either `super-board-bot[bot]` (when a GitHub App is
+    // installed on the repo) or the user's own GitHub login (solo projects).
+    // Pick during step 2 based on what `gh auth status` returned.
+    "bot_identity": "auto"
+  }
+}
