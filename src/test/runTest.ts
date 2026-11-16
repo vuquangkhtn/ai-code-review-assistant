@@ -1,7 +1,11 @@
 import * as path from 'path';
+import * as fs from 'fs';
+import * as os from 'os';
+import { execFileSync } from 'child_process';
 import { runTests } from '@vscode/test-electron';
 
 async function main() {
+    const fixtureWorkspace = process.env.CLI_REVIEW_TEST ? fs.mkdtempSync(path.join(os.tmpdir(), 'cli-review-')) : undefined;
     try {
         // The folder containing the Extension Manifest package.json
         // Passed to `--extensionDevelopmentPath`
@@ -12,17 +16,25 @@ async function main() {
         const extensionTestsPath = path.resolve(__dirname, './suite/index');
 
         // The workspace folder to open during tests (test-examples for realistic testing)
-        const workspacePath = path.resolve(__dirname, '../../test-examples');
+        const workspacePath = fixtureWorkspace || path.resolve(__dirname, '../../test-examples');
+        if (fixtureWorkspace) {
+            execFileSync('git', ['init'], { cwd: fixtureWorkspace });
+            fs.writeFileSync(path.join(fixtureWorkspace, 'sample.js'), 'let answer = 42;\n');
+        }
 
         // Download VS Code, unzip it and run the integration test
         await runTests({ 
-            extensionDevelopmentPath, 
+            extensionDevelopmentPath,
+            vscodeExecutablePath: process.env.CLI_TEST_VSCODE,
+            extensionTestsEnv: { CLI_TEST_NODE: process.execPath },
             extensionTestsPath,
-            launchArgs: [workspacePath] // Open test-examples as workspace
+            launchArgs: [workspacePath, '--skip-welcome', '--disable-workspace-trust'] // Open test-examples as workspace
         });
     } catch (err) {
         console.error('Failed to run tests');
-        process.exit(1);
+        process.exitCode = 1;
+    } finally {
+        if (fixtureWorkspace) { fs.rmSync(fixtureWorkspace, { recursive: true, force: true }); }
     }
 }
 
