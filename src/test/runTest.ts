@@ -2,7 +2,16 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as os from 'os';
 import { execFileSync } from 'child_process';
-import { runTests } from '@vscode/test-electron';
+import { downloadAndUnzipVSCode, runTests } from '@vscode/test-electron';
+
+export function resolveVSCodeExecutable(downloaded: string): string {
+    const code = path.join(path.dirname(downloaded), 'Code');
+    if (path.basename(downloaded) === 'Electron' && path.basename(path.dirname(downloaded)) === 'MacOS'
+        && !fs.existsSync(downloaded) && fs.existsSync(code)) {
+        return code;
+    }
+    return downloaded;
+}
 
 async function main() {
     const fixtureWorkspace = process.env.CLI_REVIEW_TEST ? fs.mkdtempSync(path.join(os.tmpdir(), 'cli-review-')) : undefined;
@@ -25,17 +34,18 @@ async function main() {
         // Download VS Code, unzip it and run the integration test
         await runTests({ 
             extensionDevelopmentPath,
-            vscodeExecutablePath: process.env.CLI_TEST_VSCODE,
+            vscodeExecutablePath: process.env.CLI_TEST_VSCODE
+                || resolveVSCodeExecutable(await downloadAndUnzipVSCode()),
             extensionTestsEnv: { CLI_TEST_NODE: process.execPath },
             extensionTestsPath,
             launchArgs: [workspacePath, '--skip-welcome', '--disable-workspace-trust'] // Open test-examples as workspace
         });
     } catch (err) {
-        console.error('Failed to run tests');
+        console.error('Failed to run tests', err);
         process.exitCode = 1;
     } finally {
         if (fixtureWorkspace) { fs.rmSync(fixtureWorkspace, { recursive: true, force: true }); }
     }
 }
 
-main();
+if (require.main === module) { main(); }

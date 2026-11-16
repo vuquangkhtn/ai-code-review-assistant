@@ -266,7 +266,7 @@
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
     "test": "node ./out/test/runTest.js",
-    "test:cli": "tsc && node --test src/test/node/cliReview.cjs",
+    "test:cli": "tsc && node --test src/test/node/*.cjs",
     "test:examples": "node test-examples/run-review-test.js",
     "package:vsix": "vsce package",
     "publish:vscode": "vsce publish",
