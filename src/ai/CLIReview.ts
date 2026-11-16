@@ -1,4 +1,5 @@
-import { exec, execFile } from 'child_process';
+import { exec } from 'child_process';
+import spawn = require('cross-spawn');
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { randomUUID } from 'crypto';
@@ -12,7 +13,30 @@ export async function runCLIReview(options: { command: CLIInvocation; cwd: strin
         const command = options.command;
         const child = typeof command === 'string'
             ? exec(command, settings, done)
-            : execFile(command.file, command.promptArgument ? [...command.args, options.prompt] : command.args, settings, done);
+            : spawn(command.file, command.promptArgument ? [...command.args, options.prompt] : command.args, { cwd: options.cwd });
+        if (typeof command !== 'string') {
+            const chunks: Buffer[] = [];
+            let stdoutBytes = 0;
+            let stderrBytes = 0;
+            const fail = (error: Error) => { clearTimeout(timer); child.kill(); reject(error); };
+            const timer = setTimeout(() => fail(new Error('CLI review timed out')), settings.timeout);
+            child.on('error', error => { clearTimeout(timer); reject(error); });
+            child.stdin?.on('error', fail);
+            child.stdout?.on('data', (chunk: Buffer) => {
+                stdoutBytes += chunk.length;
+                if (stdoutBytes > settings.maxBuffer) { fail(new Error('CLI stdout exceeds 4 MB')); }
+                else { chunks.push(chunk); }
+            });
+            child.stderr?.on('data', (chunk: Buffer) => {
+                stderrBytes += chunk.length;
+                if (stderrBytes > settings.maxBuffer) { fail(new Error('CLI stderr exceeds 4 MB')); }
+            });
+            child.on('close', code => {
+                clearTimeout(timer);
+                if (code !== 0) { reject(new Error(`CLI exited with code ${code}`)); }
+                else { resolve(Buffer.concat(chunks).toString('utf8')); }
+            });
+        }
         child.stdin?.on('error', reject);
         child.stdin?.end(typeof command !== 'string' && command.promptArgument ? undefined : options.prompt);
     });

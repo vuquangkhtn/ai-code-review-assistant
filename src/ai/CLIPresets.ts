@@ -19,13 +19,16 @@ export async function selectCLICommand(options: {
     const available: { id: string; file: string; args: string[] }[] = [];
     for (const preset of presets) {
         for (const directory of (process.env.PATH || '').split(path.delimiter).filter(Boolean)) {
-            const file = path.resolve(directory, preset.id + (process.platform === 'win32' ? '.exe' : ''));
-            try {
-                await fs.access(file, constants.X_OK);
-                if (!(await fs.stat(file)).isFile()) { continue; }
-                available.push({ ...preset, file });
-                break;
-            } catch { /* Not executable on this PATH entry. */ }
+            for (const extension of process.platform === 'win32' ? ['.exe', '.com', '.cmd', '.bat'] : ['']) {
+                const file = path.resolve(directory.replace(/^"|"$/g, ''), preset.id + extension);
+                try {
+                    await fs.access(file, process.platform === 'win32' ? constants.F_OK : constants.X_OK);
+                    if (!(await fs.stat(file)).isFile()) { continue; }
+                    available.push({ ...preset, file });
+                    break;
+                } catch { /* Not executable on this PATH entry. */ }
+            }
+            if (available.some(provider => provider.id === preset.id)) { break; }
         }
     }
     if (!available.length) {

@@ -328,6 +328,5 @@ One installed provider is used silently; several show a picker once and persist
 the choice across sessions. Cancelling starts no review. If the saved provider
 is removed, detection runs again. A custom command overrides all presets.
 Codex and Claude receive stdin; Copilot receives a literal prompt argument.
-On Windows, native `.exe` providers are detected; use a custom command for `.cmd`
-or other shell wrappers. Providers use their own authentication and backend;
+On Windows, `.exe`, `.com`, `.cmd` and `.bat` providers are detected. Providers use their own authentication and backend;
 no code is sent until you explicitly trigger the CLI review command.

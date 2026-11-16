@@ -80,3 +80,28 @@ test('cancel does not save or run; missing executables give an actionable error'
         await assert.rejects(selectCLICommand({ customCommand:'', savedProvider:undefined, choose:silent, save }), /No supported CLI found on PATH.*customCommand/);
     });
 });
+
+test('Windows cmd shims run with literal arguments from a PATH containing spaces', { skip: process.platform !== 'win32' }, async () => {
+    const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'cli shims-'));
+    const previous = process.env.PATH;
+    try {
+        process.env.PATH = cwd;
+        fs.writeFileSync(path.join(cwd, 'capture.cjs'), `const fs=require('fs');
+fs.writeFileSync('invocation.json',JSON.stringify({args:process.argv.slice(2),prompt:fs.readFileSync(0,'utf8')}));
+console.log('{"issues":[]}');`);
+        for (const provider of Object.keys(expected)) {
+            const shim = path.join(cwd, `${provider}.cmd`);
+            fs.writeFileSync(shim, `@echo off\r\n"${process.execPath}" "%~dp0capture.cjs" %*\r\n`);
+            const command = await selectCLICommand({customCommand:'', savedProvider:undefined, choose:silent, save});
+            const prompt = 'review "quotes" & echo injected>injected | %PATH% !value! ^ (x)\nsecond line';
+            const file = await runCLIReview({command, cwd, prompt});
+            assert.deepEqual(JSON.parse(fs.readFileSync(file)), {issues:[]});
+            assert.deepEqual(JSON.parse(fs.readFileSync(path.join(cwd, 'invocation.json'))), {
+                args: provider === 'copilot' ? [...expected[provider], prompt] : expected[provider],
+                prompt: provider === 'copilot' ? '' : prompt
+            });
+            assert.ok(!fs.existsSync(path.join(cwd, 'injected')));
+            fs.unlinkSync(shim);
+        }
+    } finally { process.env.PATH = previous; fs.rmSync(cwd, {recursive:true, force:true}); }
+});

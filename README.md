@@ -109,5 +109,4 @@ Run **AI Code Review: Run AI Review with CLI** in a trusted workspace. With no
 `aiCodeReview.cli.customCommand`, the extension detects `codex`, `claude`, and
 `copilot` on PATH. One provider is selected silently; with several, pick once.
 The choice persists in VS Code across sessions. A custom command always overrides
-the preset. CLIs must already be installed and authenticated. Native executables
-are detected on Windows; shell wrappers need a custom command.
+the preset. CLIs must already be installed and authenticated. Windows detection includes native executables and `.cmd`/`.bat` wrappers.

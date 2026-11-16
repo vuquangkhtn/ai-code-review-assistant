@@ -24,3 +24,13 @@ for (const mode of ['clean', 'noisy', 'fail', 'invalid']) {
         } finally { fs.rmSync(cwd, { recursive: true, force: true }); }
     });
 }
+
+for (const script of ["process.exit(7)", "process.stdout.write('x'.repeat(4*1024*1024+1))", "process.stderr.write('x'.repeat(4*1024*1024+1))"]) {
+    test(`preset rejects failed or oversized output: ${script}`, async () => {
+        const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'cli-limits-'));
+        try {
+            await assert.rejects(runCLIReview({command:{file:process.execPath, args:['-e',script], promptArgument:false}, cwd, prompt:''}), /CLI (exited|stdout|stderr)/);
+            assert.ok(!fs.existsSync(path.join(cwd, '.ai-code-review/results')));
+        } finally { fs.rmSync(cwd, {recursive:true, force:true}); }
+    });
+}
