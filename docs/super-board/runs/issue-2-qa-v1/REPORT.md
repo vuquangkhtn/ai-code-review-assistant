@@ -25,7 +25,7 @@ No screenshots captured: no running extension host available. No claim of visibl
 
 ## Independent review and test gaps
 
-Read implementation before author notes. Existing 11 file summaries and 2 inline notes describe the reviewed code; no prior defect findings were present. No proven implementation defect found in this pass.
+Reviewed the implementation and test assertions inline. Existing 11 file summaries and 2 inline notes describe the reviewed code; no prior defect findings were present. No proven implementation defect found in this pass.
 
 The process tests assert actual persisted stdout and captured stdin, not mocks. The GUI tests assert new CodeLens issue identity, an open review panel, and unchanged clipboard. These assertions still need execution; source inspection cannot establish that the watcher delivers a new result.
 
