@@ -1,0 +1,62 @@
+out/test/runTest.js
+chatSessionsProvider
+chatSessionCustomizationProvider
+devDeviceId
+contribEditorContentMenu
+tokenInformation
+toolInvocationApproveCombination
+chatPromptFiles
+mcpServerDefinitions
+tabInputMultiDiff
+workspaceTrust
+chatHooks
+chatDebug
+envIsConnectionMetered
+environmentPower
+terminalTitle
+languageModelPricing
+languageModelRateLimit
+chatInputNotification
+speech
+DELTA: structuralDiff
+Proceeding with EXTRA proposals (structuralDiff) because extension is in development mode. Still, this EXTENSION WILL BE BROKEN unless product.json is updated.
+(node:76983) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+(Use `Code Helper (Plugin) --trace-deprecation ...` to show where the warning was created)
+[0m[0m
+[0m  CLI review status[0m
+  [32m  ✔[0m[90m tree offers a run, cancellation while running and failure details[0m
+AI Code Review Assistant is now active!
+Result file watcher setup complete for: .ai-code-review/results/**/*.json
+  [32m  ✔[0m[90m custom command can be cancelled from the registered tree command[0m[31m (257ms)[0m
+[0m  CLI review tracer[0m
+  [32m  ✔[0m[90m manual prompt including its tail matches the pre-feature baseline[0m
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey=undefined conversationKey=undefined modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+[AccountPolicyGate] apply: state=inactive, reason=undefined, isRestricted=false
+New result file detected: /var/folders/rl/dqkc_c0j01567h1rttvfw7yh0000gn/T/cli-review-PHCvyC/.ai-code-review/results/code-review-result-2026-11-18T15-25-50-161Z-96a35c84-c205-430a-8bfb-7018b029a2ed.json
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey=undefined conversationKey=undefined modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+  [32m  ✔[0m[90m palette command delivers stdin and displays clean results via watcher[0m[31m (1005ms)[0m
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey=undefined conversationKey=undefined modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+[91m[main 2026-11-18T15:25:51.132Z][0m [AgentHost:stderr] (node:76978) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+(Use `Code Helper --trace-deprecation ...` to show where the warning was created)
+
+New result file detected: /var/folders/rl/dqkc_c0j01567h1rttvfw7yh0000gn/T/cli-review-PHCvyC/.ai-code-review/results/code-review-result-2026-11-18T15-25-51-011Z-c3f59984-6e78-420c-91a1-a8952e239440.json
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="agent-host-copilotcli" conversationKey="agent-host-copilotcli:/untitled-08083d56-b0ca-4fa3-b5d0-6056d890e9fd" modelTarget="agent-host-copilotcli" storageKey="chat.currentLanguageModel.panel.agent-host-copilotcli" widgetViewKind="view"
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="agent-host-copilotcli" conversationKey="agent-host-copilotcli:/untitled-08083d56-b0ca-4fa3-b5d0-6056d890e9fd" modelTarget="agent-host-copilotcli" storageKey="chat.currentLanguageModel.panel.agent-host-copilotcli" widgetViewKind="view"
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="agent-host-copilotcli" conversationKey="agent-host-copilotcli:/untitled-08083d56-b0ca-4fa3-b5d0-6056d890e9fd" modelTarget="agent-host-copilotcli" storageKey="chat.currentLanguageModel.panel.agent-host-copilotcli" widgetViewKind="view"
+[AgentHostCustomizationMarketplace] Unable to load session-bound SDK installation receipts { name: 'Error' }
+[AgentHostCustomizationMarketplace] Unable to load session-bound SDK installation receipts { name: 'Error' }
+[AgentHostCustomizationMarketplace] Unable to load session-bound SDK installation receipts { name: 'Error' }
+[AgentHostCustomizationMarketplace] Unable to load session-bound SDK installation receipts { name: 'Error' }
+[AgentHostCustomizationMarketplace] Unable to load session-bound SDK installation receipts { name: 'Error' }
+  [32m  ✔[0m[90m palette command delivers stdin and displays noisy results via watcher[0m[31m (939ms)[0m
+[92m [0m[32m 5 passing[0m[90m (2s)[0m
+[90m[main 2026-11-18T15:25:51.917Z][0m Extension host with pid 76983 exited with code: 0, signal: unknown.
+[91m[main 2026-11-18T15:25:52.914Z][0m AgentHostStarter: cannot create window connection: Agent Host process manager is shutting down.
+Exit code:   0
+TEST-EXIT:0
