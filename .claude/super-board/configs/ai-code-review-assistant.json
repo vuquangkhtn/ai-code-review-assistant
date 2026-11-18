@@ -53,6 +53,7 @@
   "human_approves_merge": false,
   "merge_policy": {
     "default": "auto",
+    "allow_auto_on_production": true,
     "auto_max_lines": 400,
     "size_exclude": [
       "**/package-lock.json",
