@@ -22,7 +22,7 @@ R1 requested a working-host result at this application head; the committed raw l
 | Running/done/failed and stderr tail | cliLifecycle.test.cjs:31 bounded failure tail | cliStatus.test.ts:10 asserts states, tooltip and failure command | extension.ts:115-149 wires runner state and error toast; owner host 5/5 |
 | Dedicated channel streams live stdout | cliLifecycle.test.cjs:8 observes stdout before termination | none: write-only public channel API; hook declined by owner | extension.ts:63,130 creates named channel and appends callback chunks; source reviewed |
 | Cancel kills process and clears status | cliLifecycle.test.cjs:8 verifies PID death and no result | cliStatus.test.ts:10 idle removes status; :29 registered cancel | extension.ts:145 clears state in finally; owner host cancellation passes |
-| Custom command without preset | cliReview.test.cjs fixtures exercise supplied commands | cliStatus.test.ts:29 configures only customCommand | owner host run/cancel and clean/noisy tracer pass |
+| Custom command without preset | cliReview.cjs fixtures exercise supplied commands | cliStatus.test.ts:29 configures only customCommand | owner host run/cancel and clean/noisy tracer pass |
 
 Screenshots omitted under the issue owner ruling: TCC denies capture in this host's noninteractive sessions. No screenshot claim is made.
 
