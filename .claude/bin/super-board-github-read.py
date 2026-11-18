@@ -274,6 +274,11 @@ def validate(text, kind, meta=None):
 def read(args, kind='json', meta=None, recovering=False):
     if not read_only(args):
         raise ValueError('retry helper accepts read-only GitHub commands only')
+    # gh >=2.66 refuses diffs containing terminal escape sequences (ANSI bytes in
+    # fixture files) and returns an empty payload with a hint. The diff validator
+    # only inspects line prefixes, so emitting the raw diff is safe and required.
+    if args[:2] == ['pr', 'diff'] and '--allow-escape-sequences' not in args:
+        args = [*args, '--allow-escape-sequences']
     if not recovering:
         check_halt()
     operation = {'args': args, 'kind': kind, 'meta': meta}
