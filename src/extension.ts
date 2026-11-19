@@ -61,10 +61,21 @@ export function activate(context: vscode.ExtensionContext) {
     // Setup file watcher for .ai-code-review/results directory
     setupResultFileWatcher(context);
 
+    const cliOutput = vscode.window.createOutputChannel('AI Code Review CLI');
+    let cliRun: AbortController | undefined;
+    context.subscriptions.push(cliOutput, { dispose: () => cliRun?.abort() });
+
+    const refuseDuringCLIReview = (): boolean => {
+        if (!cliRun) { return false; }
+        vscode.window.showWarningMessage('A CLI review is running — cancel it first.');
+        return true;
+    };
+
     // Register commands
     const commands = [
         // External AI commands
         vscode.commands.registerCommand('aiCodeReview.copyPrompt', async () => {
+            if (refuseDuringCLIReview()) { return; }
             // Get the default change type from configuration
             const config = vscode.workspace.getConfiguration('aiCodeReview');
             const defaultChangeType = config.get<string>('defaultChangeType', 'local');
@@ -104,7 +115,15 @@ export function activate(context: vscode.ExtensionContext) {
             }
         }),
 
+        vscode.commands.registerCommand('aiCodeReview.cancelCLIReview', () => cliRun?.abort()),
+        vscode.commands.registerCommand('aiCodeReview.showCLIOutput', () => cliOutput.show(true)),
         vscode.commands.registerCommand('aiCodeReview.runCLIReview', async () => {
+            if (refuseDuringCLIReview()) { return; }
+            const controller = new AbortController();
+            cliRun = controller;
+            cliOutput.clear();
+            cliOutput.show(true);
+            codeReviewTreeProvider.setCLIStatus({ kind: 'running' });
             try {
                 const workspace = vscode.workspace.workspaceFolders?.[0];
                 if (!workspace || !vscode.workspace.isTrusted) {
@@ -121,14 +140,25 @@ export function activate(context: vscode.ExtensionContext) {
                 if (!command) { return; }
                 const changes = await changeDetector.detectAndStoreLocalChanges();
                 const prompt = PromptGenerator.generateFileReferencePrompt(changes.filePath, 'cli').content;
-                await runCLIReview({ command, cwd: workspace.uri.fsPath, prompt });
+                await runCLIReview({ command, cwd: workspace.uri.fsPath, prompt,
+                    signal: controller.signal, onStdout: chunk => cliOutput.append(chunk) });
+                codeReviewTreeProvider.setCLIStatus({ kind: 'done' });
             } catch (error) {
-                vscode.window.showErrorMessage(`CLI review failed: ${error}`);
-                throw error;
+                if (!controller.signal.aborted) {
+                    const message = error instanceof Error ? error.message : String(error);
+                    cliOutput.appendLine(`\nCLI review failed: ${message}`);
+                    codeReviewTreeProvider.setCLIStatus({ kind: 'failed', message });
+                    vscode.window.showErrorMessage(`CLI review failed: ${message}`);
+                    throw error;
+                }
+            } finally {
+                if (controller.signal.aborted) { codeReviewTreeProvider.setCLIStatus({ kind: 'idle' }); }
+                cliRun = undefined;
             }
         }),
 
         vscode.commands.registerCommand('aiCodeReview.copyPromptLocalChanges', async () => {
+            if (refuseDuringCLIReview()) { return; }
             try {
                 const request: ReviewRequest = {
                     changeInfo: {
@@ -145,6 +175,7 @@ export function activate(context: vscode.ExtensionContext) {
         }),
 
         vscode.commands.registerCommand('aiCodeReview.copyPromptAllFiles', async () => {
+            if (refuseDuringCLIReview()) { return; }
             try {
                 const request: ReviewRequest = {
                     changeInfo: {
@@ -161,6 +192,7 @@ export function activate(context: vscode.ExtensionContext) {
         }),
 
         vscode.commands.registerCommand('aiCodeReview.copyPromptCompareBranches', async () => {
+            if (refuseDuringCLIReview()) { return; }
             try {
                 // Get all branches
                 const branches = await changeDetector.getBranches();
@@ -210,6 +242,8 @@ export function activate(context: vscode.ExtensionContext) {
 
                 const targetBranch = selectedTarget.label;
 
+                if (refuseDuringCLIReview()) { return; }
+
                 // Attempt to checkout to the target branch automatically
                 try {
                     await changeDetector.checkoutBranch(targetBranch);
@@ -231,6 +265,7 @@ export function activate(context: vscode.ExtensionContext) {
                     aiProvider: 'external'
                 };
 
+                if (refuseDuringCLIReview()) { return; }
                 await externalAIManager.copyPromptToClipboard(request);
                 // vscode.window.showInformationMessage(`Comparing changes from ${sourceBranch} to ${targetBranch}`);
             } catch (error) {

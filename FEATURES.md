@@ -330,3 +330,8 @@ is removed, detection runs again. A custom command overrides all presets.
 Codex and Claude receive stdin; Copilot receives a literal prompt argument.
 On Windows, `.exe`, `.com`, `.cmd` and `.bat` providers are detected. Providers use their own authentication and backend;
 no code is sent until you explicitly trigger the CLI review command.
+Use **Run Review with CLI** in the review tree to start the same custom command. A status node
+shows running, done, or failed. Click the running node or its stop icon to cancel; the status
+clears after the process stops. Stdout streams into **AI Code Review CLI** in the Output panel.
+Click a finished status to reopen that channel. Failed runs show the last 4096 stderr characters
+in the error toast, status tooltip, and output channel.

@@ -103,3 +103,8 @@ export interface AICodeReviewConfig {
 
 /** Custom shell command or a detected executable with literal arguments. */
 export type CLIInvocation = string | { file: string; args: string[]; promptArgument: boolean };
+export type CLIReviewStatus =
+    | { kind: 'idle' }
+    | { kind: 'running' }
+    | { kind: 'done' }
+    | { kind: 'failed'; message: string };

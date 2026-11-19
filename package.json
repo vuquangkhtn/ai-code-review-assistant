@@ -47,6 +47,17 @@
   "contributes": {
     "commands": [
       {
+        "command": "aiCodeReview.cancelCLIReview",
+        "title": "Cancel CLI Review",
+        "category": "AI Code Review",
+        "icon": "$(debug-stop)"
+      },
+      {
+        "command": "aiCodeReview.showCLIOutput",
+        "title": "Show CLI Review Output",
+        "category": "AI Code Review"
+      },
+      {
         "command": "aiCodeReview.runCLIReview",
         "title": "Run AI Review with CLI",
         "category": "AI Code Review",
@@ -150,6 +161,11 @@
         }
       ],
       "view/item/context": [
+        {
+          "command": "aiCodeReview.cancelCLIReview",
+          "when": "view == aiCodeReviewPanel && viewItem == cliReviewRunning",
+          "group": "inline"
+        },
         {
           "command": "aiCodeReview.markIssueResolved",
           "when": "view == aiCodeReviewIssues && viewItem == unresolvedIssue",
