@@ -1,0 +1,8 @@
+Exit code:   SIGABRT
+Failed to run tests TestRunFailedError: Test run terminated with signal SIGABRT
+    at ChildProcess.onProcessClosed (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-11-qa/node_modules/@vscode/test-electron/out/runTest.js:110:24)
+    at ChildProcess.emit (node:events:507:28)
+    at ChildProcess._handle.onexit (node:internal/child_process:294:12) {
+  code: undefined,
+  signal: 'SIGABRT'
+}

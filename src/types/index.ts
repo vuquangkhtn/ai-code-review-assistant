@@ -4,6 +4,8 @@ export interface CodeIssue {
     category: IssueCategory;
     title: string;
     description: string;
+    confidence?: 'high' | 'medium' | 'low';
+    evidence?: string;
     suggestions: CodeSuggestion[];
     filePath: string;
     lineNumber: number;

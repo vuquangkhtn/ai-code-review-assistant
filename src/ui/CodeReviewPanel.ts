@@ -312,6 +312,10 @@ export class CodeReviewPanel {
             font-weight: bold;
             font-size: 13px;
         }
+        .issue-confidence {
+            color: var(--vscode-descriptionForeground);
+            font-size: 11px;
+        }
         .issue-severity {
             padding: 2px 6px;
             border-radius: 10px;
@@ -521,7 +525,7 @@ export class CodeReviewPanel {
                         <div class="issue-severity severity-\${issue.severity}">\${issue.severity}</div>
                     </div>
                     <div class="issue-description">\${escapeHtml(issue.description)}</div>
-                    <div class="issue-location">\${issue.filePath}:\${issue.lineNumber}</div>
+                    <div class="issue-location">\${issue.filePath}:\${issue.lineNumber}\${issue.confidence ? ' <span class="issue-confidence">· ' + escapeHtml(issue.confidence) + ' confidence</span>' : ''}</div>
                 </div>
             \`).join('');
         }

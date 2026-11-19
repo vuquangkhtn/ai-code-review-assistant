@@ -192,7 +192,7 @@ export class IssuesPanelProvider implements vscode.TreeDataProvider<IssueItem> {
             const isResolved = this.isIssueResolved(issue.id);
             const iconName = isResolved ? 'check' : this.getSeverityIcon(issue.severity);
             const label = isResolved ? `✓ ${issue.title}` : issue.title;
-            const description = `${this.getFileName(issue.filePath)}:${issue.lineNumber}${isResolved ? ' (Resolved)' : ''}`;
+            const description = `${this.getFileName(issue.filePath)}:${issue.lineNumber}${isResolved ? ' (Resolved)' : ''}${issue.confidence ? ` · ${issue.confidence} confidence` : ''}`;
             const color = isResolved ? new vscode.ThemeColor('charts.green') : this.getSeverityColor(issue.severity);
             const contextValue = isResolved ? 'resolvedIssue' : 'unresolvedIssue';
             

@@ -33,6 +33,8 @@
 ### 📊 Structured Results Display
 **Features:**
 - Organized issues panel with severity indicators
+- Optional `confidence` (`high`, `medium`, `low`) and supporting `evidence` in review JSON
+- Confidence labels in the issues tree and review panel; older results need no migration
 - Inline annotations in code
 - CodeLens integration for quick actions
 - Filterable and sortable issue lists
