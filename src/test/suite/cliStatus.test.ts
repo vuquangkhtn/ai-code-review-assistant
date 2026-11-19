@@ -123,7 +123,15 @@ suite('CLI review status', () => {
                 else { assert.strictEqual(error, undefined); }
                 await vscode.commands.executeCommand('aiCodeReview.copyPromptLocalChanges');
                 assert.strictEqual(messages.length, 0, 'copy-paste generation works again');
-                assert.match(await vscode.env.clipboard.readText(), /Changes File/);
+                // Copy-paste generation works again: with changed files present the prompt is
+                // file-based (PromptGenerator line ~186) and the clipboard carries its notice.
+                const clipboard = await vscode.env.clipboard.readText();
+                const saved = clipboard.match(/File location: (\S+)/);
+                if (saved) {
+                    assert.match(fs.readFileSync(path.join(workspace.uri.fsPath, saved[1]), 'utf8'), /Changes File/);
+                } else {
+                    assert.match(clipboard, /Changes File/);
+                }
                 await config.update('cli.customCommand', `"${node}" "${path.join(extension.extensionPath,
                     'src/test/fixtures/review.cjs')}" clean`, vscode.ConfigurationTarget.Global);
                 await vscode.commands.executeCommand('aiCodeReview.runCLIReview');
