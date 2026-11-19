@@ -105,12 +105,13 @@ suite('CLI review status', () => {
                 const prompt = fs.readFileSync(marker, 'utf8');
                 const changes = prompt.match(/Changes File:\*\* `([^`]+)`/);
                 assert.ok(changes);
-                const contents = fs.readFileSync(changes[1], 'utf8');
+                const changesPath = path.join(workspace.uri.fsPath, changes[1]);
+                const contents = fs.readFileSync(changesPath, 'utf8');
                 for (const command of ['runCLIReview', 'copyPromptLocalChanges', 'copyPromptAllFiles',
                     'copyPromptCompareBranches', 'copyPrompt']) {
                     await vscode.commands.executeCommand(`aiCodeReview.${command}`);
                     assert.match(messages.pop() || '', /CLI review is running.*cancel it first/i, command);
-                    assert.strictEqual(fs.readFileSync(changes[1], 'utf8'), contents, 'changes file survives refusal');
+                    assert.strictEqual(fs.readFileSync(changesPath, 'utf8'), contents, 'changes file survives refusal');
                 }
                 if (ending === 'cancel') {
                     await vscode.commands.executeCommand('aiCodeReview.cancelCLIReview');
