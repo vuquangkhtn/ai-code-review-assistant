@@ -1,11 +1,19 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
+import { CLIReviewStatus } from '../types';
 
 export class CodeReviewTreeProvider implements vscode.TreeDataProvider<CodeReviewItem> {
     private _onDidChangeTreeData: vscode.EventEmitter<CodeReviewItem | undefined | null | void> = new vscode.EventEmitter<CodeReviewItem | undefined | null | void>();
     readonly onDidChangeTreeData: vscode.Event<CodeReviewItem | undefined | null | void> = this._onDidChangeTreeData.event;
     
+    private cliStatus: CLIReviewStatus = { kind: 'idle' };
+
+    setCLIStatus(status: CLIReviewStatus): void {
+        this.cliStatus = status;
+        this.refresh();
+    }
+
     private currentDefaultChangeType: string = 'local';
 
     constructor() {
@@ -54,7 +62,20 @@ export class CodeReviewTreeProvider implements vscode.TreeDataProvider<CodeRevie
     getChildren(element?: CodeReviewItem): Promise<CodeReviewItem[]> {
         if (!element) {
             // Root level items
+            const status = this.cliStatus;
+            const cliItems = [new CodeReviewItem('Run Review with CLI', vscode.TreeItemCollapsibleState.None,
+                { command: 'aiCodeReview.runCLIReview', title: 'Run Review with CLI' }, 'action', 'play')];
+            if (status.kind !== 'idle') {
+                const running = status.kind === 'running';
+                cliItems.push(new CodeReviewItem(`CLI review: ${status.kind}`, vscode.TreeItemCollapsibleState.None,
+                    { command: running ? 'aiCodeReview.cancelCLIReview' : 'aiCodeReview.showCLIOutput',
+                        title: running ? 'Cancel CLI Review' : 'Show CLI Output' },
+                    running ? 'cliReviewRunning' : 'cliReviewStatus',
+                    running ? 'loading~spin' : status.kind === 'done' ? 'check' : 'error',
+                    status.kind === 'failed' ? status.message : running ? 'Click to cancel the running review' : 'Show CLI output'));
+            }
             return Promise.resolve([
+                ...cliItems,
                 new CodeReviewItem(
                     'Open Workflow Guide',
                     vscode.TreeItemCollapsibleState.None,

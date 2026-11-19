@@ -321,3 +321,9 @@ Set `aiCodeReview.cli.customCommand` to a shell command, then run **AI Code Revi
 The extension extracts JSON from stdout, including banner-wrapped output, and writes it to `.ai-code-review/results/` for the existing watcher. The clipboard is unchanged. Nonzero exit or invalid JSON creates no result. Output is limited to 4 MiB and execution to five minutes. Manual copy-paste prompts retain their existing instructions.
 
 Run fixture integration tests with `npm run test:cli`. On a host that can launch VS Code, run `npm run compile && npx tsc && CLI_REVIEW_TEST=1 npm test` for the palette-command and watcher tests.
+
+Use **Run Review with CLI** in the review tree to start the same custom command. A status node
+shows running, done, or failed. Click the running node or its stop icon to cancel; the status
+clears after the process stops. Stdout streams into **AI Code Review CLI** in the Output panel.
+Click a finished status to reopen that channel. Failed runs show the last 4096 stderr characters
+in the error toast, status tooltip, and output channel.

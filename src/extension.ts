@@ -60,6 +60,10 @@ export function activate(context: vscode.ExtensionContext) {
     // Setup file watcher for .ai-code-review/results directory
     setupResultFileWatcher(context);
 
+    const cliOutput = vscode.window.createOutputChannel('AI Code Review CLI');
+    let cliRun: AbortController | undefined;
+    context.subscriptions.push(cliOutput, { dispose: () => cliRun?.abort() });
+
     // Register commands
     const commands = [
         // External AI commands
@@ -103,7 +107,15 @@ export function activate(context: vscode.ExtensionContext) {
             }
         }),
 
+        vscode.commands.registerCommand('aiCodeReview.cancelCLIReview', () => cliRun?.abort()),
+        vscode.commands.registerCommand('aiCodeReview.showCLIOutput', () => cliOutput.show(true)),
         vscode.commands.registerCommand('aiCodeReview.runCLIReview', async () => {
+            if (cliRun) { return; }
+            const controller = new AbortController();
+            cliRun = controller;
+            cliOutput.clear();
+            cliOutput.show(true);
+            codeReviewTreeProvider.setCLIStatus({ kind: 'running' });
             try {
                 const workspace = vscode.workspace.workspaceFolders?.[0];
                 if (!workspace || !vscode.workspace.isTrusted) {
@@ -114,10 +126,20 @@ export function activate(context: vscode.ExtensionContext) {
                 if (!command) { throw new Error('Set aiCodeReview.cli.customCommand before running a CLI review.'); }
                 const changes = await changeDetector.detectAndStoreLocalChanges();
                 const prompt = PromptGenerator.generateFileReferencePrompt(changes.filePath, 'cli').content;
-                await runCLIReview({ command, cwd: workspace.uri.fsPath, prompt });
+                await runCLIReview({ command, cwd: workspace.uri.fsPath, prompt,
+                    signal: controller.signal, onStdout: chunk => cliOutput.append(chunk) });
+                codeReviewTreeProvider.setCLIStatus({ kind: 'done' });
             } catch (error) {
-                vscode.window.showErrorMessage(`CLI review failed: ${error}`);
-                throw error;
+                if (!controller.signal.aborted) {
+                    const message = error instanceof Error ? error.message : String(error);
+                    cliOutput.appendLine(`\nCLI review failed: ${message}`);
+                    codeReviewTreeProvider.setCLIStatus({ kind: 'failed', message });
+                    vscode.window.showErrorMessage(`CLI review failed: ${message}`);
+                    throw error;
+                }
+            } finally {
+                if (controller.signal.aborted) { codeReviewTreeProvider.setCLIStatus({ kind: 'idle' }); }
+                cliRun = undefined;
             }
         }),
 

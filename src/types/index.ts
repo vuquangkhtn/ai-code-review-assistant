@@ -100,3 +100,9 @@ export interface AICodeReviewConfig {
     supportedLanguages: string[];
     excludeFileExtensions: string[];
 }
+
+export type CLIReviewStatus =
+    | { kind: 'idle' }
+    | { kind: 'running' }
+    | { kind: 'done' }
+    | { kind: 'failed'; message: string };
