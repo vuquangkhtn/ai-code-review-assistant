@@ -1,0 +1,3 @@
+Error: No supported CLI found on PATH. Install Codex, Claude Code or Copilot CLI, or set aiCodeReview.cli.customCommand.
+    at Object.selectCLICommand (evalmachine.<anonymous>:55:15)
+    at async /Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-3-qa/docs/super-board/runs/issue-3-qa-v1/windows-shim.cjs:17:28

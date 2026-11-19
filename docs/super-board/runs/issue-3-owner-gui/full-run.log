@@ -1,0 +1,46 @@
+[watch] build started
+[watch] build finished
+=== lint ===
+✖ 65 problems (0 errors, 65 warnings)
+
+=== tsc emit ===
+=== node fixtures ===
+  ---
+  duration_ms: 0.044042
+  ...
+1..17
+# tests 17
+# suites 0
+# pass 16
+# fail 0
+# cancelled 0
+# skipped 1
+# todo 0
+# duration_ms 808.019583
+=== host suite ===
+[AgentHostCustomizationMarketplace] Unable to load session-bound SDK installation receipts { name: 'Error' }
+[AgentHostCustomizationMarketplace] Unable to load session-bound SDK installation receipts { name: 'Error' }
+[AgentHostCustomizationMarketplace] Unable to load session-bound SDK installation receipts { name: 'Error' }
+[AgentHostCustomizationMarketplace] Unable to load session-bound SDK installation receipts { name: 'Error' }
+[AgentHostCustomizationMarketplace] Unable to load session-bound SDK installation receipts { name: 'Error' }
+[AgentHostCustomizationMarketplace] Unable to load session-bound SDK installation receipts { name: 'Error' }
+[AgentHostCustomizationMarketplace] Unable to load session-bound SDK installation receipts { name: 'Error' }
+[AgentHostCustomizationMarketplace] Unable to load session-bound SDK installation receipts { name: 'Error' }
+[AgentHostCustomizationMarketplace] Unable to load session-bound SDK installation receipts { name: 'Error' }
+[AgentHostCustomizationMarketplace] Unable to load session-bound SDK installation receipts { name: 'Error' }
+[AgentHostCustomizationMarketplace] Unable to load session-bound SDK installation receipts { name: 'Error' }
+  [32m  ✔[0m[90m palette command delivers stdin and displays noisy results via watcher[0m[31m (955ms)[0m
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="agent-host-copilotcli" conversationKey="agent-host-copilotcli:/untitled-319a409c-01c9-4203-bfb8-0acba37c0358" modelTarget="agent-host-copilotcli" storageKey="chat.currentLanguageModel.panel.agent-host-copilotcli" widgetViewKind="view"
+[AgentHostCustomizationMarketplace] Unable to load session-bound SDK installation receipts { name: 'Error' }
+[AgentHostCustomizationMarketplace] Unable to load session-bound SDK installation receipts { name: 'Error' }
+[AgentHostCustomizationMarketplace] Unable to load session-bound SDK installation receipts { name: 'Error' }
+[AgentHostCustomizationMarketplace] Unable to load session-bound SDK installation receipts { name: 'Error' }
+[AgentHostCustomizationMarketplace] Unable to load session-bound SDK installation receipts { name: 'Error' }
+[AgentHostCustomizationMarketplace] Unable to load session-bound SDK installation receipts { name: 'Error' }
+New result file detected: /var/folders/rl/dqkc_c0j01567h1rttvfw7yh0000gn/T/cli-review-CID2I7/.ai-code-review/results/code-review-result-2026-11-18T15-26-58-686Z-83f6b130-9f0b-4d33-a632-d14fd46cadaf.json
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="agent-host-copilotcli" conversationKey="agent-host-copilotcli:/untitled-319a409c-01c9-4203-bfb8-0acba37c0358" modelTarget="agent-host-copilotcli" storageKey="chat.currentLanguageModel.panel.agent-host-copilotcli" widgetViewKind="view"
+  [32m  ✔[0m[90m palette command delivers stdin and displays preset results via watcher[0m[31m (1296ms)[0m
+[92m [0m[32m 4 passing[0m[90m (4s)[0m
+[90m[main 2026-11-18T15:26:59.492Z][0m Extension host with pid 77572 exited with code: 0, signal: unknown.
+Exit code:   0
+HOST-EXIT:0

@@ -21,7 +21,7 @@
 - No API keys required - works with any AI service
 - Comprehensive code context included
 - Structured format for consistent results
-- Privacy-focused - code stays local
+- Manual mode makes no outbound AI calls; explicitly triggered CLI reviews send code through the CLI’s own backend
 
 ### 🔄 Multiple Review Types
 **Available Review Modes:**
@@ -316,12 +316,20 @@ You can add custom keybindings in VS Code settings:
 - Open [Extension Settings](command:aiCodeReview.openSettings)
 ### Run AI Review with CLI
 
-Set `aiCodeReview.cli.customCommand` to a shell command, then run **AI Code Review: Run AI Review with CLI** in a trusted workspace. The command receives the local-changes prompt on stdin, runs in the workspace folder, and must print a JSON object containing an `issues` array. The configured CLI may send code to its provider.
+Optionally set `aiCodeReview.cli.customCommand` to a shell command, then run **AI Code Review: Run AI Review with CLI** in a trusted workspace. The command receives the local-changes prompt on stdin, runs in the workspace folder, and must print a JSON object containing an `issues` array. The configured CLI may send code to its provider.
 
 The extension extracts JSON from stdout, including banner-wrapped output, and writes it to `.ai-code-review/results/` for the existing watcher. The clipboard is unchanged. Nonzero exit or invalid JSON creates no result. Output is limited to 4 MiB and execution to five minutes. Manual copy-paste prompts retain their existing instructions.
 
 Run fixture integration tests with `npm run test:cli`. On a host that can launch VS Code, run `npm run compile && npx tsc && CLI_REVIEW_TEST=1 npm test` for the palette-command and watcher tests.
 
+Without a custom command, PATH detection selects Codex (`--ask-for-approval never exec --sandbox read-only -`),
+Claude Code (`-p --output-format text`), or Copilot (`--silent --allow-tool=read -p`).
+One installed provider is used silently; several show a picker once and persist
+the choice across sessions. Cancelling starts no review. If the saved provider
+is removed, detection runs again. A custom command overrides all presets.
+Codex and Claude receive stdin; Copilot receives a literal prompt argument.
+On Windows, `.exe`, `.com`, `.cmd` and `.bat` providers are detected. Providers use their own authentication and backend;
+no code is sent until you explicitly trigger the CLI review command.
 Use **Run Review with CLI** in the review tree to start the same custom command. A status node
 shows running, done, or failed. Click the running node or its stop icon to cancel; the status
 clears after the process stops. Stdout streams into **AI Code Review CLI** in the Output panel.

@@ -101,6 +101,8 @@ export interface AICodeReviewConfig {
     excludeFileExtensions: string[];
 }
 
+/** Custom shell command or a detected executable with literal arguments. */
+export type CLIInvocation = string | { file: string; args: string[]; promptArgument: boolean };
 export type CLIReviewStatus =
     | { kind: 'idle' }
     | { kind: 'running' }

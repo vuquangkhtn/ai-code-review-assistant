@@ -1,19 +1,28 @@
 import { spawn } from 'child_process';
+import spawnShim = require('cross-spawn');
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { randomUUID } from 'crypto';
+import { CLIInvocation } from '../types';
 import { extractReviewJSON } from './ReviewJSON';
 
+function startCLI(command: CLIInvocation, prompt: string, cwd: string) {
+    if (typeof command === 'string') {
+        return spawn(command, { cwd, shell: true, detached: process.platform !== 'win32', windowsHide: true });
+    }
+    const args = command.promptArgument ? [...command.args, prompt] : command.args;
+    // cross-spawn resolves Windows shims (.cmd) that plain spawn refuses without a shell.
+    return spawnShim(command.file, args, { cwd, detached: process.platform !== 'win32', windowsHide: true });
+}
+
 export async function runCLIReview(options: {
-    command: string; cwd: string; prompt: string;
+    command: CLIInvocation; cwd: string; prompt: string;
     signal?: AbortSignal; onStdout?: (chunk: string) => void;
 }): Promise<string> {
     options.signal?.throwIfAborted();
     let stderrTail = '';
     const stdout = await new Promise<string>((resolve, reject) => {
-        const child = spawn(options.command, {
-            cwd: options.cwd, shell: true, detached: process.platform !== 'win32', windowsHide: true
-        });
+        const child = startCLI(options.command, options.prompt, options.cwd);
         let output = '';
         let bytes = 0;
         let failure: Error | undefined;
@@ -36,15 +45,15 @@ export async function runCLIReview(options: {
         const cancel = () => stop(new Error('CLI review cancelled.'));
         options.signal?.addEventListener('abort', cancel, { once: true });
         const timer = setTimeout(() => stop(new Error('CLI review timed out.')), 300000);
-        child.stdout.setEncoding('utf8');
-        child.stderr.setEncoding('utf8');
-        child.stdout.on('data', (chunk: string) => {
+        child.stdout?.setEncoding('utf8');
+        child.stderr?.setEncoding('utf8');
+        child.stdout?.on('data', (chunk: string) => {
             bytes += Buffer.byteLength(chunk);
             if (bytes > 4 * 1024 * 1024) { stop(new Error('CLI review output exceeded 4 MB.')); return; }
             output += chunk;
             options.onStdout?.(chunk);
         });
-        child.stderr.on('data', (chunk: string) => { stderrTail = (stderrTail + chunk).slice(-4096); });
+        child.stderr?.on('data', (chunk: string) => { stderrTail = (stderrTail + chunk).slice(-4096); });
         child.on('error', error => { failure = error; });
         child.on('close', code => {
             clearTimeout(timer);
@@ -53,8 +62,8 @@ export async function runCLIReview(options: {
             else if (code !== 0) { reject(new Error(`Command failed (exit ${code}): ${stderrTail}`)); }
             else { resolve(output); }
         });
-        child.stdin.on('error', error => stop(error));
-        child.stdin.end(options.prompt);
+        child.stdin?.on('error', error => stop(error));
+        child.stdin?.end(typeof options.command !== 'string' && options.command.promptArgument ? undefined : options.prompt);
         if (options.signal?.aborted) { cancel(); }
     });
     options.signal?.throwIfAborted();

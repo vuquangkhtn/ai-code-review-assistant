@@ -193,7 +193,7 @@
         "aiCodeReview.cli.customCommand": {
           "type": "string",
           "default": "",
-          "description": "Shell command for CLI review. Receives the prompt on stdin and must return review JSON on stdout. Runs in the trusted workspace; may send code to the configured provider."
+          "description": "Optional shell command overriding detected Codex, Claude Code or Copilot presets. Receives the prompt on stdin and must return review JSON on stdout. Runs in the trusted workspace; may send code to the configured provider."
         },
         "aiCodeReview.defaultChangeType": {
           "type": "string",
@@ -305,6 +305,7 @@
     "@semantic-release/git": "^10.0.1",
     "@semantic-release/github": "^11.0.4",
     "@semantic-release/npm": "^12.0.2",
+    "@types/cross-spawn": "^6.0.6",
     "@types/glob": "^8.1.0",
     "@types/mocha": "^10.0.10",
     "@types/node": "^16.18.126",
@@ -324,6 +325,7 @@
     "typescript": "^4.9.0"
   },
   "dependencies": {
+    "cross-spawn": "^7.0.6",
     "simple-git": "^3.16.0",
     "uuid": "^11.1.0"
   },
