@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { isPolicyBlocked, parseBlockOn, policySummary } from '../core/SeverityPolicy';
 import { CodeIssue, IssueSeverity, IssueCategory } from '../types';
 
 export class IssuesPanelProvider implements vscode.TreeDataProvider<IssueItem> {
@@ -67,9 +68,13 @@ export class IssuesPanelProvider implements vscode.TreeDataProvider<IssueItem> {
 
     getChildren(element?: IssueItem): Promise<IssueItem[]> {
         if (!element) {
+            const blockOn = parseBlockOn(vscode.workspace.getConfiguration('aiCodeReview').get('policy.blockOn'));
+            const summary = policySummary(this.issues, blockOn);
+            const policyItems = summary ? [new IssueItem(summary, 'shield', vscode.TreeItemCollapsibleState.None)] : [];
             // Root level - show groups
             if (this.issues.length === 0) {
                 return Promise.resolve([
+                    ...policyItems,
                     new IssueItem(
                         'No issues found',
                         'info',
@@ -80,7 +85,7 @@ export class IssuesPanelProvider implements vscode.TreeDataProvider<IssueItem> {
                 ]);
             }
 
-            return Promise.resolve(this.getGroupedItems());
+            return Promise.resolve([...policyItems, ...this.getGroupedItems()]);
         } else if (element.contextValue === 'issueGroup') {
             // Show issues in this group
             return Promise.resolve(this.getIssuesForGroup(element));
@@ -188,10 +193,12 @@ export class IssuesPanelProvider implements vscode.TreeDataProvider<IssueItem> {
             }
         });
 
+        const blockOn = parseBlockOn(vscode.workspace.getConfiguration('aiCodeReview').get('policy.blockOn'));
         return filteredIssues.map(issue => {
             const isResolved = this.isIssueResolved(issue.id);
             const iconName = isResolved ? 'check' : this.getSeverityIcon(issue.severity);
-            const label = isResolved ? `✓ ${issue.title}` : issue.title;
+            const blocked = isPolicyBlocked(issue.severity, blockOn);
+            const label = (blocked ? '⛔ Blocking · ' : '') + (isResolved ? `✓ ${issue.title}` : issue.title);
             const description = `${this.getFileName(issue.filePath)}:${issue.lineNumber}${isResolved ? ' (Resolved)' : ''}${issue.confidence ? ` · ${issue.confidence} confidence` : ''}`;
             const color = isResolved ? new vscode.ThemeColor('charts.green') : this.getSeverityColor(issue.severity);
             const contextValue = isResolved ? 'resolvedIssue' : 'unresolvedIssue';

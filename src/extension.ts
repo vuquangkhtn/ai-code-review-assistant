@@ -42,6 +42,12 @@ export function activate(context: vscode.ExtensionContext) {
     inlineAnnotationsProvider = new InlineAnnotationsProvider();
     codeReviewTreeProvider = new CodeReviewTreeProvider();
     issuesPanelProvider = new IssuesPanelProvider();
+    context.subscriptions.push(vscode.workspace.onDidChangeConfiguration(event => {
+        if (event.affectsConfiguration('aiCodeReview.policy.blockOn')) {
+            issuesPanelProvider.refresh();
+            CodeReviewPanel.currentPanel?.refreshPolicy();
+        }
+    }));
     codeLensProvider = new CodeLensProvider();
 
     // Register tree data providers for sidebar

@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { isPolicyBlocked, parseBlockOn, policySummary } from '../core/SeverityPolicy';
 import { ReviewResult, CodeIssue } from '../types';
 
 
@@ -9,6 +10,7 @@ export class CodeReviewPanel {
     private readonly _panel: vscode.WebviewPanel;
     private readonly _extensionUri: vscode.Uri;
     private _disposables: vscode.Disposable[] = [];
+    private _severityFilter = 'all';
     private _currentIssues: CodeIssue[] = [];
     private _reviewHistory: ReviewResult[] = [];
 
@@ -80,10 +82,8 @@ export class CodeReviewPanel {
 
     public updateIssues(issues: CodeIssue[]) {
         this._currentIssues = issues;
-        this._panel.webview.postMessage({
-            command: 'updateIssues',
-            issues: this._currentIssues
-        });
+        this._severityFilter = 'all';
+        this.refreshPolicy();
     }
 
     public addReviewToHistory(review: ReviewResult) {
@@ -99,9 +99,7 @@ export class CodeReviewPanel {
 
     public clearIssues() {
         this._currentIssues = [];
-        this._panel.webview.postMessage({
-            command: 'clearIssues'
-        });
+        this.refreshPolicy();
     }
 
     private _openFile(file: string, line?: number) {
@@ -126,13 +124,18 @@ export class CodeReviewPanel {
     }
 
     private _filterIssues(severity: string) {
-        let filteredIssues = this._currentIssues;
-        if (severity !== 'all') {
-            filteredIssues = this._currentIssues.filter(issue => issue.severity === severity);
-        }
+        this._severityFilter = severity;
+        this.refreshPolicy();
+    }
+
+    public refreshPolicy(): void {
+        const blockOn = parseBlockOn(vscode.workspace.getConfiguration('aiCodeReview').get('policy.blockOn'));
+        const filtered = this._severityFilter === 'all' ? this._currentIssues :
+            this._currentIssues.filter(issue => issue.severity === this._severityFilter);
         this._panel.webview.postMessage({
             command: 'updateIssues',
-            issues: filteredIssues
+            issues: filtered.map(issue => ({ ...issue, policyBlocked: isPolicyBlocked(issue.severity, blockOn) })),
+            policySummary: policySummary(this._currentIssues, blockOn)
         });
     }
 
@@ -316,6 +319,13 @@ export class CodeReviewPanel {
             color: var(--vscode-descriptionForeground);
             font-size: 11px;
         }
+        .issue-item.policy-blocked {
+            outline: 2px solid var(--vscode-errorForeground);
+        }
+        #policy-summary {
+            margin-bottom: 12px;
+            font-weight: bold;
+        }
         .issue-severity {
             padding: 2px 6px;
             border-radius: 10px;
@@ -453,6 +463,7 @@ export class CodeReviewPanel {
                         <button class="filter-btn" onclick="filterIssues('low')">Low</button>
                     </div>
                 </div>
+                <div id="policy-summary" role="status" hidden></div>
                 <div id="issues-container">
                     <div class="no-content">No issues found. Run a code review to see results here.</div>
                 </div>
@@ -481,6 +492,9 @@ export class CodeReviewPanel {
             const message = event.data;
             switch (message.command) {
                 case 'updateIssues':
+                    const summary = document.getElementById('policy-summary');
+                    summary.textContent = message.policySummary || '';
+                    summary.hidden = !message.policySummary;
                     currentIssues = message.issues;
                     renderIssues(currentIssues);
                     break;
@@ -519,9 +533,9 @@ export class CodeReviewPanel {
             }
 
             container.innerHTML = issues.map(issue => \`
-                <div class="issue-item \${issue.severity}" onclick="openFile('\${issue.filePath}', \${issue.lineNumber})">
+                <div class="issue-item \${issue.severity}\${issue.policyBlocked ? ' policy-blocked' : ''}" onclick="openFile('\${issue.filePath}', \${issue.lineNumber})">
                     <div class="issue-header">
-                        <div class="issue-title">\${escapeHtml(issue.title)}</div>
+                        <div class="issue-title">\${issue.policyBlocked ? '⛔ Blocking · ' : ''}\${escapeHtml(issue.title)}</div>
                         <div class="issue-severity severity-\${issue.severity}">\${issue.severity}</div>
                     </div>
                     <div class="issue-description">\${escapeHtml(issue.description)}</div>
