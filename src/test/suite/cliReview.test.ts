@@ -15,7 +15,10 @@ suite('CLI review tracer', () => {
         const content = fs.readFileSync(result.filePath, 'utf8')
             .replace(/\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d{3}Z/g, '<timestamp>');
         assert.strictEqual(createHash('sha256').update(content).digest('hex'),
-            'ca1c1da95e965f9150adca27c6df171efc4095f880771c6f4ef56a27210c631b');
+            // Baseline intentionally moved in #11: the contract now requests optional
+            // confidence and evidence for each finding (manual + CLI sections). Any other
+            // drift still fails here.
+            '21ddda529b5231e54a22cf86815bdc2ccd3c8f6f8795d817feac55a438270e5a');
         const cli = PromptGenerator.generateFileReferencePrompt('changes.json', 'cli').content
             .replace(/\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d{3}Z/g, '<timestamp>');
         assert.ok(cli.startsWith(content.split('**IMPORTANT: File Output Instructions**')[0]));
