@@ -13,6 +13,8 @@ export interface ExternalAIResponse {
         title: string;
         description: string;
         suggestion: string;
+        confidence?: CodeIssue['confidence'];
+        evidence?: string;
     }[];
     summary?: string | {
         totalIssues?: number;
@@ -237,6 +239,9 @@ export class ResponseParser {
                 category: this.mapCategory(issue.type),
                 title: issue.title || 'Untitled Issue',
                 description: issue.description || '',
+                ...(issue.confidence === 'high' || issue.confidence === 'medium' || issue.confidence === 'low'
+                    ? { confidence: issue.confidence } : {}),
+                ...(typeof issue.evidence === 'string' ? { evidence: issue.evidence } : {}),
                 suggestions: issue.suggestion ? [{
                     id: uuidv4(),
                     description: issue.suggestion,

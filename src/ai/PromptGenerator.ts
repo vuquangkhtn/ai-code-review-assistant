@@ -109,6 +109,7 @@ export class PromptGenerator {
         prompt.push("2. Name the file with timestamp: `code-review-result-YYYY-MM-DD-HH-MM-SS.json`");
         prompt.push("3. Save your complete review response in that file");
         prompt.push("");
+        prompt.push("Include optional confidence (high, medium, or low) and evidence (a supporting code reference or observation) for each finding when available.");
         prompt.push("Please format your response as a JSON object with the following structure:");
         prompt.push("");
         prompt.push("```json");
@@ -121,6 +122,8 @@ export class PromptGenerator {
         prompt.push('      "line": 42,');
         prompt.push('      "title": "Brief issue title",');
         prompt.push('      "description": "Detailed description of the issue",');
+        prompt.push('      "confidence": "high|medium|low",');
+        prompt.push('      "evidence": "Supporting code reference or observation",');
         prompt.push('      "suggestion": "Suggested fix or improvement"');
         prompt.push("    }");
         prompt.push("  ],");
@@ -340,6 +343,7 @@ export class PromptGenerator {
             "",
             "## Response Format Requirements",
             "",
+            "Include optional confidence (high, medium, or low) and evidence (a supporting code reference or observation) for each finding when available.",
             "Please format your response as a JSON object with the following structure:",
             "",
             "```json",
@@ -352,6 +356,8 @@ export class PromptGenerator {
             '      "line": 42,',
             '      "title": "Brief issue title",',
             '      "description": "Detailed description of the issue",',
+            '      "confidence": "high|medium|low",',
+            '      "evidence": "Supporting code reference or observation",',
             '      "suggestion": "Suggested fix or improvement"',
             "    }",
             "  ],",
