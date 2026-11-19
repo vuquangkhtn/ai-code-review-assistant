@@ -252,6 +252,12 @@
           "default": true,
           "description": "Enable CodeLens to show resolve actions above code lines with issues"
         },
+        "aiCodeReview.policy.blockOn": {
+          "type": "string",
+          "enum": ["off", "critical", "high"],
+          "default": "off",
+          "description": "Flag findings at or above this severity in the findings tree and review panel. Display only; does not prevent reviews or merges."
+        },
         "aiCodeReview.codeLens.selector": {
           "type": "array",
           "items": {

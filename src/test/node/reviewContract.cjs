@@ -5,7 +5,8 @@ const vm = require('node:vm');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const workspace = { workspaceFolders: [] };
+let blockOn = 'off';
+const workspace = { workspaceFolders: [], getConfiguration: () => ({ get: () => blockOn }) };
 
 // Only the extension-host API is stubbed; parser and renderers run their real code.
 const originalLoad = Module._load;
@@ -104,4 +105,60 @@ test('manual and CLI prompt contracts request confidence and evidence', () => {
             assert.match(prompt, /optional/i);
         }
     } finally { workspace.workspaceFolders = []; fs.rmSync(cwd, { recursive: true, force: true }); }
+});
+
+test('tree flags only policy findings and adds a policy summary', async () => {
+    blockOn = 'critical';
+    try {
+        const provider = new IssuesPanelProvider();
+        provider.updateIssues([parse({ severity: 'critical' }), parse()]);
+        const roots = await provider.getChildren();
+        assert.equal(roots[0].label, 'Policy: 1 blocking findings (critical)');
+        const groups = roots.filter(item => item.contextValue === 'issueGroup');
+        const items = (await Promise.all(groups.map(group => provider.getChildren(group)))).flat();
+        assert.match(items.find(item => item.tooltip.startsWith('critical')).label, /Blocking/);
+        assert.equal(items.find(item => item.tooltip.startsWith('high')).label, fixture.title);
+    } finally { blockOn = 'off'; }
+});
+
+test('panel flags threshold findings, preserves filtering, and clears policy when disabled', () => {
+    const messages = [];
+    let receive;
+    const panel = { webview: { onDidReceiveMessage(fn) { receive = fn; }, postMessage(msg) { messages.push(msg); } }, onDidDispose() {} };
+    CodeReviewPanel.revive(panel, {});
+    const elements = new Map();
+    let onMessage;
+    const context = vm.createContext({
+        acquireVsCodeApi: () => ({ postMessage() {} }),
+        window: { addEventListener(_event, handler) { onMessage = handler; } },
+        document: {
+            getElementById: id => { if (!elements.has(id)) elements.set(id, { innerHTML: '', textContent: '', hidden: true }); return elements.get(id); },
+            createElement: () => ({ set textContent(text) { this.innerHTML = text.replace(/</g, '&lt;').replace(/>/g, '&gt;'); } })
+        }
+    });
+    vm.runInContext(panel.webview.html.match(/<script>([\s\S]*?)<\/script>/)[1], context);
+    const renderLast = () => {
+        const message = messages.at(-1);
+        onMessage({ data: message });
+        return elements.get('issues-container').innerHTML;
+    };
+    blockOn = 'critical';
+    try {
+        const issues = [parse({ severity: 'critical' }), parse()];
+        CodeReviewPanel.currentPanel.updateIssues(issues);
+        assert.equal(messages.at(-1).policySummary, 'Policy: 1 blocking findings (critical)');
+        assert.equal((renderLast().match(/Blocking/g) || []).length, 1);
+        assert.equal(elements.get('policy-summary').hidden, false);
+        assert.equal(elements.get('policy-summary').textContent, 'Policy: 1 blocking findings (critical)');
+        assert.equal(Object.hasOwn(issues[0], 'policyBlocked'), false);
+        receive({ command: 'filterIssues', severity: 'high' });
+        assert.doesNotMatch(renderLast(), /Blocking/);
+        assert.equal(messages.at(-1).policySummary, 'Policy: 1 blocking findings (critical)');
+        blockOn = 'off';
+        CodeReviewPanel.currentPanel.refreshPolicy();
+        assert.equal(messages.at(-1).issues.length, 1);
+        assert.equal(messages.at(-1).policySummary, '');
+        assert.doesNotMatch(renderLast(), /Blocking/);
+        assert.equal(elements.get('policy-summary').hidden, true);
+    } finally { blockOn = 'off'; }
 });

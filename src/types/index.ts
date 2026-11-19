@@ -1,3 +1,5 @@
+export type SeverityBlockOn = 'off' | 'critical' | 'high';
+
 export interface CodeIssue {
     id: string;
     severity: IssueSeverity;

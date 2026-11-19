@@ -337,3 +337,13 @@ shows running, done, or failed. Click the running node or its stop icon to cance
 clears after the process stops. Stdout streams into **AI Code Review CLI** in the Output panel.
 Click a finished status to reopen that channel. Failed runs show the last 4096 stderr characters
 in the error toast, status tooltip, and output channel.
+
+### Severity policy
+
+Set `aiCodeReview.policy.blockOn` to `critical` to flag critical findings, or `high`
+to flag both high and critical findings. The findings tree and review panel show
+`Blocking` beside matching findings and a summary of the policy count. Lower
+severities keep their existing display. The default, `off`, preserves the existing
+appearance. Changes apply immediately to loaded findings, including resolved ones;
+the summary counts all loaded findings, regardless of the current display filter.
+This is a visual flag only: it does not stop a review, change saved results, or block a merge.
