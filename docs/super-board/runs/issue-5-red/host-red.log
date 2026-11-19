@@ -1,0 +1,112 @@
+Test-output excerpt; unrelated host startup and SDK warnings omitted.
+Full raw log: git show 11aaced:docs/super-board/runs/issue-5-red/host-red.log
+
+[0m  CLI review status[0m
+(node:83234) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+(Use `Code Helper (Plugin) --trace-deprecation ...` to show where the warning was created)
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+  [32m  ✔[0m[90m tree offers a run, cancellation while running and failure details[0m
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+AI Code Review Assistant is now active!
+Result file watcher setup complete for: .ai-code-review/results/**/*.json
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="agent-host-copilotcli" conversationKey="agent-host-copilotcli:/untitled-0a51396e-3dfe-45c9-a68b-aae86b65821d" modelTarget="agent-host-copilotcli" storageKey="chat.currentLanguageModel.panel.agent-host-copilotcli" widgetViewKind="view"
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="agent-host-copilotcli" conversationKey="agent-host-copilotcli:/untitled-0a51396e-3dfe-45c9-a68b-aae86b65821d" modelTarget="agent-host-copilotcli" storageKey="chat.currentLanguageModel.panel.agent-host-copilotcli" widgetViewKind="view"
+  [32m  ✔[0m[90m custom command can be cancelled from the registered tree command[0m[31m (267ms)[0m
+  [31m  1) single-run lock refuses generation and releases after finish[0m
+  [31m  2) single-run lock refuses generation and releases after cancel[0m
+  [31m  3) single-run lock refuses generation and releases after fail[0m
+[0m  CLI review tracer[0m
+  [32m  ✔[0m[90m manual prompt including its tail matches the pre-feature baseline[0m
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="agent-host-copilotcli" conversationKey="agent-host-copilotcli:/untitled-0a51396e-3dfe-45c9-a68b-aae86b65821d" modelTarget="agent-host-copilotcli" storageKey="chat.currentLanguageModel.panel.agent-host-copilotcli" widgetViewKind="view"
+New result file detected: /var/folders/rl/dqkc_c0j01567h1rttvfw7yh0000gn/T/cli-review-L82Sqe/.ai-code-review/results/code-review-result-2026-11-19T01-47-36-301Z-55c1b77f-f339-4dc8-920f-2cf1885665bc.json
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="agent-host-copilotcli" conversationKey="agent-host-copilotcli:/untitled-0a51396e-3dfe-45c9-a68b-aae86b65821d" modelTarget="agent-host-copilotcli" storageKey="chat.currentLanguageModel.panel.agent-host-copilotcli" widgetViewKind="view"
+  [32m  ✔[0m[90m palette command delivers stdin and displays clean results via watcher[0m[31m (947ms)[0m
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="agent-host-copilotcli" conversationKey="agent-host-copilotcli:/untitled-0a51396e-3dfe-45c9-a68b-aae86b65821d" modelTarget="agent-host-copilotcli" storageKey="chat.currentLanguageModel.panel.agent-host-copilotcli" widgetViewKind="view"
+[91m[main 2026-11-19T01:47:37.266Z][0m [AgentHost:stderr] (node:83231) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+(Use `Code Helper --trace-deprecation ...` to show where the warning was created)
+
+New result file detected: /var/folders/rl/dqkc_c0j01567h1rttvfw7yh0000gn/T/cli-review-L82Sqe/.ai-code-review/results/code-review-result-2026-11-19T01-47-37-163Z-479c6882-c631-43ba-85f2-86b63ac0e4b8.json
+  [32m  ✔[0m[90m palette command delivers stdin and displays noisy results via watcher[0m[31m (788ms)[0m
+[92m [0m[32m 5 passing[0m[90m (2s)[0m
+[31m  3 failing[0m
+[0m  1) CLI review status
+       single-run lock refuses generation and releases after finish:
+[0m[31m     AssertionError [ERR_ASSERTION]: runCLIReview[0m[90m
+  	at Context.<anonymous> (out/test/suite/cliStatus.test.js:137:28)
+[0m
+[0m  2) CLI review status
+       single-run lock refuses generation and releases after cancel:
+[0m[31m     AssertionError [ERR_ASSERTION]: runCLIReview[0m[90m
+  	at Context.<anonymous> (out/test/suite/cliStatus.test.js:137:28)
+[0m
+[0m  3) CLI review status
+       single-run lock refuses generation and releases after fail:
+[0m[31m     AssertionError [ERR_ASSERTION]: runCLIReview[0m[90m
+  	at Context.<anonymous> (out/test/suite/cliStatus.test.js:137:28)
+[0m
+Error: 3 tests failed.
+	at /private/tmp/w5/out/test/suite/index.js:48:32
+	at done (/private/tmp/w5/node_modules/mocha/lib/mocha.js:1030:7)
+[90m[main 2026-11-19T01:47:37.861Z][0m Extension host with pid 83234 exited with code: 0, signal: unknown.
+[91m[main 2026-11-19T01:47:38.870Z][0m AgentHostStarter: cannot create window connection: Agent Host process manager is shutting down.
+Exit code:   1
+Failed to run tests TestRunFailedError: Test run failed with code 1
+    at ChildProcess.onProcessClosed (/private/tmp/w5/node_modules/@vscode/test-electron/out/runTest.js:110:24)
+    at ChildProcess.emit (node:events:524:28)
+    at ChildProcess._handle.onexit (node:internal/child_process:293:12) {
+  code: 1,
+  signal: undefined
+}
