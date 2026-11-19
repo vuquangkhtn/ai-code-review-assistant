@@ -12,5 +12,5 @@ Exit code: 1
 Red for the right reason: every failing assertion is the missing refusal. Builder note: the draft
 patch's two `fs.readFileSync(changes[1])` calls used the workspace-relative prompt path verbatim and
 failed ENOENT before reaching the refusal; they now resolve via `path.join(workspace.uri.fsPath, …)`
-(assertions unchanged). Raw log: `host-red.log`. First (pre-fix) run preserved in git history of this
+(assertions unchanged). Log excerpt: `host-red.log`; full raw log is preserved at commit `11aaced`. First (pre-fix) run preserved in git history of this
 file at f814c77. Green run will be supplied owner-session-side after implementation, same recipe.
