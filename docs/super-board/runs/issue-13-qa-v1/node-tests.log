@@ -1,0 +1,46 @@
+
+> ai-code-review-assistant@0.9.0 test:cli
+> tsc && node --test src/test/node/*.cjs
+
+✔ stdout arrives before exit; cancel kills the fixture and writes no result (134.170583ms)
+✔ failure includes the bounded stderr tail (26.859667ms)
+✔ one PATH codex runs silently with documented flags (182.733458ms)
+✔ one PATH claude runs silently with documented flags (159.378666ms)
+✔ one PATH copilot runs silently with documented flags (149.471083ms)
+✔ multiple providers ask once and reuse persisted choice in a fresh selection (1.263542ms)
+✔ custom command overrides presets and stored preference without asking (0.374125ms)
+✔ cancel does not save or run; missing executables give an actionable error (1.084084ms)
+﹣ Windows cmd shims run with literal arguments from a PATH containing spaces (0.073917ms) # SKIP
+✔ real CLI receives stdin and handles clean output (35.844875ms)
+✔ real CLI receives stdin and handles noisy output (31.907375ms)
+✔ real CLI receives stdin and handles fail output (26.280792ms)
+✔ real CLI receives stdin and handles invalid output (25.5735ms)
+✔ preset rejects failed or oversized output: process.exit(7) (19.903917ms)
+✔ preset rejects failed or oversized output: process.stdout.write('x'.repeat(4*1024*1024+1)) (31.670334ms)
+✔ preset rejects failed or oversized output: process.stderr.write('x'.repeat(4*1024*1024+1)) (27.056167ms)
+✔ groups by file/line, matches normalized titles, retains each provider evidence (10.2565ms)
+✔ different locations and different titles remain unique; empty reviews work (0.179834ms)
+✔ tree distinguishes shared and unique findings and displays confidence/evidence as plain text (1.448541ms)
+✔ parser round-trips high confidence and evidence through saved JSON (1.93375ms)
+✔ parser round-trips medium confidence and evidence through saved JSON (0.263416ms)
+✔ parser round-trips low confidence and evidence through saved JSON (0.076917ms)
+✔ legacy results keep optional fields absent and retain existing content (0.082042ms)
+✔ malformed optional fields do not discard a valid finding or reach renderers (0.255292ms)
+✔ tree shows optional confidence without changing the legacy description (0.463084ms)
+✔ panel renders confidence only when supplied and escapes imported text (1.050583ms)
+✔ manual and CLI prompt contracts request confidence and evidence (1.129417ms)
+✔ tree flags only policy findings and adds a policy summary (0.34375ms)
+✔ panel flags threshold findings, preserves filtering, and clears policy when disabled (0.660333ms)
+✔ policy thresholds include their boundary and leave lower severities alone (0.640917ms)
+✔ invalid configuration defaults off and summaries include zero findings (0.088333ms)
+✔ resolves Code without changing the signed bundle (1.263958ms)
+✔ resolves Electron without changing the signed bundle (0.633417ms)
+✔ preserves non-macOS executable paths (0.045417ms)
+ℹ tests 34
+ℹ suites 0
+ℹ pass 33
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 1
+ℹ todo 0
+ℹ duration_ms 544.988666
