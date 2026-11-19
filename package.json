@@ -46,6 +46,7 @@
   ],
   "contributes": {
     "commands": [
+      { "command": "aiCodeReview.compareCLIReviews", "title": "Compare Two CLI Providers", "category": "AI Code Review" },
       {
         "command": "aiCodeReview.cancelCLIReview",
         "title": "Cancel CLI Review",
@@ -135,6 +136,7 @@
     },
     "views": {
       "aiCodeReview": [
+        { "id": "aiCodeReviewComparison", "name": "Provider Comparison", "when": "true" },
         {
           "id": "aiCodeReviewPanel",
           "name": "Code Review",
@@ -190,6 +192,12 @@
     "configuration": {
       "title": "AI Code Review Assistant",
       "properties": {
+        "aiCodeReview.cli.comparisonCommands": {
+          "type": "object",
+          "default": {},
+          "additionalProperties": { "type": "string" },
+          "description": "Named shell commands offered by Compare Two CLI Providers. Configure at least two commands; both receive the same review prompt and may send code to their providers."
+        },
         "aiCodeReview.cli.customCommand": {
           "type": "string",
           "default": "",

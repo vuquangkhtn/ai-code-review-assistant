@@ -14,6 +14,13 @@ process.stdin.on('end', () => {
     if (process.argv.includes('invalid')) { console.log('No review available'); return; }
     const result = { issues: [{ type: 'bug', severity: 'high', file: 'sample.js', line: 1,
         title: 'Fixture CLI issue', description: 'Fixture result from stdin', suggestion: 'Use const' }] };
+    const comparison = process.argv.find(arg => arg === 'compare-one' || arg === 'compare-two');
+    if (comparison) {
+        fs.writeFileSync(`${comparison}-prompt.txt`, prompt);
+        result.issues[0].confidence = 'high';
+        result.issues[0].evidence = 'sample.js:1 declares a mutable binding';
+        result.issues.push({ ...result.issues[0], title: `Only ${comparison}` });
+    }
     if (process.argv.includes('noisy')) { console.log('Starting {not JSON} banner'); }
     console.log(JSON.stringify(result));
     if (process.argv.includes('noisy')) { console.log('Finished {usage: 1}'); }

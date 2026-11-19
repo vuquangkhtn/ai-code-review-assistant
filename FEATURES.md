@@ -347,3 +347,18 @@ severities keep their existing display. The default, `off`, preserves the existi
 appearance. Changes apply immediately to loaded findings, including resolved ones;
 the summary counts all loaded findings, regardless of the current display filter.
 This is a visual flag only: it does not stop a review, change saved results, or block a merge.
+
+### Compare two CLI providers
+
+Configure `aiCodeReview.cli.comparisonCommands` with at least two names and shell commands, for example:
+
+```json
+"aiCodeReview.cli.comparisonCommands": {
+  "Codex": "codex exec --sandbox read-only -",
+  "Claude": "claude -p --output-format text"
+}
+```
+
+Run **AI Code Review: Compare Two CLI Providers** and select exactly two entries. Both receive the same local-changes prompt, run sequentially under the CLI review lock, and save separate JSON files. Cancel Review stops the comparison. Commands run only in a trusted workspace and may send code to both providers.
+
+The **Provider Comparison** sidebar groups findings by file and line. Matching titles (ignoring case and surrounding whitespace) at the same location are marked **Shared**; others are **Unique**. Provider rows retain severity and optional confidence, with descriptions, suggestions and evidence in the tooltip. Shared means matching reports, not independent proof that a finding is correct.

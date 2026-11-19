@@ -112,3 +112,7 @@ export type CLIReviewStatus =
     | { kind: 'running' }
     | { kind: 'done' }
     | { kind: 'failed'; message: string };
+
+export interface ProviderReview { provider: string; issues: CodeIssue[] }
+export interface ComparisonFinding { entries: { provider: string; issue: CodeIssue }[] }
+export interface ComparisonGroup { filePath: string; lineNumber: number; findings: ComparisonFinding[] }

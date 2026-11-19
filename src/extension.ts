@@ -1,3 +1,7 @@
+import { groupComparison } from './ai/Comparison';
+import { ComparisonTreeProvider } from './ui/ComparisonTreeProvider';
+import { ResponseParser } from './ai/ResponseParser';
+import * as fs from 'fs/promises';
 import { selectCLICommand } from './ai/CLIPresets';
 import { runCLIReview } from './ai/CLIReview';
 import { PromptGenerator } from './ai/PromptGenerator';
@@ -53,6 +57,9 @@ export function activate(context: vscode.ExtensionContext) {
     // Register tree data providers for sidebar
     vscode.window.registerTreeDataProvider('aiCodeReviewPanel', codeReviewTreeProvider);
     vscode.window.registerTreeDataProvider('aiCodeReviewIssues', issuesPanelProvider);
+
+    const comparisonTree = new ComparisonTreeProvider();
+    context.subscriptions.push(comparisonTree, vscode.window.registerTreeDataProvider('aiCodeReviewComparison', comparisonTree));
 
     // Register CodeLens provider for supported languages
     const config = vscode.workspace.getConfiguration('aiCodeReview');
@@ -123,7 +130,8 @@ export function activate(context: vscode.ExtensionContext) {
 
         vscode.commands.registerCommand('aiCodeReview.cancelCLIReview', () => cliRun?.abort()),
         vscode.commands.registerCommand('aiCodeReview.showCLIOutput', () => cliOutput.show(true)),
-        vscode.commands.registerCommand('aiCodeReview.runCLIReview', async () => {
+        ...['aiCodeReview.runCLIReview', 'aiCodeReview.compareCLIReviews'].map(commandId =>
+        vscode.commands.registerCommand(commandId, async () => {
             if (refuseDuringCLIReview()) { return; }
             const controller = new AbortController();
             cliRun = controller;
@@ -134,6 +142,34 @@ export function activate(context: vscode.ExtensionContext) {
                 const workspace = vscode.workspace.workspaceFolders?.[0];
                 if (!workspace || !vscode.workspace.isTrusted) {
                     throw new Error('CLI review requires a trusted workspace.');
+                }
+                if (commandId === 'aiCodeReview.compareCLIReviews') {
+                    const configured = vscode.workspace.getConfiguration('aiCodeReview', workspace.uri)
+                        .get<Record<string, string>>('cli.comparisonCommands', {});
+                    const providers = Object.entries(configured).filter(([, command]) => typeof command === 'string' && command.trim())
+                        .map(([label, command]) => ({ label, command, picked: Object.keys(configured).length === 2 }));
+                    if (providers.length < 2) { throw new Error('Set at least two named commands in aiCodeReview.cli.comparisonCommands.'); }
+                    const selected = await vscode.window.showQuickPick(providers, {
+                        canPickMany: true, placeHolder: 'Select exactly two providers to compare (code is sent to both CLIs)'
+                    });
+                    if (!selected) { codeReviewTreeProvider.setCLIStatus({ kind: 'idle' }); return; }
+                    if (selected.length !== 2) { throw new Error('Select exactly two providers.'); }
+                    const changes = await changeDetector.detectAndStoreLocalChanges();
+                    const prompt = PromptGenerator.generateFileReferencePrompt(changes.filePath, 'cli').content;
+                    const reviews = [];
+                    for (const provider of selected) {
+                        controller.signal.throwIfAborted();
+                        cliOutput.appendLine(`\nProvider: ${provider.label}`);
+                        const file = await runCLIReview({ command: provider.command, cwd: workspace.uri.fsPath, prompt,
+                            signal: controller.signal, onStdout: chunk => cliOutput.append(chunk) });
+                        const result = ResponseParser.parseResponse(await fs.readFile(file, 'utf8'), provider.label, []);
+                        if (!result) { throw new Error(`Cannot parse results from ${provider.label}`); }
+                        reviews.push({ provider: provider.label, issues: result.issues });
+                    }
+                    comparisonTree.update(groupComparison(reviews));
+                    await vscode.commands.executeCommand('aiCodeReviewComparison.focus');
+                    codeReviewTreeProvider.setCLIStatus({ kind: 'done' });
+                    return;
                 }
                 const customCommand = vscode.workspace.getConfiguration('aiCodeReview', workspace.uri)
                     .get<string>('cli.customCommand', '').trim();
@@ -161,7 +197,7 @@ export function activate(context: vscode.ExtensionContext) {
                 if (controller.signal.aborted) { codeReviewTreeProvider.setCLIStatus({ kind: 'idle' }); }
                 cliRun = undefined;
             }
-        }),
+        })),
 
         vscode.commands.registerCommand('aiCodeReview.copyPromptLocalChanges', async () => {
             if (refuseDuringCLIReview()) { return; }
