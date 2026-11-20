@@ -1,0 +1,8 @@
+## Control test: .vscodeignore delta (issue #29 QA v1)
+
+- control listing (three new .vscodeignore lines removed): 753 files
+- actual listing (with the new lines): 18 files
+- delta (control-only): 735 files, by tree: {'.agents': 639, '.claude': 96}
+- delta entries NOT under .zcode/.agents/.claude: NONE
+- runtime presence in actual listing: dist/extension.js, package.json, resources/*, docs/sample.gif all present
+
