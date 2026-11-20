@@ -161,7 +161,10 @@ export function activate(context: vscode.ExtensionContext) {
                         controller.signal.throwIfAborted();
                         cliOutput.appendLine(`\nProvider: ${provider.label}`);
                         const file = await runCLIReview({ command: provider.command, cwd: workspace.uri.fsPath, prompt,
-                            signal: controller.signal, onStdout: chunk => cliOutput.append(chunk) });
+                            signal: controller.signal,
+                            review: { type: changes.changeInfo.type, files: changes.changeInfo.files.map(file => file.path) },
+                            onProgress: progress => codeReviewTreeProvider.setCLIStatus({ kind: 'running', progress }),
+                            onStdout: chunk => cliOutput.append(chunk) });
                         const result = ResponseParser.parseResponse(await fs.readFile(file, 'utf8'), provider.label, []);
                         if (!result) { throw new Error(`Cannot parse results from ${provider.label}`); }
                         reviews.push({ provider: provider.label, issues: result.issues });
@@ -183,7 +186,10 @@ export function activate(context: vscode.ExtensionContext) {
                 const changes = await changeDetector.detectAndStoreLocalChanges();
                 const prompt = PromptGenerator.generateFileReferencePrompt(changes.filePath, 'cli').content;
                 await runCLIReview({ command, cwd: workspace.uri.fsPath, prompt,
-                    signal: controller.signal, onStdout: chunk => cliOutput.append(chunk) });
+                    signal: controller.signal,
+                    review: { type: changes.changeInfo.type, files: changes.changeInfo.files.map(file => file.path) },
+                    onProgress: progress => codeReviewTreeProvider.setCLIStatus({ kind: 'running', progress }),
+                    onStdout: chunk => cliOutput.append(chunk) });
                 codeReviewTreeProvider.setCLIStatus({ kind: 'done' });
             } catch (error) {
                 if (!controller.signal.aborted) {
