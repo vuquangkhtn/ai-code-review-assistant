@@ -271,6 +271,53 @@ def validate(text, kind, meta=None):
     return value
 
 
+def complete_pr_files(args, stdout):
+    """gh pr view --json files returns at most 100 files; complete the list over REST so
+    the metadata validator's changedFiles == len(files) check can pass for large PRs."""
+    try:
+        payload = json.loads(stdout)
+    except ValueError:
+        return stdout
+    if not (isinstance(payload, dict) and isinstance(payload.get('files'), list)
+            and type(payload.get('changedFiles')) is int):
+        return stdout
+    total = payload['changedFiles']
+    if not 0 < len(payload['files']) < total:
+        return stdout
+    number = next((args[i + 1] for i, arg in enumerate(args[:-1])
+                   if arg == 'view' and args[i + 1].isdigit()), None)
+    if number is None:
+        return stdout
+    repo = next((args[i + 1] for i, arg in enumerate(args[:-1]) if arg == '-R'), None)
+    if not repo:
+        probe = subprocess.run(['gh', 'repo', 'view', '--json', 'nameWithOwner'],
+                               capture_output=True, text=True, timeout=30)
+        try:
+            repo = json.loads(probe.stdout)['nameWithOwner']
+        except (ValueError, KeyError, TypeError):
+            return stdout
+    files, page = [], 1
+    try:
+        while len(files) < total and page <= (total + 99) // 100 + 1:
+            run = subprocess.run(['gh', 'api', f'repos/{repo}/pulls/{number}/files?per_page=100&page={page}'],
+                                 capture_output=True, text=True, timeout=30)
+            if run.returncode:
+                return stdout
+            batch = json.loads(run.stdout)
+            if not isinstance(batch, list) or not batch:
+                break
+            for f in batch:
+                if isinstance(f, dict) and isinstance(f.get('filename'), str) and f['filename']:
+                    files.append({'path': f['filename']})
+            page += 1
+    except (OSError, subprocess.SubprocessError, ValueError):
+        return stdout
+    if len(files) != total:
+        return stdout
+    payload['files'] = files
+    return json.dumps(payload)
+
+
 def read(args, kind='json', meta=None, recovering=False):
     if not read_only(args):
         raise ValueError('retry helper accepts read-only GitHub commands only')
@@ -306,8 +353,9 @@ def read(args, kind='json', meta=None, recovering=False):
                 status = re.search(r'HTTP [0-9]{3}', result.stderr)
                 last = 'GitHub required read failed' + (f' ({status[0]})' if status else '')
             else:
+                stdout = complete_pr_files(args, result.stdout) if kind == 'metadata' else result.stdout
                 try:
-                    value = validate(result.stdout, kind, meta)
+                    value = validate(stdout, kind, meta)
                     if not recovering:
                         check_halt()
                     return result.stdout, value
