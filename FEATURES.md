@@ -323,6 +323,8 @@ Optionally set `aiCodeReview.cli.customCommand` to a shell command, then run **A
 
 The extension extracts JSON from stdout, including banner-wrapped output, and writes it to `.ai-code-review/results/` for the existing watcher. The clipboard is unchanged. Nonzero exit or invalid JSON creates no result. Output is limited to 4 MiB and execution to five minutes. Manual copy-paste prompts retain their existing instructions.
 
+A startup watchdog catches stuck CLIs: if the provider CLI produces no output within `aiCodeReview.cli.stallTimeoutMs` (default 120000 ms, `0` disables), the run fails fast with a stall error instead of waiting the full five-minute timeout — the first output on stdout or stderr proves the CLI is alive and disarms the watchdog, so long-but-alive reviews keep the full timeout. Failure messages classify the cause: stall, timeout, non-zero exit (with the stderr tail), or failed to start on spawn errors. When a run fails, the message offers recovery: with another detected provider it names the alternatives and shows a **Switch CLI Provider** action that opens **AI Code Review: Select CLI Provider** to change the active provider; with no alternative it points to the CLI output channel for diagnosis and the `aiCodeReview.cli` settings.
+
 Run fixture integration tests with `npm run test:cli`. On a host that can launch VS Code, run `npm run compile && npx tsc && CLI_REVIEW_TEST=1 npm test` for the palette-command and watcher tests.
 
 Without a custom command, PATH detection selects Codex (`--ask-for-approval never exec --sandbox read-only -`),

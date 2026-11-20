@@ -232,6 +232,12 @@
           ],
           "description": "CLI provider used by CLI Review when installed on PATH. 'auto' (default) keeps detection and asks once, persisting the choice. A concrete provider takes precedence over the persisted pick; if it is not installed, CLI Review fails with instructions. Select CLI Provider rewrites this setting when it is not 'auto'."
         },
+        "aiCodeReview.cli.stallTimeoutMs": {
+          "type": "number",
+          "default": 120000,
+          "minimum": 0,
+          "description": "Startup watchdog for CLI Review: if the provider CLI produces no output for this many milliseconds after starting, the run fails fast with a stall error instead of waiting the full five-minute timeout. The first output on stdout or stderr disarms the watchdog, so slow-but-alive runs keep the full timeout. 0 disables the watchdog."
+        },
         "aiCodeReview.defaultChangeType": {
           "type": "string",
           "enum": [

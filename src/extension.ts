@@ -2,7 +2,7 @@ import { groupComparison } from './ai/Comparison';
 import { ComparisonTreeProvider } from './ui/ComparisonTreeProvider';
 import { ResponseParser } from './ai/ResponseParser';
 import * as fs from 'fs/promises';
-import { selectCLICommand, selectComparisonProviders, switchCLIProvider } from './ai/CLIPresets';
+import { detectCLIPresets, selectCLICommand, selectComparisonProviders, suggestFailureRecovery, switchCLIProvider, FailureRecovery } from './ai/CLIPresets';
 import { runCLIReview } from './ai/CLIReview';
 import { PromptGenerator } from './ai/PromptGenerator';
 import * as vscode from 'vscode';
@@ -221,11 +221,15 @@ export function activate(context: vscode.ExtensionContext) {
             cliOutput.clear();
             cliOutput.show(true);
             codeReviewTreeProvider.setCLIStatus({ kind: 'running' });
+            let attemptedProvider: string | undefined;
+            let cliAttempted = false;
             try {
                 const workspace = vscode.workspace.workspaceFolders?.[0];
                 if (!workspace || !vscode.workspace.isTrusted) {
                     throw new Error('CLI review requires a trusted workspace.');
                 }
+                const stallTimeoutMs = vscode.workspace.getConfiguration('aiCodeReview', workspace.uri)
+                    .get<number>('cli.stallTimeoutMs', 120000);
                 if (commandId === 'aiCodeReview.compareCLIReviews') {
                     const configured = vscode.workspace.getConfiguration('aiCodeReview', workspace.uri)
                         .get<Record<string, string>>('cli.comparisonCommands', {});
@@ -244,11 +248,13 @@ export function activate(context: vscode.ExtensionContext) {
                     for (const provider of selection.providers) {
                         controller.signal.throwIfAborted();
                         cliOutput.appendLine(`\nProvider: ${provider.label}`);
+                        cliAttempted = true;
                         const file = await runCLIReview({ command: provider.command, cwd: workspace.uri.fsPath, prompt,
                             signal: controller.signal,
                             review: { type: changes.changeInfo.type, files: changes.changeInfo.files.map(file => file.path) },
                             onProgress: progress => codeReviewTreeProvider.setCLIStatus({ kind: 'running', progress }),
-                            onStdout: chunk => cliOutput.append(chunk) });
+                            onStdout: chunk => cliOutput.append(chunk),
+                            stallTimeoutMs });
                         const result = ResponseParser.parseResponse(await fs.readFile(file, 'utf8'), provider.label, []);
                         if (!result) { throw new Error(`Cannot parse results from ${provider.label}`); }
                         reviews.push({ provider: provider.label, issues: result.issues });
@@ -260,11 +266,15 @@ export function activate(context: vscode.ExtensionContext) {
                 }
                 const customCommand = vscode.workspace.getConfiguration('aiCodeReview', workspace.uri)
                     .get<string>('cli.customCommand', '').trim();
+                const savedProvider = context.globalState.get<string>('aiCodeReview.cli.defaultProvider');
+                const defaultProvider = vscode.workspace.getConfiguration('aiCodeReview', workspace.uri)
+                    .get<string>('cli.defaultProvider', 'auto');
+                attemptedProvider = customCommand ? 'custom'
+                    : (defaultProvider !== 'auto' ? defaultProvider : savedProvider);
                 const command = await selectCLICommand({
                     customCommand,
-                    savedProvider: context.globalState.get<string>('aiCodeReview.cli.defaultProvider'),
-                    defaultProvider: vscode.workspace.getConfiguration('aiCodeReview', workspace.uri)
-                        .get<string>('cli.defaultProvider', 'auto'),
+                    savedProvider,
+                    defaultProvider,
                     choose: providers => vscode.window.showQuickPick(providers, { placeHolder: 'Choose a CLI for AI reviews' }),
                     save: provider => context.globalState.update('aiCodeReview.cli.defaultProvider', provider)
                 });
@@ -272,18 +282,40 @@ export function activate(context: vscode.ExtensionContext) {
                 const changes = await collectCLIChanges(controller);
                 if (!changes) { codeReviewTreeProvider.setCLIStatus({ kind: 'idle' }); return; }
                 const prompt = PromptGenerator.generateFileReferencePrompt(changes.filePath, 'cli').content;
+                cliAttempted = true;
                 await runCLIReview({ command, cwd: workspace.uri.fsPath, prompt,
                     signal: controller.signal,
                     review: { type: changes.changeInfo.type, files: changes.changeInfo.files.map(file => file.path) },
                     onProgress: progress => codeReviewTreeProvider.setCLIStatus({ kind: 'running', progress }),
-                    onStdout: chunk => cliOutput.append(chunk) });
+                    onStdout: chunk => cliOutput.append(chunk),
+                    stallTimeoutMs });
                 codeReviewTreeProvider.setCLIStatus({ kind: 'done' });
             } catch (error) {
                 if (!controller.signal.aborted) {
                     const message = error instanceof Error ? error.message : String(error);
-                    cliOutput.appendLine(`\nCLI review failed: ${message}`);
-                    codeReviewTreeProvider.setCLIStatus({ kind: 'failed', message });
-                    vscode.window.showErrorMessage(`CLI review failed: ${message}`);
+                    let recovery: FailureRecovery | undefined;
+                    if (cliAttempted) {
+                        try {
+                            recovery = suggestFailureRecovery({
+                                failedProvider: attemptedProvider,
+                                detected: (await detectCLIPresets()).map(provider => provider.id)
+                            });
+                        } catch { /* guidance must never mask the original failure */ }
+                    }
+                    const failed = recovery ? `${message}\n${recovery.message}` : message;
+                    cliOutput.appendLine(`\nCLI review failed: ${failed}`);
+                    codeReviewTreeProvider.setCLIStatus({ kind: 'failed', message: failed });
+                    const actions = recovery
+                        ? (recovery.alternatives.length ? ['Switch CLI Provider', 'Show Output'] : ['Show Output', 'Open Settings'])
+                        : [];
+                    const picked = await vscode.window.showErrorMessage(`CLI review failed: ${message}`, ...actions);
+                    if (picked === 'Switch CLI Provider') {
+                        await vscode.commands.executeCommand('aiCodeReview.selectCLIProvider');
+                    } else if (picked === 'Show Output') {
+                        await vscode.commands.executeCommand('aiCodeReview.showCLIOutput');
+                    } else if (picked === 'Open Settings') {
+                        await vscode.commands.executeCommand('workbench.action.openSettings', 'aiCodeReview.cli');
+                    }
                     throw error;
                 }
             } finally {

@@ -159,3 +159,22 @@ export async function switchCLIProvider(options: {
     if (settingForced && settingForced !== picked) { await options.saveSetting(picked); }
     return { kind: 'switched', provider: picked };
 }
+
+export interface FailureRecovery { message: string; alternatives: string[]; }
+
+export function suggestFailureRecovery(options: {
+    failedProvider?: string;
+    detected: string[];
+}): FailureRecovery {
+    const alternatives = options.detected.filter(id => id !== options.failedProvider);
+    if (alternatives.length) {
+        return {
+            alternatives,
+            message: `Switch provider: run "AI Code Review: Select CLI Provider" and pick ${alternatives.join(' or ')}.`
+        };
+    }
+    return {
+        alternatives: [],
+        message: 'No other CLI provider is detected. Check the AI Code Review CLI output channel for diagnostics, then review the aiCodeReview.cli settings (custom command or default provider).'
+    };
+}
