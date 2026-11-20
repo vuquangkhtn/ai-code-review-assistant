@@ -1,0 +1,194 @@
+
+> ai-code-review-assistant@0.9.0 test:cli
+> tsc && node --test src/test/node/*.cjs
+
+TAP version 13
+# Subtest: stdout arrives before exit; cancel kills the fixture and writes no result
+ok 1 - stdout arrives before exit; cancel kills the fixture and writes no result
+  ---
+  duration_ms: 127.664084
+  ...
+# Subtest: failure includes the bounded stderr tail
+ok 2 - failure includes the bounded stderr tail
+  ---
+  duration_ms: 20.071916
+  ...
+# Subtest: one PATH codex runs silently with documented flags
+ok 3 - one PATH codex runs silently with documented flags
+  ---
+  duration_ms: 410.771416
+  ...
+# Subtest: one PATH claude runs silently with documented flags
+ok 4 - one PATH claude runs silently with documented flags
+  ---
+  duration_ms: 164.394541
+  ...
+# Subtest: one PATH copilot runs silently with documented flags
+ok 5 - one PATH copilot runs silently with documented flags
+  ---
+  duration_ms: 169.843083
+  ...
+# Subtest: multiple providers ask once and reuse persisted choice in a fresh selection
+ok 6 - multiple providers ask once and reuse persisted choice in a fresh selection
+  ---
+  duration_ms: 2.225292
+  ...
+# Subtest: custom command overrides presets and stored preference without asking
+ok 7 - custom command overrides presets and stored preference without asking
+  ---
+  duration_ms: 0.707125
+  ...
+# Subtest: cancel does not save or run; missing executables give an actionable error
+ok 8 - cancel does not save or run; missing executables give an actionable error
+  ---
+  duration_ms: 1.605
+  ...
+# Subtest: Windows cmd shims run with literal arguments from a PATH containing spaces
+ok 9 - Windows cmd shims run with literal arguments from a PATH containing spaces # SKIP
+  ---
+  duration_ms: 0.144458
+  ...
+# Subtest: live progress counts split paths once and ignores ambiguous basenames
+ok 10 - live progress counts split paths once and ignores ambiguous basenames
+  ---
+  duration_ms: 179.18925
+  ...
+# Subtest: each provider starts at zero; duplicate paths and final tokens count once
+ok 11 - each provider starts at zero; duplicate paths and final tokens count once
+  ---
+  duration_ms: 35.275792
+  ...
+# Subtest: real CLI receives stdin and handles clean output
+ok 12 - real CLI receives stdin and handles clean output
+  ---
+  duration_ms: 31.876333
+  ...
+# Subtest: real CLI receives stdin and handles noisy output
+ok 13 - real CLI receives stdin and handles noisy output
+  ---
+  duration_ms: 21.601292
+  ...
+# Subtest: real CLI receives stdin and handles fail output
+ok 14 - real CLI receives stdin and handles fail output
+  ---
+  duration_ms: 19.743792
+  ...
+# Subtest: real CLI receives stdin and handles invalid output
+ok 15 - real CLI receives stdin and handles invalid output
+  ---
+  duration_ms: 20.998916
+  ...
+# Subtest: preset rejects failed or oversized output: process.exit(7)
+ok 16 - preset rejects failed or oversized output: process.exit(7)
+  ---
+  duration_ms: 14.728959
+  ...
+# Subtest: preset rejects failed or oversized output: process.stdout.write('x'.repeat(4*1024*1024+1))
+ok 17 - preset rejects failed or oversized output: process.stdout.write('x'.repeat(4*1024*1024+1))
+  ---
+  duration_ms: 21.043833
+  ...
+# Subtest: preset rejects failed or oversized output: process.stderr.write('x'.repeat(4*1024*1024+1))
+ok 18 - preset rejects failed or oversized output: process.stderr.write('x'.repeat(4*1024*1024+1))
+  ---
+  duration_ms: 23.717292
+  ...
+# Subtest: groups by file/line, matches normalized titles, retains each provider evidence
+ok 19 - groups by file/line, matches normalized titles, retains each provider evidence
+  ---
+  duration_ms: 8.649375
+  ...
+# Subtest: different locations and different titles remain unique; empty reviews work
+ok 20 - different locations and different titles remain unique; empty reviews work
+  ---
+  duration_ms: 0.088791
+  ...
+# Subtest: tree distinguishes shared and unique findings and displays confidence/evidence as plain text
+ok 21 - tree distinguishes shared and unique findings and displays confidence/evidence as plain text
+  ---
+  duration_ms: 0.618041
+  ...
+# Subtest: parser round-trips high confidence and evidence through saved JSON
+ok 22 - parser round-trips high confidence and evidence through saved JSON
+  ---
+  duration_ms: 2.027417
+  ...
+# Subtest: parser round-trips medium confidence and evidence through saved JSON
+ok 23 - parser round-trips medium confidence and evidence through saved JSON
+  ---
+  duration_ms: 0.237292
+  ...
+# Subtest: parser round-trips low confidence and evidence through saved JSON
+ok 24 - parser round-trips low confidence and evidence through saved JSON
+  ---
+  duration_ms: 0.114417
+  ...
+# Subtest: legacy results keep optional fields absent and retain existing content
+ok 25 - legacy results keep optional fields absent and retain existing content
+  ---
+  duration_ms: 0.094042
+  ...
+# Subtest: malformed optional fields do not discard a valid finding or reach renderers
+ok 26 - malformed optional fields do not discard a valid finding or reach renderers
+  ---
+  duration_ms: 0.246708
+  ...
+# Subtest: tree shows optional confidence without changing the legacy description
+ok 27 - tree shows optional confidence without changing the legacy description
+  ---
+  duration_ms: 0.508667
+  ...
+# Subtest: panel renders confidence only when supplied and escapes imported text
+ok 28 - panel renders confidence only when supplied and escapes imported text
+  ---
+  duration_ms: 0.904709
+  ...
+# Subtest: manual and CLI prompt contracts request confidence and evidence
+ok 29 - manual and CLI prompt contracts request confidence and evidence
+  ---
+  duration_ms: 1.576875
+  ...
+# Subtest: tree flags only policy findings and adds a policy summary
+ok 30 - tree flags only policy findings and adds a policy summary
+  ---
+  duration_ms: 0.49175
+  ...
+# Subtest: panel flags threshold findings, preserves filtering, and clears policy when disabled
+ok 31 - panel flags threshold findings, preserves filtering, and clears policy when disabled
+  ---
+  duration_ms: 0.911917
+  ...
+# Subtest: policy thresholds include their boundary and leave lower severities alone
+ok 32 - policy thresholds include their boundary and leave lower severities alone
+  ---
+  duration_ms: 0.749334
+  ...
+# Subtest: invalid configuration defaults off and summaries include zero findings
+ok 33 - invalid configuration defaults off and summaries include zero findings
+  ---
+  duration_ms: 0.088833
+  ...
+# Subtest: resolves Code without changing the signed bundle
+ok 34 - resolves Code without changing the signed bundle
+  ---
+  duration_ms: 2.013042
+  ...
+# Subtest: resolves Electron without changing the signed bundle
+ok 35 - resolves Electron without changing the signed bundle
+  ---
+  duration_ms: 0.808292
+  ...
+# Subtest: preserves non-macOS executable paths
+ok 36 - preserves non-macOS executable paths
+  ---
+  duration_ms: 0.048667
+  ...
+1..36
+# tests 36
+# suites 0
+# pass 35
+# fail 0
+# cancelled 0
+# skipped 1
+# todo 0
+# duration_ms 787.589

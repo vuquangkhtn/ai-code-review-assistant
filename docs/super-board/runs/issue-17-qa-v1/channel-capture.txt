@@ -1,0 +1,77 @@
+=== AC1/AC5 evidence: exact output-channel text, in arrival order ===
+(Each "[[CLI-RUN-STATUS-PAYLOAD: ...]]" line marks the moment the CLI run
+ status was set to { kind: "running", progress } via setCLIStatus.)
+
+=== CLI review ===
+Command: /Users/gauwan/.volta/tools/image/node/20.19.4/bin/node -e 
+            process.stdin.resume();
+            process.stdout.write('Reviewing index.ts src/a/ind');
+            setTimeout(() => process.stdout.write('ex.ts src/a/index.ts unique.ts'), 50);
+            setTimeout(() => process.stdout.write(' src/b/index.tsx'), 100);
+            setTimeout(() => process.stdout.write(' src/b/index.ts\n{"issues":[]}'), 150);
+        
+Review type: local
+Files:
+  src/a/index.ts
+  src/b/index.ts
+  unique.ts
+Total files: 3
+
+
+[progress] reviewed 0/3 files
+--- provider output ---
+
+[[CLI-RUN-STATUS-PAYLOAD: {"reviewed":0,"total":3}]]
+Reviewing index.ts src/a/ind
+ex.ts src/a/index.ts unique.ts
+
+[progress] reviewed 1/3 files
+--- provider output ---
+
+[[CLI-RUN-STATUS-PAYLOAD: {"reviewed":1,"total":3}]]
+ src/b/index.tsx
+
+[progress] reviewed 2/3 files
+--- provider output ---
+
+[[CLI-RUN-STATUS-PAYLOAD: {"reviewed":2,"total":3}]]
+ src/b/index.ts
+{"issues":[]}
+
+[progress] reviewed 3/3 files
+--- provider output ---
+
+[[CLI-RUN-STATUS-PAYLOAD: {"reviewed":3,"total":3}]]
+
+=== AC4 evidence: CLI run status payloads in order ===
+[
+  {
+    "reviewed": 0,
+    "total": 3
+  },
+  {
+    "reviewed": 1,
+    "total": 3
+  },
+  {
+    "reviewed": 2,
+    "total": 3
+  },
+  {
+    "reviewed": 3,
+    "total": 3
+  }
+]
+
+=== AC2 evidence: provider stdout chunk boundaries ===
+[
+  "=== CLI review ===\nCommand: /Users/gauwan/.volta/tools/image/node/20.19.4/bin/node -e \n            process.stdin.resume();\n            process.stdout.write('Reviewing index.ts src/a/ind');\n            setTimeout(() => process.stdout.write('ex.ts src/a/index.ts unique.ts'), 50);\n            setTimeout(() => process.stdout.write(' src/b/index.tsx'), 100);\n            setTimeout(() => process.stdout.write(' src/b/index.ts\\n{\"issues\":[]}'), 150);\n        \nReview type: local\nFiles:\n  src/a/index.ts\n  src/b/index.ts\n  unique.ts\nTotal files: 3\n",
+  "\n[progress] reviewed 0/3 files\n--- provider output ---\n",
+  "Reviewing index.ts src/a/ind",
+  "ex.ts src/a/index.ts unique.ts",
+  "\n[progress] reviewed 1/3 files\n--- provider output ---\n",
+  " src/b/index.tsx",
+  "\n[progress] reviewed 2/3 files\n--- provider output ---\n",
+  " src/b/index.ts\n{\"issues\":[]}",
+  "\n[progress] reviewed 3/3 files\n--- provider output ---\n"
+]
