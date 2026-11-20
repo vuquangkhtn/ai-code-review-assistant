@@ -319,7 +319,7 @@ You can add custom keybindings in VS Code settings:
 - Open [Extension Settings](command:aiCodeReview.openSettings)
 ### Run AI Review with CLI
 
-Optionally set `aiCodeReview.cli.customCommand` to a shell command, then run **AI Code Review: Run AI Review with CLI** in a trusted workspace. The command receives the local-changes prompt on stdin, runs in the workspace folder, and must print a JSON object containing an `issues` array. The configured CLI may send code to its provider.
+Optionally set `aiCodeReview.cli.customCommand` to a shell command, then run **AI Code Review: Run AI Review with CLI** in a trusted workspace. With Local Changes selected, the command receives the local-changes prompt on stdin. With Compare Branches selected, it asks for source and target branches using the manual-review picker, checks out the target, and receives the branch-comparison prompt on stdin. Dismissing either branch picker leaves the working tree unchanged and returns the run to idle. The command runs in the workspace folder, and must print a JSON object containing an `issues` array. The configured CLI may send code to its provider.
 
 The extension extracts JSON from stdout, including banner-wrapped output, and writes it to `.ai-code-review/results/` for the existing watcher. The clipboard is unchanged. Nonzero exit or invalid JSON creates no result. Output is limited to 4 MiB and execution to five minutes. Manual copy-paste prompts retain their existing instructions.
 
