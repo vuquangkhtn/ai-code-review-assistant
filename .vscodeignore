@@ -60,6 +60,11 @@ CHANGELOG.md
 # GitHub workflows and CI/CD
 .github/**
 
+# Agent tooling (dev only — symlinks into .agents/.claude, not runtime assets)
+.zcode/**
+.agents/**
+.claude/**
+
 # IDE files
 .idea/**
 *.swp
