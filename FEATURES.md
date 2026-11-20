@@ -365,4 +365,6 @@ Configure `aiCodeReview.cli.comparisonCommands` with at least two names and shel
 
 Run **AI Code Review: Compare Two CLI Providers** and select exactly two entries. Both receive the same local-changes prompt, run sequentially under the CLI review lock, and save separate JSON files. Cancel Review stops the comparison. Commands run only in a trusted workspace and may send code to both providers.
 
+When `aiCodeReview.cli.comparisonCommands` has no named commands, the comparison falls back to the same preset auto-detection as CLI Review (Codex, Claude Code, Copilot CLI on PATH): with exactly two detected both run directly; with more than two a picker selects the two to compare; with fewer than two the error names the setting and shows a two-entry example. Named entries remain the explicit override and keep their labels in the output headers.
+
 The **Provider Comparison** sidebar groups findings by file and line. Matching titles (ignoring case and surrounding whitespace) at the same location are marked **Shared**; others are **Unique**. Provider rows retain severity and optional confidence, with descriptions, suggestions and evidence in the tooltip. Shared means matching reports, not independent proof that a finding is correct.
