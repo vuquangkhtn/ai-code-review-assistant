@@ -28,12 +28,12 @@ This VS Code extension generates structured prompts for AI code reviews that you
 ## 🚀 Simple Usage
 
 ### 3-Step Process
-1. **Generate Prompt**: Use `Cmd+K Cmd+G` or run "Generate AI Prompt" command
+1. **Generate Prompt**: Use `Cmd+K Cmd+G` or run the "Manual Review" command
 2. **Copy to AI**: Copy the generated prompt to your favorite AI (ChatGPT, Claude, etc.)
 3. **View Results**: Save the AI response as JSON and see organized feedback in VS Code
 
 ### Quick Commands
-- **`Cmd+K Cmd+G`** - Generate AI Prompt (most common)
+- **`Cmd+K Cmd+G`** - Manual Review (most common)
 - **`AI Code Review: Local Changes`** - Review uncommitted changes
 - **`AI Code Review: All Files`** - Review entire codebase
 - **`AI Code Review: Compare Branches`** - Compare between branches
@@ -60,7 +60,7 @@ This extension is designed to work with **any AI provider** you prefer:
 - **Any other AI that accepts text prompts**
 
 ### Why No API Keys?
-- **Privacy**: Manual copy-paste mode makes no outbound AI calls. CLI mode sends code through the CLI’s own backend only when you explicitly run **Run AI Review with CLI**
+- **Privacy**: Manual copy-paste mode makes no outbound AI calls. CLI mode sends code through the CLI’s own backend only when you explicitly run **CLI Review**
 - **Flexibility**: Use any AI provider, switch anytime
 - **Cost Control**: Use your existing AI subscriptions
 - **Reliability**: Manual copy-paste mode has no extension-managed API limits; CLI mode uses the CLI’s account and service limits
@@ -105,7 +105,7 @@ Every star, review, and piece of feedback motivates us to keep building awesome 
 *Built with ❤️ for developers who want AI-powered code reviews without the complexity*
 ### CLI provider defaults
 
-Run **AI Code Review: Run AI Review with CLI** in a trusted workspace. With no
+Run **AI Code Review: CLI Review** in a trusted workspace. With no
 `aiCodeReview.cli.customCommand`, the extension detects `codex`, `claude`, and
 `copilot` on PATH. One provider is selected silently; with several, pick once.
 The choice persists in VS Code across sessions. A custom command always overrides

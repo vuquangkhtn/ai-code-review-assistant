@@ -3,6 +3,32 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { CLIReviewStatus } from '../types';
 
+/** Presentation of the one-button CLI Review row, derived only from the run status. */
+export function cliReviewRowSpec(status: CLIReviewStatus): {
+    label: string; description: string; icon: string;
+    commandId: string; commandTitle: string; contextValue: string; tooltip: string;
+} {
+    if (status.kind === 'running') {
+        const progress = status.progress ? `${status.progress.reviewed}/${status.progress.total} files` : 'Running…';
+        return { label: 'CLI Review', description: progress, icon: 'loading~spin',
+            commandId: 'aiCodeReview.cancelCLIReview', commandTitle: 'Stop the running review?',
+            contextValue: 'cliReviewRunning', tooltip: 'Click to stop the running review (asks for confirmation)' };
+    }
+    if (status.kind === 'failed') {
+        return { label: 'CLI Review', description: status.message, icon: 'error',
+            commandId: 'aiCodeReview.runCLIReview', commandTitle: 'Run CLI Review',
+            contextValue: 'cliReviewAction', tooltip: status.message };
+    }
+    if (status.kind === 'done') {
+        return { label: 'CLI Review', description: 'Review completed', icon: 'check',
+            commandId: 'aiCodeReview.runCLIReview', commandTitle: 'Run CLI Review',
+            contextValue: 'cliReviewAction', tooltip: 'Run a CLI review' };
+    }
+    return { label: 'CLI Review', description: '', icon: 'play',
+        commandId: 'aiCodeReview.runCLIReview', commandTitle: 'Run CLI Review',
+        contextValue: 'cliReviewAction', tooltip: 'Run a CLI review' };
+}
+
 export class CodeReviewTreeProvider implements vscode.TreeDataProvider<CodeReviewItem> {
     private _onDidChangeTreeData: vscode.EventEmitter<CodeReviewItem | undefined | null | void> = new vscode.EventEmitter<CodeReviewItem | undefined | null | void>();
     readonly onDidChangeTreeData: vscode.Event<CodeReviewItem | undefined | null | void> = this._onDidChangeTreeData.event;
@@ -61,61 +87,37 @@ export class CodeReviewTreeProvider implements vscode.TreeDataProvider<CodeRevie
 
     getChildren(element?: CodeReviewItem): Promise<CodeReviewItem[]> {
         if (!element) {
-            // Root level items
-            const status = this.cliStatus;
-            const cliItems = [new CodeReviewItem('Run Review with CLI', vscode.TreeItemCollapsibleState.None,
-                { command: 'aiCodeReview.runCLIReview', title: 'Run Review with CLI' }, 'action', 'play')];
-            if (status.kind !== 'idle') {
-                const running = status.kind === 'running';
-                cliItems.push(new CodeReviewItem(`CLI review: ${status.kind}`, vscode.TreeItemCollapsibleState.None,
-                    { command: running ? 'aiCodeReview.cancelCLIReview' : 'aiCodeReview.showCLIOutput',
-                        title: running ? 'Cancel CLI Review' : 'Show CLI Output' },
-                    running ? 'cliReviewRunning' : 'cliReviewStatus',
-                    running ? 'loading~spin' : status.kind === 'done' ? 'check' : 'error',
-                    status.kind === 'failed' ? status.message : running ? 'Click to cancel the running review' : 'Show CLI output'));
-            }
+            // Root level items: one-button CLI Review row, then Manual Review, then the Review Type group.
+            const cli = cliReviewRowSpec(this.cliStatus);
             return Promise.resolve([
-                ...cliItems,
                 new CodeReviewItem(
-                    'Open Workflow Guide',
+                    cli.label,
                     vscode.TreeItemCollapsibleState.None,
-                    {
-                        command: 'aiCodeReview.openWorkflowGuide',
-                        title: 'Open Workflow Guide',
-                        arguments: []
-                    },
-                    'action',
-                    'book',
-                    'Open detailed workflow guide in a new panel'
+                    { command: cli.commandId, title: cli.commandTitle },
+                    cli.contextValue,
+                    cli.icon,
+                    cli.tooltip,
+                    cli.description || undefined
                 ),
                 new CodeReviewItem(
-                    'Configure Change Type',
-                    vscode.TreeItemCollapsibleState.Expanded,
-                    undefined,
-                    'defaultChangeTypeGroup',
-                    'gear'
-                ),
-                new CodeReviewItem(
-                    'Generate AI Prompt (Cmd+K Cmd+G)',
+                    'Manual Review',
                     vscode.TreeItemCollapsibleState.None,
                     {
                         command: 'aiCodeReview.copyPrompt',
-                        title: 'Copy Prompt',
+                        title: 'Manual Review',
                         arguments: []
                     },
                     'action',
-                    'copy'
+                    'copy',
+                    'Generate a prompt to paste into any AI chat'
                 ),
                 new CodeReviewItem(
-                    'Paste Prompt to AI Chat (Manual)',
-                    vscode.TreeItemCollapsibleState.None,
-                    {
-                        command: 'aiCodeReview.pastePrompt',
-                        title: 'Paste Prompt to AI Chat',
-                        arguments: []
-                    },
-                    'action',
-                    'send'
+                    'Review Type',
+                    vscode.TreeItemCollapsibleState.Expanded,
+                    undefined,
+                    'defaultChangeTypeGroup',
+                    'gear',
+                    'Choose which changes to review'
                 ),
             ]);
         } else if (element.contextValue === 'defaultChangeTypeGroup') {
@@ -158,14 +160,18 @@ export class CodeReviewItem extends vscode.TreeItem {
         public readonly command?: vscode.Command,
         public readonly contextValue?: string,
         public readonly iconName?: string,
-        public readonly tooltipText?: string
+        public readonly tooltipText?: string,
+        public readonly descriptionText?: string
     ) {
         super(label, collapsibleState);
         this.tooltip = tooltipText || this.label;
         this.contextValue = contextValue || 'codeReviewItem';
-        
+
         if (iconName) {
             this.iconPath = new vscode.ThemeIcon(iconName);
+        }
+        if (descriptionText) {
+            this.description = descriptionText;
         }
     }
 }

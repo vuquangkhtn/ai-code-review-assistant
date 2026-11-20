@@ -64,13 +64,13 @@
       },
       {
         "command": "aiCodeReview.runCLIReview",
-        "title": "Run AI Review with CLI",
+        "title": "CLI Review",
         "category": "AI Code Review",
         "enablement": "isWorkspaceTrusted"
       },
       {
         "command": "aiCodeReview.copyPrompt",
-        "title": "Copy AI Prompt",
+        "title": "Manual Review",
         "category": "AI Code Review"
       },
       {
@@ -109,6 +109,11 @@
         "title": "Filter Issues",
         "category": "AI Code Review",
         "icon": "$(gear)"
+      },
+      {
+        "command": "aiCodeReview.openWorkflowGuide",
+        "title": "Open Workflow Guide",
+        "category": "AI Code Review"
       },
       {
         "command": "aiCodeReview.pastePrompt",
@@ -171,11 +176,6 @@
         }
       ],
       "view/item/context": [
-        {
-          "command": "aiCodeReview.cancelCLIReview",
-          "when": "view == aiCodeReviewPanel && viewItem == cliReviewRunning",
-          "group": "inline"
-        },
         {
           "command": "aiCodeReview.markIssueResolved",
           "when": "view == aiCodeReviewIssues && viewItem == unresolvedIssue",

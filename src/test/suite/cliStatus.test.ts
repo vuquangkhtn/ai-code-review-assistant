@@ -6,21 +6,29 @@ import { suite, test } from 'mocha';
 import { CodeReviewTreeProvider } from '../../ui/CodeReviewTreeProvider';
 
 suite('CLI review status', () => {
-    test('tree offers a run, cancellation while running and failure details', async () => {
+    test('one CLI Review row reflects the run: order, renames, no separate status row', async () => {
         const tree = new CodeReviewTreeProvider();
-        const run = (await tree.getChildren()).find(item => item.label === 'Run Review with CLI');
-        assert.strictEqual(run?.command?.command, 'aiCodeReview.runCLIReview');
-        tree.setCLIStatus({ kind: 'running' });
-        const running = (await tree.getChildren()).find(item => item.contextValue === 'cliReviewRunning');
-        assert.strictEqual(running?.command?.command, 'aiCodeReview.cancelCLIReview');
+        const rows = await tree.getChildren();
+        assert.deepStrictEqual(rows.map(item => item.label), ['CLI Review', 'Manual Review', 'Review Type']);
+        const run = rows[0];
+        assert.strictEqual(run.command?.command, 'aiCodeReview.runCLIReview');
+        assert.strictEqual((run.iconPath as vscode.ThemeIcon).id, 'play');
+        tree.setCLIStatus({ kind: 'running', progress: { reviewed: 3, total: 10 } });
+        const running = (await tree.getChildren())[0];
+        assert.strictEqual(running.command?.command, 'aiCodeReview.cancelCLIReview');
+        assert.strictEqual(running.contextValue, 'cliReviewRunning');
+        assert.strictEqual((running.iconPath as vscode.ThemeIcon).id, 'loading~spin');
+        assert.strictEqual(running.description, '3/10 files');
         tree.setCLIStatus({ kind: 'done' });
-        assert.ok((await tree.getChildren()).some(item => item.label === 'CLI review: done'));
+        assert.strictEqual(((await tree.getChildren())[0].iconPath as vscode.ThemeIcon).id, 'check');
         tree.setCLIStatus({ kind: 'failed', message: 'fixture stderr tail' });
-        const failed = (await tree.getChildren()).find(item => item.label === 'CLI review: failed');
-        assert.strictEqual(failed?.tooltip, 'fixture stderr tail');
-        assert.strictEqual(failed?.command?.command, 'aiCodeReview.showCLIOutput');
+        const failed = (await tree.getChildren())[0];
+        assert.strictEqual(failed.description, 'fixture stderr tail');
+        assert.strictEqual(failed.tooltip, 'fixture stderr tail');
+        assert.strictEqual(failed.command?.command, 'aiCodeReview.runCLIReview');
         tree.setCLIStatus({ kind: 'idle' });
-        assert.ok(!(await tree.getChildren()).some(item => item.contextValue?.startsWith('cliReview')));
+        assert.deepStrictEqual((await tree.getChildren()).map(item => item.label),
+            ['CLI Review', 'Manual Review', 'Review Type']);
     });
 
     test('custom command can be cancelled from the registered tree command', async function () {
@@ -38,6 +46,12 @@ suite('CLI review status', () => {
         fs.writeFileSync(fixture, `require('fs').writeFileSync(${JSON.stringify(marker)}, String(process.pid));
             process.stdin.resume(); console.log('review is alive'); setTimeout(() => {}, 30000);`);
         await config.update('cli.customCommand', `"${node}" "${fixture}"`, vscode.ConfigurationTarget.Global);
+        // The cancel command confirms before aborting; auto-consent for this test.
+        const originalCancelWarning = vscode.window.showWarningMessage;
+        vscode.window.showWarningMessage = async (message: string) => {
+            assert.match(message, /Stop the running review/);
+            return 'Stop';
+        };
         const results = path.join(workspace.uri.fsPath, '.ai-code-review/results');
         const before = fs.existsSync(results) ? fs.readdirSync(results).sort() : [];
         const running = vscode.commands.executeCommand('aiCodeReview.runCLIReview');
@@ -53,6 +67,7 @@ suite('CLI review status', () => {
         } finally {
             await vscode.commands.executeCommand('aiCodeReview.cancelCLIReview');
             await running;
+            vscode.window.showWarningMessage = originalCancelWarning;
             await config.update('cli.customCommand', previous, vscode.ConfigurationTarget.Global);
             fs.rmSync(fixture, { force: true });
             fs.rmSync(marker, { force: true });
@@ -90,6 +105,7 @@ suite('CLI review status', () => {
             const messages: string[] = [];
             const originalWarning = vscode.window.showWarningMessage;
             vscode.window.showWarningMessage = (message: string) => {
+                if (/Stop the running review/.test(message)) { return Promise.resolve('Stop'); }
                 messages.push(message);
                 return Promise.resolve(undefined);
             };
