@@ -1,0 +1,129 @@
+TAP version 13
+# Subtest: empty setting with exactly two detected presets runs both without a picker, end to end
+ok 1 - empty setting with exactly two detected presets runs both without a picker, end to end
+  ---
+  duration_ms: 377.333167
+  ...
+# Subtest: empty setting with more than two detected presets asks a picker for exactly two
+ok 2 - empty setting with more than two detected presets asks a picker for exactly two
+  ---
+  duration_ms: 1.344792
+  ...
+# Subtest: picking one or cancelling the detected picker errors or cancels cleanly
+ok 3 - picking one or cancelling the detected picker errors or cancels cleanly
+  ---
+  duration_ms: 1.373958
+  ...
+# Subtest: named entries override detection and keep their labels and commands
+not ok 4 - named entries override detection and keep their labels and commands
+  ---
+  duration_ms: 1.899375
+  location: '/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-21-qa/src/test/node/comparisonProviders.cjs:88:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+      [
+    +   'mutated',
+    +   'mutated'
+    -   'first',
+    -   'second'
+      ]
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    0: 'first'
+    1: 'second'
+  actual:
+    0: 'mutated'
+    1: 'mutated'
+  operator: 'deepStrictEqual'
+  stack: |-
+    /Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-21-qa/src/test/node/comparisonProviders.cjs:98:16
+    async withPATHFixture (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-21-qa/src/test/node/comparisonProviders.cjs:28:9)
+    async TestContext.<anonymous> (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-21-qa/src/test/node/comparisonProviders.cjs:89:5)
+    async Test.run (node:internal/test_runner/test:797:9)
+    async Test.processPendingSubtests (node:internal/test_runner/test:526:7)
+  ...
+# Subtest: more than two named entries pick exactly two; one named entry stays an explicit error
+not ok 5 - more than two named entries pick exactly two; one named entry stays an explicit error
+  ---
+  duration_ms: 0.206375
+  location: '/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-21-qa/src/test/node/comparisonProviders.cjs:103:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+      [
+    +   'mutated',
+    +   'mutated'
+    -   'three',
+    -   'one'
+      ]
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    0: 'three'
+    1: 'one'
+  actual:
+    0: 'mutated'
+    1: 'mutated'
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-21-qa/src/test/node/comparisonProviders.cjs:112:12)
+    async Test.run (node:internal/test_runner/test:797:9)
+    async Test.processPendingSubtests (node:internal/test_runner/test:526:7)
+  ...
+# Subtest: fewer than two detected providers and no setting give the actionable error
+ok 6 - fewer than two detected providers and no setting give the actionable error
+  ---
+  duration_ms: 1.674541
+  ...
+# Subtest: named entries override detection end to end and their labels reach the comparison output
+not ok 7 - named entries override detection end to end and their labels reach the comparison output
+  ---
+  duration_ms: 0.794292
+  location: '/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-21-qa/src/test/node/comparisonProviders.cjs:129:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+      [
+    +   'mutated',
+    +   'mutated'
+    -   'Codex CLI',
+    -   'Claude CLI'
+      ]
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    0: 'Codex CLI'
+    1: 'Claude CLI'
+  actual:
+    0: 'mutated'
+    1: 'mutated'
+  operator: 'deepStrictEqual'
+  stack: |-
+    /Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-21-qa/src/test/node/comparisonProviders.cjs:136:16
+    async withPATHFixture (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-21-qa/src/test/node/comparisonProviders.cjs:28:9)
+    async TestContext.<anonymous> (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-21-qa/src/test/node/comparisonProviders.cjs:130:5)
+    async Test.run (node:internal/test_runner/test:797:9)
+    async Test.processPendingSubtests (node:internal/test_runner/test:526:7)
+  ...
+# Subtest: cancelling the named-entries picker cancels cleanly
+ok 8 - cancelling the named-entries picker cancels cleanly
+  ---
+  duration_ms: 0.077375
+  ...
+1..8
+# tests 8
+# suites 0
+# pass 5
+# fail 3
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 413.649625

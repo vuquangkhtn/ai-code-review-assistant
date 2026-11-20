@@ -125,3 +125,30 @@ test('fewer than two detected providers and no setting give the actionable error
         assert.match(selection.message, /"claude".*"codex"/s);
     });
 });
+
+test('named entries override detection end to end and their labels reach the comparison output', { skip: process.platform === 'win32' }, async () => {
+    await withPATHFixture(['codex', 'claude'], async cwd => {
+        const selection = await selectComparisonProviders({
+            configured: { 'Codex CLI': 'codex --ask-for-approval never exec --sandbox read-only -', 'Claude CLI': 'claude -p --output-format text' },
+            choose: async items => items.filter(item => item.picked)
+        });
+        assert.equal(selection.kind, 'providers');
+        assert.deepEqual(selection.providers.map(provider => provider.label), ['Codex CLI', 'Claude CLI']);
+        const reviews = [];
+        for (const provider of selection.providers) {
+            const file = await runCLIReview({ command: provider.command, cwd, prompt: 'review this' });
+            reviews.push({ provider: provider.label, issues: JSON.parse(fs.readFileSync(file, 'utf8')).issues });
+        }
+        const groups = groupComparison(reviews);
+        assert.equal(groups.length, 1);
+        assert.deepEqual(groups[0].findings[0].entries.map(entry => entry.provider), ['Codex CLI', 'Claude CLI']);
+    });
+});
+
+test('cancelling the named-entries picker cancels cleanly', async () => {
+    const cancelled = await selectComparisonProviders({
+        configured: { one: 'cmd1', two: 'cmd2', three: 'cmd3' },
+        choose: async () => undefined
+    });
+    assert.equal(cancelled.kind, 'cancelled');
+});

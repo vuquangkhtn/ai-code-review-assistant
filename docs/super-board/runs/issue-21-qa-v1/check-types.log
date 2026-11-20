@@ -1,0 +1,4 @@
+
+> ai-code-review-assistant@0.10.0 check-types
+> tsc --noEmit
+
