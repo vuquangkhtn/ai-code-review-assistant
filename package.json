@@ -2,7 +2,7 @@
   "name": "ai-code-review-assistant",
   "displayName": "AI Prompt Code Review",
   "description": "Generating AI Code review Prompt. Work with any AI Providers",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "publisher": "vuquangkhtn",
   "license": "MIT",
   "icon": "resources/icon.png",
@@ -46,7 +46,11 @@
   ],
   "contributes": {
     "commands": [
-      { "command": "aiCodeReview.compareCLIReviews", "title": "Compare Two CLI Providers", "category": "AI Code Review" },
+      {
+        "command": "aiCodeReview.compareCLIReviews",
+        "title": "Compare Two CLI Providers",
+        "category": "AI Code Review"
+      },
       {
         "command": "aiCodeReview.cancelCLIReview",
         "title": "Cancel CLI Review",
@@ -136,7 +140,11 @@
     },
     "views": {
       "aiCodeReview": [
-        { "id": "aiCodeReviewComparison", "name": "Provider Comparison", "when": "true" },
+        {
+          "id": "aiCodeReviewComparison",
+          "name": "Provider Comparison",
+          "when": "true"
+        },
         {
           "id": "aiCodeReviewPanel",
           "name": "Code Review",
@@ -195,7 +203,9 @@
         "aiCodeReview.cli.comparisonCommands": {
           "type": "object",
           "default": {},
-          "additionalProperties": { "type": "string" },
+          "additionalProperties": {
+            "type": "string"
+          },
           "description": "Named shell commands offered by Compare Two CLI Providers. Configure at least two commands; both receive the same review prompt and may send code to their providers."
         },
         "aiCodeReview.cli.customCommand": {
@@ -262,7 +272,11 @@
         },
         "aiCodeReview.policy.blockOn": {
           "type": "string",
-          "enum": ["off", "critical", "high"],
+          "enum": [
+            "off",
+            "critical",
+            "high"
+          ],
           "default": "off",
           "description": "Flag findings at or above this severity in the findings tree and review panel. Display only; does not prevent reviews or merges."
         },

@@ -1,3 +1,17 @@
+# [0.10.0](https://github.com/vuquangkhtn/ai-code-review-assistant/compare/v0.9.0...v0.10.0) (2026-11-20)
+
+
+### Bug Fixes
+
+* **board:** complete truncated PR file lists in github-read helper ([abdcdf2](https://github.com/vuquangkhtn/ai-code-review-assistant/commit/abdcdf295fe64b52b94068fa32f4a8b8218e4abc)), closes [#30](https://github.com/vuquangkhtn/ai-code-review-assistant/issues/30)
+* **board:** escape braces in codex lane read caveat ([695bc21](https://github.com/vuquangkhtn/ai-code-review-assistant/commit/695bc21269d52f0e4022e57c806d19d52cf2a850))
+* **board:** return completed PR file list from github-read helper ([0976be2](https://github.com/vuquangkhtn/ai-code-review-assistant/commit/0976be21a5aa70fe36024fb766824a70b50ce099))
+
+
+### Features
+
+* release comparison and CLI-review batch ([ff57bf0](https://github.com/vuquangkhtn/ai-code-review-assistant/commit/ff57bf047e3723860bd3e68410f00295f57c6644)), closes [#16](https://github.com/vuquangkhtn/ai-code-review-assistant/issues/16) [#16](https://github.com/vuquangkhtn/ai-code-review-assistant/issues/16) [#24](https://github.com/vuquangkhtn/ai-code-review-assistant/issues/24)
+
 # [0.9.0](https://github.com/vuquangkhtn/ai-code-review-assistant/compare/v0.8.1...v0.9.0) (2025-10-04)
 
 
