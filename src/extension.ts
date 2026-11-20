@@ -2,7 +2,7 @@ import { groupComparison } from './ai/Comparison';
 import { ComparisonTreeProvider } from './ui/ComparisonTreeProvider';
 import { ResponseParser } from './ai/ResponseParser';
 import * as fs from 'fs/promises';
-import { selectCLICommand, selectComparisonProviders } from './ai/CLIPresets';
+import { selectCLICommand, selectComparisonProviders, switchCLIProvider } from './ai/CLIPresets';
 import { runCLIReview } from './ai/CLIReview';
 import { PromptGenerator } from './ai/PromptGenerator';
 import * as vscode from 'vscode';
@@ -263,6 +263,8 @@ export function activate(context: vscode.ExtensionContext) {
                 const command = await selectCLICommand({
                     customCommand,
                     savedProvider: context.globalState.get<string>('aiCodeReview.cli.defaultProvider'),
+                    defaultProvider: vscode.workspace.getConfiguration('aiCodeReview', workspace.uri)
+                        .get<string>('cli.defaultProvider', 'auto'),
                     choose: providers => vscode.window.showQuickPick(providers, { placeHolder: 'Choose a CLI for AI reviews' }),
                     save: provider => context.globalState.update('aiCodeReview.cli.defaultProvider', provider)
                 });
@@ -289,6 +291,37 @@ export function activate(context: vscode.ExtensionContext) {
                 cliRun = undefined;
             }
         })),
+
+        vscode.commands.registerCommand('aiCodeReview.selectCLIProvider', async () => {
+            const workspace = vscode.workspace.workspaceFolders?.[0];
+            if (!workspace || !vscode.workspace.isTrusted) {
+                vscode.window.showErrorMessage('Selecting a CLI provider requires a trusted workspace.');
+                return;
+            }
+            const config = vscode.workspace.getConfiguration('aiCodeReview', workspace.uri);
+            try {
+                const result = await switchCLIProvider({
+                    customCommand: config.get<string>('cli.customCommand', ''),
+                    defaultProviderSetting: config.get<string>('cli.defaultProvider', 'auto'),
+                    persistedProvider: context.globalState.get<string>('aiCodeReview.cli.defaultProvider'),
+                    choose: items => vscode.window.showQuickPick(items, {
+                        placeHolder: 'Select the CLI provider for AI reviews'
+                    }).then(item => item?.id),
+                    save: provider => context.globalState.update('aiCodeReview.cli.defaultProvider', provider),
+                    saveSetting: provider => vscode.workspace.getConfiguration('aiCodeReview')
+                        .update('cli.defaultProvider', provider, vscode.ConfigurationTarget.Global)
+                });
+                if (result.kind === 'switched') {
+                    vscode.window.showInformationMessage(result.provider === 'custom'
+                        ? 'CLI reviews will use the custom command (aiCodeReview.cli.customCommand).'
+                        : `CLI provider set to ${result.provider}.`);
+                } else if (result.kind === 'error') {
+                    vscode.window.showErrorMessage(result.message);
+                }
+            } catch (error) {
+                vscode.window.showErrorMessage(`Failed to switch CLI provider: ${error instanceof Error ? error.message : String(error)}`);
+            }
+        }),
 
         vscode.commands.registerCommand('aiCodeReview.copyPromptLocalChanges', async () => {
             if (refuseDuringCLIReview()) { return; }

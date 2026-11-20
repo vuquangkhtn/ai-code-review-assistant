@@ -326,13 +326,34 @@ The extension extracts JSON from stdout, including banner-wrapped output, and wr
 Run fixture integration tests with `npm run test:cli`. On a host that can launch VS Code, run `npm run compile && npx tsc && CLI_REVIEW_TEST=1 npm test` for the palette-command and watcher tests.
 
 Without a custom command, PATH detection selects Codex (`--ask-for-approval never exec --sandbox read-only -`),
-Claude Code (`-p --output-format text`), or Copilot (`--silent --allow-tool=read -p`).
+Claude Code (`-p --output-format text`), Copilot (`--silent --allow-tool=read -p`), or zcode (`-p`).
 One installed provider is used silently; several show a picker once and persist
 the choice across sessions. Cancelling starts no review. If the saved provider
 is removed, detection runs again. A custom command overrides all presets.
-Codex and Claude receive stdin; Copilot receives a literal prompt argument.
+Codex and Claude receive the prompt on stdin; Copilot and zcode receive it as a
+literal prompt argument (`zcode -p <prompt>` — the documented headless mode of
+zcode 0.17.3; zcode is not verified end to end on hosts where it is not
+installed, and `aiCodeReview.cli.customCommand` remains the fallback for any
+provider whose flags cannot be verified).
 On Windows, `.exe`, `.com`, `.cmd` and `.bat` providers are detected. Providers use their own authentication and backend;
 no code is sent until you explicitly trigger the CLI review command.
+
+Set `aiCodeReview.cli.defaultProvider` to pick the provider up front: `auto` (default)
+keeps the detect-once-and-persist behavior above; a concrete provider (`codex`,
+`claude`, `copilot`, `zcode`) is used whenever it is on PATH and takes precedence
+over the persisted pick — if it is not installed, CLI Review fails with instructions
+to install it or set the setting back to `auto`. The preset registry is data-driven:
+a new provider is one entry in `src/ai/CLIPresets.ts` plus its enum value in the
+setting; selection, persistence and comparison reuse it unchanged.
+
+Run **AI Code Review: Select CLI Provider** to switch providers from the Command
+Palette. It lists every detected preset plus the configured custom command, marks
+the current one (`auto` mode: the persisted pick; a concrete setting: that provider,
+shown as `not found on PATH (current)` when it is not installed), and switching
+persists the choice for the next CLI review without re-prompting. When the setting
+is a concrete provider, switching rewrites the setting so the switch is not
+silently superseded; the custom command always overrides presets until
+`aiCodeReview.cli.customCommand` is cleared.
 Use **CLI Review** in the review tree to start the same custom command. The single row reflects
 the run: a spinner with reviewed/total progress in its description while running, a check when
 done, and the failure message on failure. Clicking the row while it runs — or **Cancel CLI

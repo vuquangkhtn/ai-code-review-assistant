@@ -3,16 +3,22 @@ import { constants } from 'fs';
 import * as path from 'path';
 import { CLIInvocation } from '../types';
 
-const presets = [
-    { id: 'codex', args: ['--ask-for-approval', 'never', 'exec', '--sandbox', 'read-only', '-'] },
-    { id: 'claude', args: ['-p', '--output-format', 'text'] },
-    { id: 'copilot', args: ['--silent', '--allow-tool=read', '-p'] }
+// Data-driven registry: adding a provider is one entry here — detection, selection,
+// persistence, the comparison fallback and the switcher pick it up without further changes.
+// promptArgument: the prompt is appended as a literal last argument (copilot -p, zcode -p)
+// instead of being piped to stdin (codex, claude).
+export const cliPresets = [
+    { id: 'codex', args: ['--ask-for-approval', 'never', 'exec', '--sandbox', 'read-only', '-'], promptArgument: false },
+    { id: 'claude', args: ['-p', '--output-format', 'text'], promptArgument: false },
+    { id: 'copilot', args: ['--silent', '--allow-tool=read', '-p'], promptArgument: true },
+    { id: 'zcode', args: ['-p'], promptArgument: true }
 ];
+const presets = cliPresets;
 
 export interface DetectedCLI { id: string; file: string; args: string[]; promptArgument: boolean; }
 
 export async function detectCLIPresets(): Promise<DetectedCLI[]> {
-    const available: { id: string; file: string; args: string[] }[] = [];
+    const available: { id: string; file: string; args: string[]; promptArgument: boolean }[] = [];
     for (const preset of presets) {
         for (const directory of (process.env.PATH || '').split(path.delimiter).filter(Boolean)) {
             for (const extension of process.platform === 'win32' ? ['.exe', '.com', '.cmd', '.bat'] : ['']) {
@@ -27,21 +33,28 @@ export async function detectCLIPresets(): Promise<DetectedCLI[]> {
             if (available.some(provider => provider.id === preset.id)) { break; }
         }
     }
-    return available.map(provider => ({ ...provider, promptArgument: provider.id === 'copilot' }));
+    return available;
 }
 
 export async function selectCLICommand(options: {
     customCommand: string;
     savedProvider: string | undefined;
+    defaultProvider?: string;
     choose: (providers: string[]) => PromiseLike<string | undefined>;
     save: (provider: string) => PromiseLike<void>;
 }): Promise<CLIInvocation | undefined> {
     if (options.customCommand.trim()) { return options.customCommand.trim(); }
     const available = await detectCLIPresets();
     if (!available.length) {
-        throw new Error('No supported CLI found on PATH. Install Codex, Claude Code or Copilot CLI, or set aiCodeReview.cli.customCommand.');
+        throw new Error('No supported CLI found on PATH. Install Codex, Claude Code, Copilot CLI or zcode, or set aiCodeReview.cli.customCommand.');
     }
-    let selected = available.find(provider => provider.id === options.savedProvider);
+    const wanted = options.defaultProvider?.trim();
+    const forced = wanted && wanted !== 'auto' ? wanted : undefined;
+    let selected = forced ? available.find(provider => provider.id === forced) : undefined;
+    if (forced && !selected) {
+        throw new Error(`aiCodeReview.cli.defaultProvider is '${forced}' but the ${forced} CLI was not found on PATH. Install it or set the setting to 'auto'.`);
+    }
+    if (!selected) { selected = available.find(provider => provider.id === options.savedProvider); }
     if (!selected) {
         const id = available.length === 1 ? available[0].id : await options.choose(available.map(provider => provider.id));
         if (!id) { return undefined; }
@@ -49,7 +62,7 @@ export async function selectCLICommand(options: {
         if (!selected) { throw new Error('Selected CLI is no longer available.'); }
         await options.save(selected.id);
     }
-    return { file: selected.file, args: selected.args, promptArgument: selected.id === 'copilot' };
+    return { file: selected.file, args: selected.args, promptArgument: selected.promptArgument };
 }
 
 export type ComparisonSelection =
@@ -84,7 +97,7 @@ export async function selectComparisonProviders(options: {
     if (detected.length < 2) {
         return {
             kind: 'error',
-            message: `Comparison needs two CLI providers. Install at least two supported CLIs (Codex, Claude Code or Copilot CLI), or set at least two named commands in aiCodeReview.cli.comparisonCommands, e.g. ${comparisonExample}.`
+            message: `Comparison needs two CLI providers. Install at least two supported CLIs (Codex, Claude Code, Copilot CLI or zcode), or set at least two named commands in aiCodeReview.cli.comparisonCommands, e.g. ${comparisonExample}.`
         };
     }
     let chosen = detected;
@@ -99,4 +112,50 @@ export async function selectComparisonProviders(options: {
         kind: 'providers',
         providers: chosen.map(provider => ({ label: provider.id, command: { file: provider.file, args: provider.args, promptArgument: provider.promptArgument } }))
     };
+}
+
+export type CLISwitchResult =
+    | { kind: 'switched'; provider: string }
+    | { kind: 'cancelled' }
+    | { kind: 'error'; message: string };
+
+export async function switchCLIProvider(options: {
+    customCommand: string;
+    defaultProviderSetting: string;
+    persistedProvider: string | undefined;
+    choose: (items: { id: string; label: string; description: string }[]) => PromiseLike<string | undefined>;
+    save: (provider: string) => PromiseLike<void>;
+    saveSetting: (provider: string) => PromiseLike<void>;
+}): Promise<CLISwitchResult> {
+    const detected = await detectCLIPresets();
+    const wanted = options.defaultProviderSetting?.trim();
+    const settingForced = wanted && wanted !== 'auto' ? wanted : undefined;
+    const current = options.customCommand.trim() ? 'custom'
+        : settingForced ?? (detected.some(provider => provider.id === options.persistedProvider) ? options.persistedProvider : undefined);
+    const items = detected.map(provider => ({
+        id: provider.id,
+        label: provider.id,
+        description: provider.id === current ? '(current)' : ''
+    }));
+    if (settingForced && !detected.some(provider => provider.id === settingForced)) {
+        items.push({ id: settingForced, label: settingForced, description: 'not found on PATH (current)' });
+    }
+    if (options.customCommand.trim()) {
+        items.push({
+            id: 'custom',
+            label: 'custom command',
+            description: `${options.customCommand.trim()}${current === 'custom' ? ' (current)' : ''}`
+        });
+    }
+    if (!items.length) {
+        return { kind: 'error', message: 'No supported CLI found on PATH. Install Codex, Claude Code, Copilot CLI or zcode, or set aiCodeReview.cli.customCommand.' };
+    }
+    const picked = await options.choose(items);
+    if (!picked) { return { kind: 'cancelled' }; }
+    if (picked === 'custom') { return { kind: 'switched', provider: 'custom' }; }
+    const known = detected.some(provider => provider.id === picked) || picked === settingForced;
+    if (!known) { return { kind: 'cancelled' }; }
+    await options.save(picked);
+    if (settingForced && settingForced !== picked) { await options.saveSetting(picked); }
+    return { kind: 'switched', provider: picked };
 }
