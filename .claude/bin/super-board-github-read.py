@@ -358,7 +358,7 @@ def read(args, kind='json', meta=None, recovering=False):
                     value = validate(stdout, kind, meta)
                     if not recovering:
                         check_halt()
-                    return result.stdout, value
+                    return stdout, value
                 except (ValueError, KeyError, TypeError, AttributeError, IndexError) as error:
                     last = f'GitHub required read returned incomplete evidence: {error}'
                     shape_only = shape_only and not isinstance(error, GitHubErrors)
