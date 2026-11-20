@@ -1,0 +1,45 @@
+# Mutation sanity check — issue-22-qa-v1 (bed330e)
+
+Purpose: confirm the Builder's guard tests can fail (no test that only asserts on
+its own mock). Two mutants applied locally to src/ai/CLIPresets.ts, suite re-run,
+then restored with `git checkout --`. No mutation reached a commit.
+
+## Mutant 1 — drop the defaultProvider override precedence
+
+Change: `const forced = wanted && wanted !== 'auto' ? wanted : undefined;`
+     → `const forced = undefined as string | undefined;`
+   (selectCLICommand ignores aiCodeReview.cli.defaultProvider entirely)
+
+Result (node --test src/test/node/cliPresets.cjs):
+
+    not ok 10 - defaultProvider setting overrides a stale persisted pick; auto keeps it
+    # tests 14
+    # pass 12
+    # fail 1
+
+Killed by: "defaultProvider setting overrides a stale persisted pick; auto keeps it".
+Restored → green.
+
+## Mutant 2 — drop the switcher persistence write
+
+Change: removed `await options.save(picked);` from switchCLIProvider
+   (switch no longer persists the picked provider)
+
+Result (node --test src/test/node/cliPresets.cjs):
+
+    not ok 11 - switcher persists the picked provider and the next run uses it silently
+    not ok 12 - switcher reflects a concrete setting, rewrites it on switch, lists a not-found forced provider
+    # tests 14
+    # pass 11
+    # fail 2
+
+Killed by: the persistence test (AC1) and the setting-rewrite test (AC2).
+Restored → `# pass 13 # fail 0` (13 pass + 1 Windows-only skip).
+
+## Surviving-mutant note
+
+`>` → `>=` class mutants in the `settingForced !== picked` guard (line 159) are
+not pinned: switching to the same provider as the forced setting writes the
+persisted pick but skips the setting rewrite. No test covers pick === forced
+setting. Ranked Low (no observable behavior difference — setting already equals
+the pick); listed in the QA handoff under "Test gaps (not written)".

@@ -106,7 +106,10 @@ Every star, review, and piece of feedback motivates us to keep building awesome 
 ### CLI provider defaults
 
 Run **AI Code Review: CLI Review** in a trusted workspace. With no
-`aiCodeReview.cli.customCommand`, the extension detects `codex`, `claude`, and
-`copilot` on PATH. One provider is selected silently; with several, pick once.
-The choice persists in VS Code across sessions. A custom command always overrides
-the preset. CLIs must already be installed and authenticated. Windows detection includes native executables and `.cmd`/`.bat` wrappers.
+`aiCodeReview.cli.customCommand`, the extension detects `codex`, `claude`,
+`copilot`, and `zcode` on PATH. One provider is selected silently; with several,
+pick once. The choice persists in VS Code across sessions. Set
+`aiCodeReview.cli.defaultProvider` to fix the provider up front (`auto` keeps the
+detect-once behavior), and run **AI Code Review: Select CLI Provider** to switch
+providers from the Command Palette. A custom command always overrides the preset.
+CLIs must already be installed and authenticated. Windows detection includes native executables and `.cmd`/`.bat` wrappers.
