@@ -1,0 +1,54 @@
+TAP version 13
+# AI Code Review Assistant is now active!
+# Result file watcher setup complete for: undefined
+# Subtest: tree rows: renames, order and pruned duplicate rows
+ok 1 - tree rows: renames, order and pruned duplicate rows
+  ---
+  duration_ms: 1.513333
+  ...
+# Subtest: CLI Review row transitions: idle → running with progress → done/failed → idle
+ok 2 - CLI Review row transitions: idle → running with progress → done/failed → idle
+  ---
+  duration_ms: 0.15675
+  ...
+# Subtest: no status row is ever added next to the CLI Review row
+ok 3 - no status row is ever added next to the CLI Review row
+  ---
+  duration_ms: 0.083333
+  ...
+# Subtest: manifest: removed actions stay palette commands; inline stop menu is gone; titles follow renames
+ok 4 - manifest: removed actions stay palette commands; inline stop menu is gone; titles follow renames
+  ---
+  duration_ms: 0.411209
+  ...
+# Subtest: cancel asks for confirmation; dispose still aborts without a dialog
+not ok 5 - cancel asks for confirmation; dispose still aborts without a dialog
+  ---
+  duration_ms: 253.557375
+  location: '/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-20-qa/src/test/node/cliTreeLifecycle.cjs:99:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    dismissed confirmation must not abort
+    + actual - expected
+    
+    + 'idle'
+    - 'running'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'running'
+  actual: 'idle'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-20-qa/src/test/node/cliTreeLifecycle.cjs:174:16)
+    async Test.run (node:internal/test_runner/test:797:9)
+    async Test.processPendingSubtests (node:internal/test_runner/test:526:7)
+  ...
+1..5
+# tests 5
+# suites 0
+# pass 4
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 283.622208
