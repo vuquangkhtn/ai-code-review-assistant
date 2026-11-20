@@ -23,6 +23,80 @@ suite('CLI review tracer', () => {
             .replace(/\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d{3}Z/g, '<timestamp>');
         assert.ok(cli.startsWith(content.split('**IMPORTANT: File Output Instructions**')[0]));
     });
+    for (const selection of ['branch', 'local', 'cancel-base', 'cancel-target']) {
+        test(`CLI review uses selected changes: ${selection}`, async function () {
+            this.timeout(20000);
+            const extension = vscode.extensions.getExtension('vuquangkhtn.ai-code-review-assistant');
+            assert.ok(extension);
+            await extension.activate();
+            const workspace = vscode.workspace.workspaceFolders?.[0];
+            const node = process.env.CLI_TEST_NODE;
+            assert.ok(workspace && node);
+            const cwd = workspace.uri.fsPath;
+            const git = (...args: string[]) => execFileSync('git', args, { cwd, encoding: 'utf8' }).trim();
+            git('add', '.');
+            git('-c', 'user.name=Test', '-c', 'user.email=test@example.com', 'commit', '--allow-empty', '-m', 'fixture');
+            const originalBranch = git('branch', '--show-current');
+            git('branch', '-f', 'review-base');
+            git('checkout', '-B', 'review-target');
+            fs.writeFileSync(path.join(cwd, 'sample.js'), 'const branchOnly = 18;\n');
+            git('add', 'sample.js');
+            git('-c', 'user.name=Test', '-c', 'user.email=test@example.com', 'commit', '-m', 'branch change');
+            git('checkout', 'review-base');
+            const config = vscode.workspace.getConfiguration('aiCodeReview');
+            const previousType = config.inspect<string>('defaultChangeType')?.globalValue;
+            const previousCommand = config.inspect<string>('cli.customCommand')?.globalValue;
+            const choose = vscode.window.showQuickPick;
+            let picks = 0;
+            const promptFile = path.join(cwd, 'received-prompt.txt');
+            fs.rmSync(promptFile, { force: true });
+            // The UI boundary is scripted; the command, git detector and CLI are real.
+            Object.defineProperty(vscode.window, 'showQuickPick', { configurable: true, value: async (items: readonly vscode.QuickPickItem[], options: vscode.QuickPickOptions) => {
+                picks++;
+                assert.match(options.title || '', new RegExp(`Step ${picks}/2`));
+                if (picks === 1) {
+                    assert.ok(items.some(item => item.label === 'review-base' && item.description === '(current)'));
+                    if (selection === 'cancel-base') { return undefined; }
+                    return items.find(item => item.label === 'review-base');
+                }
+                assert.ok(!items.some(item => item.label === 'review-base'));
+                return selection === 'cancel-target' ? undefined : items.find(item => item.label === 'review-target');
+            }});
+            try {
+                await config.update('defaultChangeType', selection === 'local' ? 'local' : 'branch', vscode.ConfigurationTarget.Global);
+                await config.update('cli.customCommand', `"${node}" "${path.join(extension.extensionPath, 'src/test/fixtures/review.cjs')}"`, vscode.ConfigurationTarget.Global);
+                await vscode.commands.executeCommand('aiCodeReview.runCLIReview');
+                if (selection.startsWith('cancel')) {
+                    assert.ok(!fs.existsSync(promptFile), 'no CLI process starts');
+                    assert.strictEqual(git('branch', '--show-current'), 'review-base');
+                    assert.strictEqual(picks, selection === 'cancel-base' ? 1 : 2);
+                    // A second command must run, proving cancellation released the lock.
+                    await config.update('defaultChangeType', 'local', vscode.ConfigurationTarget.Global);
+                    await vscode.commands.executeCommand('aiCodeReview.runCLIReview');
+                    assert.ok(fs.existsSync(promptFile));
+                } else {
+                    assert.strictEqual(picks, selection === 'local' ? 0 : 2);
+                    const prompt = fs.readFileSync(promptFile, 'utf8');
+                    assert.match(prompt, /Respond with a JSON object only/);
+                    const changesPath = prompt.match(/Changes File:\*\* `([^`]+)`/);
+                    assert.ok(changesPath);
+                    const changes = JSON.parse(fs.readFileSync(path.resolve(cwd, changesPath[1]), 'utf8'));
+                    assert.strictEqual(changes.type, selection === 'local' ? 'local' : 'branch');
+                    if (selection === 'branch') {
+                        assert.strictEqual(changes.source, 'review-base');
+                        assert.strictEqual(changes.target, 'review-target');
+                        assert.ok(JSON.stringify(changes).includes('sample.js'));
+                        assert.strictEqual(git('branch', '--show-current'), 'review-target');
+                    }
+                }
+            } finally {
+                vscode.window.showQuickPick = choose;
+                await config.update('defaultChangeType', previousType, vscode.ConfigurationTarget.Global);
+                await config.update('cli.customCommand', previousCommand, vscode.ConfigurationTarget.Global);
+                git('checkout', originalBranch);
+            }
+        });
+    }
     for (const mode of ['clean', 'noisy', 'preset']) {
         test(`palette command delivers stdin and displays ${mode} results via watcher`, async function () {
             this.timeout(20000);

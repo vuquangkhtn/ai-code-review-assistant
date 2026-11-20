@@ -84,6 +84,82 @@ export function activate(context: vscode.ExtensionContext) {
         return true;
     };
 
+    const selectComparisonBranches = async (allowCheckout: () => boolean) => {
+        // Get all branches
+        const branches = await changeDetector.getBranches();
+        if (branches.length < 2) {
+            vscode.window.showErrorMessage('At least 2 branches are required for comparison.');
+            return;
+        }
+
+        // Get default source branch
+        const defaultSourceBranch = await changeDetector.getDefaultSourceBranch();
+        const currentBranch = await changeDetector.getCurrentBranch();
+
+        // Create branch options for quick pick
+        const branchOptions = branches.map(branch => ({
+            label: branch,
+            description: branch === currentBranch ? '(current)' : ''
+        }));
+
+        // Select source branch
+        const selectedSource = await vscode.window.showQuickPick(branchOptions, {
+            placeHolder: `Select source branch ${defaultSourceBranch ? `(default: ${defaultSourceBranch})` : ''}`,
+            title: 'Compare Branches - Step 1/2: Select Source Branch'
+        });
+
+        if (!selectedSource) {
+            return;
+        }
+
+        const sourceBranch = selectedSource.label;
+
+        // Select target branch (exclude the selected source branch)
+        const targetBranchOptions = branches
+            .filter(branch => branch !== sourceBranch)
+            .map(branch => ({
+                label: branch,
+                description: branch === currentBranch ? '(current)' : ''
+            }));
+
+        const selectedTarget = await vscode.window.showQuickPick(targetBranchOptions, {
+            placeHolder: 'Select target branch to compare against',
+            title: 'Compare Branches - Step 2/2: Select Target Branch'
+        });
+
+        if (!selectedTarget) {
+            return;
+        }
+
+        const targetBranch = selectedTarget.label;
+
+        if (!allowCheckout()) { return; }
+
+        // Attempt to checkout to the target branch automatically
+        try {
+            await changeDetector.checkoutBranch(targetBranch);
+        } catch (checkoutError) {
+            vscode.window.showErrorMessage(
+                `Failed to checkout to target branch '${targetBranch}'. If you have local changes, please reset or stash them and try again.\nDetails: ${checkoutError}`
+            );
+            return;
+        }
+
+        return { source: sourceBranch, target: targetBranch };
+    };
+
+    const collectCLIChanges = async (controller: AbortController) => {
+        const changeType = vscode.workspace.getConfiguration('aiCodeReview').get<string>('defaultChangeType', 'local');
+        if (changeType !== 'branch' && changeType !== 'commit') {
+            controller.signal.throwIfAborted();
+            return changeDetector.detectAndStoreLocalChanges();
+        }
+        const branches = await selectComparisonBranches(() => !controller.signal.aborted);
+        controller.signal.throwIfAborted();
+        if (!branches) { return; }
+        return changeDetector.detectAndStoreBranchChanges(branches.source, branches.target);
+    };
+
     // Register commands
     const commands = [
         // External AI commands
@@ -154,7 +230,8 @@ export function activate(context: vscode.ExtensionContext) {
                     });
                     if (!selected) { codeReviewTreeProvider.setCLIStatus({ kind: 'idle' }); return; }
                     if (selected.length !== 2) { throw new Error('Select exactly two providers.'); }
-                    const changes = await changeDetector.detectAndStoreLocalChanges();
+                    const changes = await collectCLIChanges(controller);
+                    if (!changes) { codeReviewTreeProvider.setCLIStatus({ kind: 'idle' }); return; }
                     const prompt = PromptGenerator.generateFileReferencePrompt(changes.filePath, 'cli').content;
                     const reviews = [];
                     for (const provider of selected) {
@@ -182,8 +259,9 @@ export function activate(context: vscode.ExtensionContext) {
                     choose: providers => vscode.window.showQuickPick(providers, { placeHolder: 'Choose a CLI for AI reviews' }),
                     save: provider => context.globalState.update('aiCodeReview.cli.defaultProvider', provider)
                 });
-                if (!command) { return; }
-                const changes = await changeDetector.detectAndStoreLocalChanges();
+                if (!command) { codeReviewTreeProvider.setCLIStatus({ kind: 'idle' }); return; }
+                const changes = await collectCLIChanges(controller);
+                if (!changes) { codeReviewTreeProvider.setCLIStatus({ kind: 'idle' }); return; }
                 const prompt = PromptGenerator.generateFileReferencePrompt(changes.filePath, 'cli').content;
                 await runCLIReview({ command, cwd: workspace.uri.fsPath, prompt,
                     signal: controller.signal,
@@ -242,72 +320,14 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand('aiCodeReview.copyPromptCompareBranches', async () => {
             if (refuseDuringCLIReview()) { return; }
             try {
-                // Get all branches
-                const branches = await changeDetector.getBranches();
-                if (branches.length < 2) {
-                    vscode.window.showErrorMessage('At least 2 branches are required for comparison.');
-                    return;
-                }
-
-                // Get default source branch
-                const defaultSourceBranch = await changeDetector.getDefaultSourceBranch();
-                const currentBranch = await changeDetector.getCurrentBranch();
-
-                // Create branch options for quick pick
-                const branchOptions = branches.map(branch => ({
-                    label: branch,
-                    description: branch === currentBranch ? '(current)' : ''
-                }));
-
-                // Select source branch
-                const selectedSource = await vscode.window.showQuickPick(branchOptions, {
-                    placeHolder: `Select source branch ${defaultSourceBranch ? `(default: ${defaultSourceBranch})` : ''}`,
-                    title: 'Compare Branches - Step 1/2: Select Source Branch'
-                });
-
-                if (!selectedSource) {
-                    return;
-                }
-
-                const sourceBranch = selectedSource.label;
-
-                // Select target branch (exclude the selected source branch)
-                const targetBranchOptions = branches
-                    .filter(branch => branch !== sourceBranch)
-                    .map(branch => ({
-                        label: branch,
-                        description: branch === currentBranch ? '(current)' : ''
-                    }));
-
-                const selectedTarget = await vscode.window.showQuickPick(targetBranchOptions, {
-                    placeHolder: 'Select target branch to compare against',
-                    title: 'Compare Branches - Step 2/2: Select Target Branch'
-                });
-
-                if (!selectedTarget) {
-                    return;
-                }
-
-                const targetBranch = selectedTarget.label;
-
-                if (refuseDuringCLIReview()) { return; }
-
-                // Attempt to checkout to the target branch automatically
-                try {
-                    await changeDetector.checkoutBranch(targetBranch);
-                } catch (checkoutError) {
-                    vscode.window.showErrorMessage(
-                        `Failed to checkout to target branch '${targetBranch}'. If you have local changes, please reset or stash them and try again.\nDetails: ${checkoutError}`
-                    );
-                    return;
-                }
-
+                const branches = await selectComparisonBranches(() => !refuseDuringCLIReview());
+                if (!branches) { return; }
                 // Create request for branch comparison
                 const request: ReviewRequest = {
                     changeInfo: {
                         type: ChangeType.BRANCH,
-                        source: sourceBranch,
-                        target: targetBranch,
+                        source: branches.source,
+                        target: branches.target,
                         files: []
                     },
                     aiProvider: 'external'
@@ -315,7 +335,6 @@ export function activate(context: vscode.ExtensionContext) {
 
                 if (refuseDuringCLIReview()) { return; }
                 await externalAIManager.copyPromptToClipboard(request);
-                // vscode.window.showInformationMessage(`Comparing changes from ${sourceBranch} to ${targetBranch}`);
             } catch (error) {
                 vscode.window.showErrorMessage(`Failed to copy prompt for branch comparison: ${error}`);
             }

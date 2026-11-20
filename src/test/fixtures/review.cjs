@@ -8,7 +8,7 @@ process.stdin.on('end', () => {
     assert.match(prompt, /Respond with a JSON object only/);
     assert.doesNotMatch(prompt, /How to Use This Review Result|File Output Instructions/);
     const changes = prompt.match(/Changes File:\*\* `([^`]+)`/)[1];
-    assert.match(fs.readFileSync(changes, 'utf8'), /sample.js/);
+    assert.ok(Array.isArray(JSON.parse(fs.readFileSync(changes, 'utf8')).files));
     fs.writeFileSync('received-prompt.txt', prompt);
     if (process.argv.includes('fail')) { process.exit(7); }
     if (process.argv.includes('invalid')) { console.log('No review available'); return; }
