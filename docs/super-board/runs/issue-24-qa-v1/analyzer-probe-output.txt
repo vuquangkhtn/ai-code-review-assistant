@@ -1,0 +1,4 @@
+{"scenario":"feat-only (this PR squash)","releaseType":"minor"}
+{"scenario":"wip-only (PR #16 squash — root cause)","releaseType":null}
+{"scenario":"wip + feat (what main will see after merge)","releaseType":"minor"}
+SUMMARY [{"scenario":"feat-only (this PR squash)","releaseType":"minor"},{"scenario":"wip-only (PR #16 squash — root cause)","releaseType":null},{"scenario":"wip + feat (what main will see after merge)","releaseType":"minor"}]

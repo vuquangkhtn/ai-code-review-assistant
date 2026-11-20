@@ -1,0 +1,24 @@
+=== pipeline check-changes simulation (complete-pipeline.yml lines 100-164) ===
+=== last tag: ===
+v0.9.0
+=== commits since last tag (pre-merge main): ===
+695bc21 fix(board): escape braces in codex lane read caveat
+ed6f7fb chore(board): teach codex lanes gh's slurp+jq incompatibility
+a581a25 🚧 [wip] comparison: compare two CLI providers (#16)
+6240094 ✨ [feat] policy: flag findings at an optional severity threshold (#15)
+a887868 ✨ [feat] review: add optional confidence and evidence (#14)
+4505f0b ✨ [feat] cli-review: detect provider presets (#8)
+c2febe1 ✨ [feat] cli-review: refuse generation during an active run (#9)
+ddc4072 ✨ [feat] cli-review: tree status, live output and cancel (#7)
+e9e4f36 chore(board): emit escape-sequence PR diffs in github-read helper
+6af502a chore(board): complete allow_auto_on_production migration per owner directive
+60457bc ✨ [feat] cli-review: run reviews through a custom command
+e4487e7 chore(board): resolve PR evidence shapes in github-read helper
+9f9d88b chore(board): vendor super-board pack and agent configs
+f5ed2c8 docs: add AGENTS.md workspace instructions for coding agents
+dedcb95 docs: fix placeholder support links in README
+=== HAS_FEAT grep '^[a-f0-9]+ feat' pre-merge: ===
+(no match)
+=== simulated post-merge log with squash subject 'feat: release comparison and CLI-review batch': ===
+abc1234 feat: release comparison and CLI-review batch
+HAS_FEAT match -> should_release=true version_type=minor
