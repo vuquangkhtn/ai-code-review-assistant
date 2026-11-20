@@ -1,0 +1,22 @@
+Mutation check — prove the AC4 idle-guard tests can fail.
+Mutant: delete both lines `if (!changes) { codeReviewTreeProvider.setCLIStatus({ kind: 'idle' }); return; }` from src/extension.ts (both command handlers), rebuild with tsc, run src/test/node/branchReview.cjs.
+
+== tsc output on mutant ==
+dropped 2 occurrences
+src/extension.ts(235,80): error TS18048: 'changes' is possibly 'undefined'.
+src/extension.ts(242,45): error TS18048: 'changes' is possibly 'undefined'.
+src/extension.ts(242,77): error TS18048: 'changes' is possibly 'undefined'.
+src/extension.ts(265,76): error TS18048: 'changes' is possibly 'undefined'.
+
+== node --test src/test/node/branchReview.cjs on mutant ==
+ok 1 - registered CLI command selects branch changes
+ok 2 - registered CLI command selects local changes
+not ok 3 - registered CLI command selects cancel-base changes
+not ok 4 - registered CLI command selects cancel-target changes
+not ok 5 - registered CLI command selects checkout-fail changes
+# pass 2
+# fail 3
+
+== restore (git checkout -- src/extension.ts), rebuild, rerun ==
+# pass 5
+# fail 0

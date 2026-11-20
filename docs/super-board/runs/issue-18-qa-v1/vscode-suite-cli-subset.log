@@ -1,0 +1,225 @@
+hint: Using 'master' as the name for the initial branch. This default branch name
+hint: is subject to change. To configure the initial branch name to use in all
+hint: of your new repositories, which will suppress this warning, call:
+hint:
+hint: 	git config --global init.defaultBranch <name>
+hint:
+hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+hint: 'development'. The just-created branch can be renamed via this command:
+hint:
+hint: 	git branch -m <name>
+[main 2026-11-20T20:01:52.466Z] [node-compile-cache] main: packaged cache enabled (status: enabled, configured: /Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-18-qa/.vscode-test/vscode-darwin-arm64-1.147.0/Visual Studio Code.app/Contents/Resources/app/node-compile-cache/main, active: /Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-18-qa/.vscode-test/vscode-darwin-arm64-1.147.0/Visual Studio Code.app/Contents/Resources/app/node-compile-cache/main/v24.22.1-arm64-d4bb394e)
+[main 2026-11-20T20:01:52.470Z] StorageMainService: creating application shared storage
+[main 2026-11-20T20:01:52.528Z] [shared storage] Creating shared storage database at ':memory:' (wasCreated: true)
+[main 2026-11-20T20:01:52.529Z] [shared storage] Initializing fallback application storage (path: in-memory)
+[main 2026-11-20T20:01:52.546Z] [shared storage] Fallback application storage initialized with 3 items
+[main 2026-11-20T20:01:52.547Z] update#setState disabled
+[main 2026-11-20T20:01:52.547Z] update#ctor - updates are disabled by the environment
+Via 'product.json#extensionEnabledApiProposals' extension 'ms-vscode.remote-repositories' wants API proposal 'timeline' but that proposal DOES NOT EXIST. Likely, the proposal has been finalized (check 'vscode.d.ts') or was abandoned.
+Via 'product.json#extensionEnabledApiProposals' extension 'github.vscode-pull-request-github' wants API proposal 'agentsWindowActivation' but that proposal DOES NOT EXIST. Likely, the proposal has been finalized (check 'vscode.d.ts') or was abandoned.
+Via 'product.json#extensionEnabledApiProposals' extension 'github.remotehub' wants API proposal 'timeline' but that proposal DOES NOT EXIST. Likely, the proposal has been finalized (check 'vscode.d.ts') or was abandoned.
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey=undefined conversationKey=undefined modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+[AgentPluginRepositoryService] Both old and new agent-plugins directories exist; skipping directory migration
+Started local extension host with pid 9208.
+Loading development extension at /private/tmp/issue-18-qa-suite
+Extension 'github.copilot-chat' appears in product.json but enables LESS API proposals than the extension wants.
+package.json (LOSES): agentSessionsWorkspace
+speech
+structuralDiff
+agentsWindowConfiguration
+chatDebug
+chatHooks
+envIsConnectionMetered
+extensionsAny
+newSymbolNamesProvider
+interactive
+codeActionAI
+activeComment
+commentReveal
+contribCommentThreadAdditionalMenu
+contribCommentsViewThreadMenus
+contribChatEditorInlineGutterMenu
+documentFiltersExclusive
+embeddings
+findTextInFiles
+findTextInFiles2
+languageModelToolSupportsModel
+findFiles2
+textSearchProvider
+terminalDataWriteEvent
+terminalExecuteCommandEvent
+terminalSelection
+terminalQuickFixProvider
+mappedEditsProvider
+aiRelatedInformation
+aiSettingsSearch
+chatParticipantAdditions
+defaultChatParticipant
+contribSourceControlInputBoxMenu
+authLearnMore
+authIssuers
+testObserver
+aiTextSearchProvider
+chatParticipantPrivate
+chatProvider
+contribDebugCreateConfiguration
+chatReferenceDiagnostic
+textSearchProvider2
+chatReferenceBinaryData
+languageModelSystem
+languageModelCapabilities
+languageModelPricing
+languageModelRateLimit
+inlineCompletionsAdditions
+chatStatusItem
+chatInputNotification
+taskProblemMatcherStatus
+contribLanguageModelToolSets
+textDocumentChangeReason
+resolvers
+taskExecutionTerminal
+dataChannels
+languageModelThinkingPart
+chatSessionsProvider
+devDeviceId
+contribEditorContentMenu
+chatPromptFiles
+mcpServerDefinitions
+tabInputMultiDiff
+workspaceTrust
+environmentPower
+terminalTitle
+toolInvocationApproveCombination
+chatSessionCustomizationProvider
+product.json (WINS): agentSessionsWorkspace
+agentsWindowConfiguration
+interactive
+terminalDataWriteEvent
+terminalExecuteCommandEvent
+terminalSelection
+terminalQuickFixProvider
+chatParticipantAdditions
+defaultChatParticipant
+embeddings
+chatProvider
+mappedEditsProvider
+aiRelatedInformation
+aiSettingsSearch
+codeActionAI
+findTextInFiles
+findTextInFiles2
+textSearchProvider
+textSearchProvider2
+activeComment
+commentReveal
+contribSourceControlInputBoxMenu
+contribCommentEditorActionsMenu
+contribCommentThreadAdditionalMenu
+contribCommentsViewThreadMenus
+contribChatEditorInlineGutterMenu
+extensionAffinity
+newSymbolNamesProvider
+findFiles2
+chatReferenceDiagnostic
+extensionsAny
+authLearnMore
+authIssuers
+testObserver
+aiTextSearchProvider
+documentFiltersExclusive
+chatParticipantPrivate
+contribDebugCreateConfiguration
+inlineCompletionsAdditions
+chatReferenceBinaryData
+languageModelSystem
+languageModelCapabilities
+languageModelThinkingPart
+languageModelToolSupportsModel
+chatStatusItem
+taskProblemMatcherStatus
+contribLanguageModelToolSets
+textDocumentChangeReason
+resolvers
+taskExecutionTerminal
+dataChannels
+chatSessionsProvider
+chatSessionCustomizationProvider
+devDeviceId
+contribEditorContentMenu
+tokenInformation
+toolInvocationApproveCombination
+chatPromptFiles
+mcpServerDefinitions
+tabInputMultiDiff
+workspaceTrust
+chatHooks
+chatDebug
+envIsConnectionMetered
+environmentPower
+terminalTitle
+languageModelPricing
+languageModelRateLimit
+chatInputNotification
+speech
+DELTA: structuralDiff
+Proceeding with EXTRA proposals (structuralDiff) because extension is in development mode. Still, this EXTENSION WILL BE BROKEN unless product.json is updated.
+[AccountPolicyGate] apply: state=inactive, reason=undefined, isRestricted=false
+
+  CLI review status
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey=undefined conversationKey=undefined modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+    ✔ tree offers a run, cancellation while running and failure details
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="agent-host-copilotcli" conversationKey="agent-host-copilotcli:/untitled-55f271d5-0b96-4b7a-9409-cf27d6a37835" modelTarget="agent-host-copilotcli" storageKey="chat.currentLanguageModel.panel.agent-host-copilotcli" widgetViewKind="view"
+(node:9208) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+(Use `Code Helper (Plugin) --trace-deprecation ...` to show where the warning was created)
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="agent-host-copilotcli" conversationKey="agent-host-copilotcli:/untitled-55f271d5-0b96-4b7a-9409-cf27d6a37835" modelTarget="agent-host-copilotcli" storageKey="chat.currentLanguageModel.panel.agent-host-copilotcli" widgetViewKind="view"
+AI Code Review Assistant is now active!
+Result file watcher setup complete for: .ai-code-review/results/**/*.json
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="agent-host-copilotcli" conversationKey="agent-host-copilotcli:/untitled-55f271d5-0b96-4b7a-9409-cf27d6a37835" modelTarget="agent-host-copilotcli" storageKey="chat.currentLanguageModel.panel.agent-host-copilotcli" widgetViewKind="view"
+Settings Sync: Account status changed from uninitialized to unavailable
+    ✔ custom command can be cancelled from the registered tree command (296ms)
+Cleaned up 3 files from previous AI review sessions
+    ✔ single-run lock refuses generation and releases after finish (257ms)
+Cleaned up 5 files from previous AI review sessions
+    ✔ single-run lock refuses generation and releases after cancel (147ms)
+Cleaned up 5 files from previous AI review sessions
+    ✔ single-run lock refuses generation and releases after fail (162ms)
+  CLI review tracer
+    ✔ manual prompt including its tail matches the pre-feature baseline
+Switched to a new branch 'review-target'
+Switched to branch 'review-base'
+New result file detected: /var/folders/rl/dqkc_c0j01567h1rttvfw7yh0000gn/T/cli-review-lSfgiI/.ai-code-review/results/code-review-result-2026-11-20T20-01-54-131Z-7366b064-a7e0-4870-baa1-68c6505a4c9c.json
+Switched to branch 'master'
+    ✔ CLI review uses selected changes: branch (164ms)
+Switched to and reset branch 'review-target'
+Switched to branch 'review-base'
+Switched to branch 'master'
+    ✔ CLI review uses selected changes: local (138ms)
+Switched to and reset branch 'review-target'
+Switched to branch 'review-base'
+Switched to branch 'master'
+    ✔ CLI review uses selected changes: cancel-base (181ms)
+Switched to and reset branch 'review-target'
+Switched to branch 'review-base'
+New result file detected: /var/folders/rl/dqkc_c0j01567h1rttvfw7yh0000gn/T/cli-review-lSfgiI/.ai-code-review/results/code-review-result-2026-11-20T20-01-54-274Z-b4f619a1-8cd3-407c-ab03-36090c6ed705.json
+New result file detected: /var/folders/rl/dqkc_c0j01567h1rttvfw7yh0000gn/T/cli-review-lSfgiI/.ai-code-review/results/code-review-result-2026-11-20T20-01-54-417Z-0ff405f8-d998-4264-943a-50a211e37f77.json
+Switched to branch 'master'
+    ✔ CLI review uses selected changes: cancel-target (190ms)
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="agent-host-copilotcli" conversationKey="agent-host-copilotcli:/untitled-55f271d5-0b96-4b7a-9409-cf27d6a37835" modelTarget="agent-host-copilotcli" storageKey="chat.currentLanguageModel.panel.agent-host-copilotcli" widgetViewKind="view"
+(Use `Code Helper --trace-deprecation ...` to show where the warning was created)
+
+New result file detected: /var/folders/rl/dqkc_c0j01567h1rttvfw7yh0000gn/T/cli-review-lSfgiI/.ai-code-review/results/code-review-result-2026-11-20T20-01-54-597Z-9bbb43a7-93c2-470e-bcf5-74da77cc6052.json
+New result file detected: /var/folders/rl/dqkc_c0j01567h1rttvfw7yh0000gn/T/cli-review-lSfgiI/.ai-code-review/results/code-review-result-2026-11-20T20-01-54-774Z-e81d5cc7-3d3c-4403-98d6-b9d7f44bac35.json
+New result file detected: /var/folders/rl/dqkc_c0j01567h1rttvfw7yh0000gn/T/cli-review-lSfgiI/.ai-code-review/results/code-review-result-2026-11-20T20-01-54-999Z-77d9a0df-7d79-4b07-b3b5-4dae7394f466.json
+    ✔ palette command delivers stdin and displays clean results via watcher (410ms)
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="agent-host-copilotcli" conversationKey="agent-host-copilotcli:/untitled-55f271d5-0b96-4b7a-9409-cf27d6a37835" modelTarget="agent-host-copilotcli" storageKey="chat.currentLanguageModel.panel.agent-host-copilotcli" widgetViewKind="view"
+New result file detected: /var/folders/rl/dqkc_c0j01567h1rttvfw7yh0000gn/T/cli-review-lSfgiI/.ai-code-review/results/code-review-result-2026-11-20T20-01-55-309Z-963dce2b-aa3d-41c6-81c5-b725f9609b07.json
+    ✔ palette command delivers stdin and displays noisy results via watcher (322ms)
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="agent-host-copilotcli" conversationKey="agent-host-copilotcli:/untitled-55f271d5-0b96-4b7a-9409-cf27d6a37835" modelTarget="agent-host-copilotcli" storageKey="chat.currentLanguageModel.panel.agent-host-copilotcli" widgetViewKind="view"
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="agent-host-copilotcli" conversationKey="agent-host-copilotcli:/untitled-55f271d5-0b96-4b7a-9409-cf27d6a37835" modelTarget="agent-host-copilotcli" storageKey="chat.currentLanguageModel.panel.agent-host-copilotcli" widgetViewKind="view"
+    ✔ palette command delivers stdin and displays preset results via watcher (291ms)
+  Two-provider comparison
+New result file detected: /var/folders/rl/dqkc_c0j01567h1rttvfw7yh0000gn/T/cli-review-lSfgiI/.ai-code-review/results/code-review-result-2026-11-20T20-01-55-828Z-b0495590-a938-4e3e-8d2b-0308b71abcbd.json
+    ✔ registered command runs two fixture CLIs on one prompt and groups their saved results (1146ms)
+  14 passing (4s)
+[main 2026-11-20T20:01:56.998Z] Extension host with pid 9208 exited with code: 0, signal: unknown.
+Exit code:   0
