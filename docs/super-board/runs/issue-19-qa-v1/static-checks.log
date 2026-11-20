@@ -1,0 +1,15 @@
+# Static checks — issue #19 QA v1, head 97bcb5f
+
+## npm run check-types (tsc --noEmit)
+exit 0 — no output (clean)
+
+## npm run lint (eslint src --ext ts)
+exit 0 — 66 problems (0 errors, 66 warnings). Warnings are pre-existing
+(matches Builder handoff: "Lint has 66 warnings and no errors"); none in
+src/test/node/manualPrompt.cjs or the changed hunk of src/ai/ExternalAIManager.ts.
+
+## npm run compile (tsc --noEmit + esbuild bundle to dist/)
+exit 0 — "[watch] build finished"
+
+## npx tsc (emit to out/ for the Node test harness)
+exit 0
