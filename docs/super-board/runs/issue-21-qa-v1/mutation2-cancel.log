@@ -1,0 +1,67 @@
+TAP version 13
+# Subtest: empty setting with exactly two detected presets runs both without a picker, end to end
+ok 1 - empty setting with exactly two detected presets runs both without a picker, end to end
+  ---
+  duration_ms: 377.629125
+  ...
+# Subtest: empty setting with more than two detected presets asks a picker for exactly two
+ok 2 - empty setting with more than two detected presets asks a picker for exactly two
+  ---
+  duration_ms: 1.847584
+  ...
+# Subtest: picking one or cancelling the detected picker errors or cancels cleanly
+ok 3 - picking one or cancelling the detected picker errors or cancels cleanly
+  ---
+  duration_ms: 1.81125
+  ...
+# Subtest: named entries override detection and keep their labels and commands
+ok 4 - named entries override detection and keep their labels and commands
+  ---
+  duration_ms: 0.745959
+  ...
+# Subtest: more than two named entries pick exactly two; one named entry stays an explicit error
+ok 5 - more than two named entries pick exactly two; one named entry stays an explicit error
+  ---
+  duration_ms: 0.186708
+  ...
+# Subtest: fewer than two detected providers and no setting give the actionable error
+ok 6 - fewer than two detected providers and no setting give the actionable error
+  ---
+  duration_ms: 0.919625
+  ...
+# Subtest: named entries override detection end to end and their labels reach the comparison output
+ok 7 - named entries override detection end to end and their labels reach the comparison output
+  ---
+  duration_ms: 345.971458
+  ...
+# Subtest: cancelling the named-entries picker cancels cleanly
+not ok 8 - cancelling the named-entries picker cancels cleanly
+  ---
+  duration_ms: 0.810084
+  location: '/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-21-qa/src/test/node/comparisonProviders.cjs:148:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + 'error'
+    - 'cancelled'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'cancelled'
+  actual: 'error'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-21-qa/src/test/node/comparisonProviders.cjs:153:12)
+    async Test.run (node:internal/test_runner/test:797:9)
+    async Test.processPendingSubtests (node:internal/test_runner/test:526:7)
+  ...
+1..8
+# tests 8
+# suites 0
+# pass 7
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 760.02125

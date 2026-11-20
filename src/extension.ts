@@ -2,7 +2,7 @@ import { groupComparison } from './ai/Comparison';
 import { ComparisonTreeProvider } from './ui/ComparisonTreeProvider';
 import { ResponseParser } from './ai/ResponseParser';
 import * as fs from 'fs/promises';
-import { selectCLICommand } from './ai/CLIPresets';
+import { selectCLICommand, selectComparisonProviders } from './ai/CLIPresets';
 import { runCLIReview } from './ai/CLIReview';
 import { PromptGenerator } from './ai/PromptGenerator';
 import * as vscode from 'vscode';
@@ -229,19 +229,19 @@ export function activate(context: vscode.ExtensionContext) {
                 if (commandId === 'aiCodeReview.compareCLIReviews') {
                     const configured = vscode.workspace.getConfiguration('aiCodeReview', workspace.uri)
                         .get<Record<string, string>>('cli.comparisonCommands', {});
-                    const providers = Object.entries(configured).filter(([, command]) => typeof command === 'string' && command.trim())
-                        .map(([label, command]) => ({ label, command, picked: Object.keys(configured).length === 2 }));
-                    if (providers.length < 2) { throw new Error('Set at least two named commands in aiCodeReview.cli.comparisonCommands.'); }
-                    const selected = await vscode.window.showQuickPick(providers, {
-                        canPickMany: true, placeHolder: 'Select exactly two providers to compare (code is sent to both CLIs)'
+                    const selection = await selectComparisonProviders({
+                        configured,
+                        choose: items => vscode.window.showQuickPick(items, {
+                            canPickMany: true, placeHolder: 'Select exactly two providers to compare (code is sent to both CLIs)'
+                        })
                     });
-                    if (!selected) { codeReviewTreeProvider.setCLIStatus({ kind: 'idle' }); return; }
-                    if (selected.length !== 2) { throw new Error('Select exactly two providers.'); }
+                    if (selection.kind === 'cancelled') { codeReviewTreeProvider.setCLIStatus({ kind: 'idle' }); return; }
+                    if (selection.kind === 'error') { throw new Error(selection.message); }
                     const changes = await collectCLIChanges(controller);
                     if (!changes) { codeReviewTreeProvider.setCLIStatus({ kind: 'idle' }); return; }
                     const prompt = PromptGenerator.generateFileReferencePrompt(changes.filePath, 'cli').content;
                     const reviews = [];
-                    for (const provider of selected) {
+                    for (const provider of selection.providers) {
                         controller.signal.throwIfAborted();
                         cliOutput.appendLine(`\nProvider: ${provider.label}`);
                         const file = await runCLIReview({ command: provider.command, cwd: workspace.uri.fsPath, prompt,

@@ -206,7 +206,7 @@
           "additionalProperties": {
             "type": "string"
           },
-          "description": "Named shell commands offered by Compare Two CLI Providers. Configure at least two commands; both receive the same review prompt and may send code to their providers."
+          "description": "Named shell commands offered by Compare Two CLI Providers. Configure at least two commands; both receive the same review prompt and may send code to their providers. Leave empty to auto-detect installed provider CLIs (Codex, Claude Code, Copilot CLI): exactly two are compared directly, more than two show a picker."
         },
         "aiCodeReview.cli.customCommand": {
           "type": "string",

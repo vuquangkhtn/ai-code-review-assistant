@@ -1,0 +1,341 @@
+
+> ai-code-review-assistant@0.10.0 test:cli
+> tsc && node --test src/test/node/*.cjs
+
+TAP version 13
+# AI Code Review Assistant is now active!
+# Result file watcher setup complete for: undefined
+# AI Code Review Assistant is now active!
+# Result file watcher setup complete for: undefined
+# Subtest: registered CLI command selects branch changes
+ok 1 - registered CLI command selects branch changes
+  ---
+  duration_ms: 158.736916
+  ...
+# AI Code Review Assistant is now active!
+# Result file watcher setup complete for: undefined
+# Subtest: registered CLI command selects local changes
+ok 2 - registered CLI command selects local changes
+  ---
+  duration_ms: 99.939583
+  ...
+# AI Code Review Assistant is now active!
+# Result file watcher setup complete for: undefined
+# Subtest: registered CLI command selects cancel-base changes
+ok 3 - registered CLI command selects cancel-base changes
+  ---
+  duration_ms: 112.212458
+  ...
+# AI Code Review Assistant is now active!
+# Result file watcher setup complete for: undefined
+# Subtest: registered CLI command selects cancel-target changes
+ok 4 - registered CLI command selects cancel-target changes
+  ---
+  duration_ms: 106.626708
+  ...
+# Subtest: registered CLI command selects checkout-fail changes
+ok 5 - registered CLI command selects checkout-fail changes
+  ---
+  duration_ms: 118.752291
+  ...
+# Subtest: stdout arrives before exit; cancel kills the fixture and writes no result
+ok 6 - stdout arrives before exit; cancel kills the fixture and writes no result
+  ---
+  duration_ms: 141.664042
+  ...
+# Subtest: failure includes the bounded stderr tail
+ok 7 - failure includes the bounded stderr tail
+  ---
+  duration_ms: 33.517417
+  ...
+# Subtest: one PATH codex runs silently with documented flags
+ok 8 - one PATH codex runs silently with documented flags
+  ---
+  duration_ms: 204.486083
+  ...
+# Subtest: one PATH claude runs silently with documented flags
+ok 9 - one PATH claude runs silently with documented flags
+  ---
+  duration_ms: 250.860666
+  ...
+# Subtest: one PATH copilot runs silently with documented flags
+ok 10 - one PATH copilot runs silently with documented flags
+  ---
+  duration_ms: 248.368708
+  ...
+# Subtest: multiple providers ask once and reuse persisted choice in a fresh selection
+ok 11 - multiple providers ask once and reuse persisted choice in a fresh selection
+  ---
+  duration_ms: 1.552208
+  ...
+# Subtest: custom command overrides presets and stored preference without asking
+ok 12 - custom command overrides presets and stored preference without asking
+  ---
+  duration_ms: 0.63175
+  ...
+# Subtest: cancel does not save or run; missing executables give an actionable error
+ok 13 - cancel does not save or run; missing executables give an actionable error
+  ---
+  duration_ms: 1.272542
+  ...
+# Subtest: Windows cmd shims run with literal arguments from a PATH containing spaces
+ok 14 - Windows cmd shims run with literal arguments from a PATH containing spaces # SKIP
+  ---
+  duration_ms: 0.050125
+  ...
+# Subtest: live progress counts split paths once and ignores ambiguous basenames
+ok 15 - live progress counts split paths once and ignores ambiguous basenames
+  ---
+  duration_ms: 176.455708
+  ...
+# Subtest: each provider starts at zero; duplicate paths and final tokens count once
+ok 16 - each provider starts at zero; duplicate paths and final tokens count once
+  ---
+  duration_ms: 42.4725
+  ...
+# Subtest: real CLI receives stdin and handles clean output
+ok 17 - real CLI receives stdin and handles clean output
+  ---
+  duration_ms: 41.926458
+  ...
+# Subtest: real CLI receives stdin and handles noisy output
+ok 18 - real CLI receives stdin and handles noisy output
+  ---
+  duration_ms: 27.720417
+  ...
+# Subtest: real CLI receives stdin and handles fail output
+ok 19 - real CLI receives stdin and handles fail output
+  ---
+  duration_ms: 24.197375
+  ...
+# Subtest: real CLI receives stdin and handles invalid output
+ok 20 - real CLI receives stdin and handles invalid output
+  ---
+  duration_ms: 28.594333
+  ...
+# Subtest: preset rejects failed or oversized output: process.exit(7)
+ok 21 - preset rejects failed or oversized output: process.exit(7)
+  ---
+  duration_ms: 21.703459
+  ...
+# Subtest: preset rejects failed or oversized output: process.stdout.write('x'.repeat(4*1024*1024+1))
+ok 22 - preset rejects failed or oversized output: process.stdout.write('x'.repeat(4*1024*1024+1))
+  ---
+  duration_ms: 31.481541
+  ...
+# Subtest: preset rejects failed or oversized output: process.stderr.write('x'.repeat(4*1024*1024+1))
+ok 23 - preset rejects failed or oversized output: process.stderr.write('x'.repeat(4*1024*1024+1))
+  ---
+  duration_ms: 32.227458
+  ...
+# AI Code Review Assistant is now active!
+# Result file watcher setup complete for: undefined
+# Subtest: tree rows: renames, order and pruned duplicate rows
+ok 24 - tree rows: renames, order and pruned duplicate rows
+  ---
+  duration_ms: 2.053042
+  ...
+# Subtest: CLI Review row transitions: idle → running with progress → done/failed → idle
+ok 25 - CLI Review row transitions: idle → running with progress → done/failed → idle
+  ---
+  duration_ms: 0.185083
+  ...
+# Subtest: no status row is ever added next to the CLI Review row
+ok 26 - no status row is ever added next to the CLI Review row
+  ---
+  duration_ms: 0.100083
+  ...
+# Subtest: manifest: removed actions stay palette commands; inline stop menu is gone; titles follow renames
+ok 27 - manifest: removed actions stay palette commands; inline stop menu is gone; titles follow renames
+  ---
+  duration_ms: 0.75175
+  ...
+# Subtest: cancel asks for confirmation; dispose still aborts without a dialog
+ok 28 - cancel asks for confirmation; dispose still aborts without a dialog
+  ---
+  duration_ms: 303.636
+  ...
+# Subtest: groups by file/line, matches normalized titles, retains each provider evidence
+ok 29 - groups by file/line, matches normalized titles, retains each provider evidence
+  ---
+  duration_ms: 6.905917
+  ...
+# Subtest: different locations and different titles remain unique; empty reviews work
+ok 30 - different locations and different titles remain unique; empty reviews work
+  ---
+  duration_ms: 0.096833
+  ...
+# Subtest: tree distinguishes shared and unique findings and displays confidence/evidence as plain text
+ok 31 - tree distinguishes shared and unique findings and displays confidence/evidence as plain text
+  ---
+  duration_ms: 0.640084
+  ...
+# Subtest: empty setting with exactly two detected presets runs both without a picker, end to end
+ok 32 - empty setting with exactly two detected presets runs both without a picker, end to end
+  ---
+  duration_ms: 572.250583
+  ...
+# Subtest: empty setting with more than two detected presets asks a picker for exactly two
+ok 33 - empty setting with more than two detected presets asks a picker for exactly two
+  ---
+  duration_ms: 1.543666
+  ...
+# Subtest: picking one or cancelling the detected picker errors or cancels cleanly
+ok 34 - picking one or cancelling the detected picker errors or cancels cleanly
+  ---
+  duration_ms: 1.743334
+  ...
+# Subtest: named entries override detection and keep their labels and commands
+ok 35 - named entries override detection and keep their labels and commands
+  ---
+  duration_ms: 0.6535
+  ...
+# Subtest: more than two named entries pick exactly two; one named entry stays an explicit error
+ok 36 - more than two named entries pick exactly two; one named entry stays an explicit error
+  ---
+  duration_ms: 0.147667
+  ...
+# Subtest: fewer than two detected providers and no setting give the actionable error
+ok 37 - fewer than two detected providers and no setting give the actionable error
+  ---
+  duration_ms: 0.738125
+  ...
+# Subtest: named entries override detection end to end and their labels reach the comparison output
+ok 38 - named entries override detection end to end and their labels reach the comparison output
+  ---
+  duration_ms: 377.883417
+  ...
+# Subtest: cancelling the named-entries picker cancels cleanly
+ok 39 - cancelling the named-entries picker cancels cleanly
+  ---
+  duration_ms: 0.15875
+  ...
+# Cleaned up 1 files from previous AI review sessions
+# Cleaned up 1 files from previous AI review sessions
+# Cleaned up 1 files from previous AI review sessions
+# Cleaned up 1 files from previous AI review sessions
+# Cleaned up 1 files from previous AI review sessions
+# Subtest: local completion offers guidance and handles Paste to AI Chat…
+ok 40 - local completion offers guidance and handles Paste to AI Chat…
+  ---
+  duration_ms: 2.173209
+  ...
+# Subtest: local completion offers guidance and handles Open Changes
+ok 41 - local completion offers guidance and handles Open Changes
+  ---
+  duration_ms: 1.149042
+  ...
+# Subtest: local completion offers guidance and handles dismissal
+ok 42 - local completion offers guidance and handles dismissal
+  ---
+  duration_ms: 0.96175
+  ...
+# Subtest: branch completion offers guidance and handles Paste to AI Chat…
+ok 43 - branch completion offers guidance and handles Paste to AI Chat…
+  ---
+  duration_ms: 1.085292
+  ...
+# Subtest: branch completion offers guidance and handles Open Changes
+ok 44 - branch completion offers guidance and handles Open Changes
+  ---
+  duration_ms: 0.915333
+  ...
+# Subtest: branch completion offers guidance and handles dismissal
+ok 45 - branch completion offers guidance and handles dismissal
+  ---
+  duration_ms: 1.40675
+  ...
+# Subtest: issue \#29 AC1: every tracked symlink is relative, resolvable and stays inside the repo
+ok 46 - issue \#29 AC1: every tracked symlink is relative, resolvable and stays inside the repo
+  ---
+  duration_ms: 1091.173
+  ...
+# Subtest: issue \#29 AC2: .vscodeignore excludes the agent dev trees from the vsix
+ok 47 - issue \#29 AC2: .vscodeignore excludes the agent dev trees from the vsix
+  ---
+  duration_ms: 0.161416
+  ...
+# Subtest: parser round-trips high confidence and evidence through saved JSON
+ok 48 - parser round-trips high confidence and evidence through saved JSON
+  ---
+  duration_ms: 1.5825
+  ...
+# Subtest: parser round-trips medium confidence and evidence through saved JSON
+ok 49 - parser round-trips medium confidence and evidence through saved JSON
+  ---
+  duration_ms: 0.144292
+  ...
+# Subtest: parser round-trips low confidence and evidence through saved JSON
+ok 50 - parser round-trips low confidence and evidence through saved JSON
+  ---
+  duration_ms: 0.066792
+  ...
+# Subtest: legacy results keep optional fields absent and retain existing content
+ok 51 - legacy results keep optional fields absent and retain existing content
+  ---
+  duration_ms: 0.071958
+  ...
+# Subtest: malformed optional fields do not discard a valid finding or reach renderers
+ok 52 - malformed optional fields do not discard a valid finding or reach renderers
+  ---
+  duration_ms: 0.229084
+  ...
+# Subtest: tree shows optional confidence without changing the legacy description
+ok 53 - tree shows optional confidence without changing the legacy description
+  ---
+  duration_ms: 0.493833
+  ...
+# Subtest: panel renders confidence only when supplied and escapes imported text
+ok 54 - panel renders confidence only when supplied and escapes imported text
+  ---
+  duration_ms: 0.915791
+  ...
+# Subtest: manual and CLI prompt contracts request confidence and evidence
+ok 55 - manual and CLI prompt contracts request confidence and evidence
+  ---
+  duration_ms: 1.891208
+  ...
+# Subtest: tree flags only policy findings and adds a policy summary
+ok 56 - tree flags only policy findings and adds a policy summary
+  ---
+  duration_ms: 0.270625
+  ...
+# Subtest: panel flags threshold findings, preserves filtering, and clears policy when disabled
+ok 57 - panel flags threshold findings, preserves filtering, and clears policy when disabled
+  ---
+  duration_ms: 1.035417
+  ...
+# Subtest: policy thresholds include their boundary and leave lower severities alone
+ok 58 - policy thresholds include their boundary and leave lower severities alone
+  ---
+  duration_ms: 0.99575
+  ...
+# Subtest: invalid configuration defaults off and summaries include zero findings
+ok 59 - invalid configuration defaults off and summaries include zero findings
+  ---
+  duration_ms: 0.276916
+  ...
+# Subtest: resolves Code without changing the signed bundle
+ok 60 - resolves Code without changing the signed bundle
+  ---
+  duration_ms: 2.2655
+  ...
+# Subtest: resolves Electron without changing the signed bundle
+ok 61 - resolves Electron without changing the signed bundle
+  ---
+  duration_ms: 0.798625
+  ...
+# Subtest: preserves non-macOS executable paths
+ok 62 - preserves non-macOS executable paths
+  ---
+  duration_ms: 0.051125
+  ...
+1..62
+# tests 62
+# suites 0
+# pass 61
+# fail 0
+# cancelled 0
+# skipped 1
+# todo 0
+# duration_ms 1173.257417
