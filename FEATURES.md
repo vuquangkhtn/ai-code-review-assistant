@@ -60,7 +60,8 @@
 2. Type "Copy AI Prompt" or use the keyboard shortcut
 3. Select review type when prompted
 4. Prompt is automatically copied to clipboard
-5. Paste into your preferred AI tool
+5. Choose **Paste to AI Chat…** on the completion alert for the existing manual-paste instructions, or **Open Changes** to inspect the changes file. Both local and branch-comparison prompts offer these actions.
+6. Paste into your preferred AI tool
 
 #### `AI Code Review: Local Changes`
 **Command ID:** `aiCodeReview.copyPromptLocalChanges`  

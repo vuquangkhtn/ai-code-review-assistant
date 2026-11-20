@@ -93,14 +93,17 @@ export class ExternalAIManager {
             
             await vscode.env.clipboard.writeText(promptResult.content);
             
-            // Show information message with Open Changes button
+            // Offer the changes file and the existing manual-paste guidance.
             const changeTypeLabel = this.getChangeTypeLabel(request.changeInfo.type);
             vscode.window.showInformationMessage(
                 `Prompt For ${changeTypeLabel} copied to clipboard!`,
-                'Open Changes'
+                'Open Changes',
+                'Paste to AI Chat…'
             ).then(selection => {
                 if (selection === 'Open Changes') {
                     vscode.commands.executeCommand('aiCodeReview.openChangeFile');
+                } else if (selection === 'Paste to AI Chat…') {
+                    vscode.commands.executeCommand('aiCodeReview.pastePrompt');
                 }
             });
         } catch (error) {

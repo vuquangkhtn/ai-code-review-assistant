@@ -1,0 +1,45 @@
+TAP version 13
+# Cleaned up 1 files from previous AI review sessions
+# Cleaned up 1 files from previous AI review sessions
+# Cleaned up 1 files from previous AI review sessions
+# Cleaned up 1 files from previous AI review sessions
+# Cleaned up 1 files from previous AI review sessions
+# Subtest: local completion offers guidance and handles Paste to AI Chat…
+ok 1 - local completion offers guidance and handles Paste to AI Chat…
+  ---
+  duration_ms: 1.671833
+  ...
+# Subtest: local completion offers guidance and handles Open Changes
+ok 2 - local completion offers guidance and handles Open Changes
+  ---
+  duration_ms: 0.773042
+  ...
+# Subtest: local completion offers guidance and handles dismissal
+ok 3 - local completion offers guidance and handles dismissal
+  ---
+  duration_ms: 0.292584
+  ...
+# Subtest: branch completion offers guidance and handles Paste to AI Chat…
+ok 4 - branch completion offers guidance and handles Paste to AI Chat…
+  ---
+  duration_ms: 0.360167
+  ...
+# Subtest: branch completion offers guidance and handles Open Changes
+ok 5 - branch completion offers guidance and handles Open Changes
+  ---
+  duration_ms: 0.310833
+  ...
+# Subtest: branch completion offers guidance and handles dismissal
+ok 6 - branch completion offers guidance and handles dismissal
+  ---
+  duration_ms: 0.496041
+  ...
+1..6
+# tests 6
+# suites 0
+# pass 6
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 35.921084
