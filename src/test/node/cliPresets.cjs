@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { selectCLICommand, switchCLIProvider, cliPresets } = require('../../../out/ai/CLIPresets');
+const { selectCLICommand, switchCLIProvider, suggestFailureRecovery, cliPresets } = require('../../../out/ai/CLIPresets');
 const { runCLIReview } = require('../../../out/ai/CLIReview');
 
 async function withPATHFixture(providers, run) {
@@ -205,4 +205,32 @@ test('switcher cancel changes nothing; empty PATH gives the actionable error', {
         assert.equal(result.kind, 'error');
         assert.match(result.message, /No supported CLI found on PATH.*customCommand/);
     });
+});
+
+test('failure recovery offers the switch action when another provider is detected', () => {
+    const recovery = suggestFailureRecovery({ failedProvider: 'claude', detected: ['claude', 'codex'] });
+    assert.deepEqual(recovery.alternatives, ['codex']);
+    assert.match(recovery.message, /Select CLI Provider/);
+    assert.match(recovery.message, /codex/);
+});
+
+test('failure recovery points at the output channel and CLI settings with no alternative', () => {
+    for (const options of [{ failedProvider: 'claude', detected: ['claude'] }, { failedProvider: 'claude', detected: [] }, { detected: [] }]) {
+        const recovery = suggestFailureRecovery(options);
+        assert.deepEqual(recovery.alternatives, []);
+        assert.match(recovery.message, /output/i);
+        assert.match(recovery.message, /aiCodeReview\.cli/);
+    }
+});
+
+test('custom command failures suggest every detected preset as an alternative', () => {
+    const recovery = suggestFailureRecovery({ failedProvider: 'custom', detected: ['claude', 'codex'] });
+    assert.deepEqual(recovery.alternatives, ['claude', 'codex']);
+});
+
+test('stall watchdog setting is declared with a numeric default', () => {
+    const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, '..', '..', '..', 'package.json'), 'utf8'));
+    const setting = pkg.contributes.configuration.properties['aiCodeReview.cli.stallTimeoutMs'];
+    assert.equal(setting.type, 'number');
+    assert.ok(setting.default > 0, 'watchdog must ship enabled by default');
 });

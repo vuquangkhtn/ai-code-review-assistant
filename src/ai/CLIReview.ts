@@ -20,6 +20,7 @@ export async function runCLIReview(options: {
     signal?: AbortSignal; onStdout?: (chunk: string) => void;
     review?: { type: string; files: string[] };
     onProgress?: (progress: CLIReviewProgress) => void;
+    stallTimeoutMs?: number;
 }): Promise<string> {
     options.signal?.throwIfAborted();
     const files = [...new Set(options.review?.files.map(file => file.replace(/\\/g, '/')))];
@@ -78,19 +79,44 @@ export async function runCLIReview(options: {
         const cancel = () => stop(new Error('CLI review cancelled.'));
         options.signal?.addEventListener('abort', cancel, { once: true });
         const timer = setTimeout(() => stop(new Error('CLI review timed out.')), 300000);
+        // Startup watchdog: a silent CLI (auth prompt, network stall, bad invocation) must
+        // fail fast instead of burning the full timeout. The first output on any stream
+        // proves the CLI is alive and disarms the watchdog; only the full timeout then
+        // applies, so long-but-alive reviews are never killed early.
+        const stallWindow = options.stallTimeoutMs ?? 120000;
+        let sawOutput = false;
+        const stallTimer = stallWindow > 0 ? setTimeout(() => {
+            stop(new Error(`CLI review stalled: no output within ${stallWindow} ms (aiCodeReview.cli.stallTimeoutMs). The CLI may be waiting for authentication or a network connection.`));
+        }, stallWindow) : undefined;
+        const markAlive = () => {
+            if (sawOutput) { return; }
+            sawOutput = true;
+            if (stallTimer) { clearTimeout(stallTimer); }
+        };
         child.stdout?.setEncoding('utf8');
         child.stderr?.setEncoding('utf8');
         child.stdout?.on('data', (chunk: string) => {
+            markAlive();
             bytes += Buffer.byteLength(chunk);
             if (bytes > 4 * 1024 * 1024) { stop(new Error('CLI review output exceeded 4 MB.')); return; }
             output += chunk;
             options.onStdout?.(chunk);
             if (options.review) { updateProgress(output); }
         });
-        child.stderr?.on('data', (chunk: string) => { stderrTail = (stderrTail + chunk).slice(-4096); });
-        child.on('error', error => { failure = error; });
+        child.stderr?.on('data', (chunk: string) => {
+            markAlive();
+            stderrTail = (stderrTail + chunk).slice(-4096);
+        });
+        child.on('error', error => {
+            if (failure) { return; }
+            const code = (error as { code?: unknown }).code;
+            failure = typeof code === 'string' && ['ENOENT', 'EACCES', 'EPERM', 'E2BIG'].includes(code)
+                ? new Error(`CLI review failed to start (${code}): ${error.message}`)
+                : error;
+        });
         child.on('close', code => {
             clearTimeout(timer);
+            if (stallTimer) { clearTimeout(stallTimer); }
             options.signal?.removeEventListener('abort', cancel);
             if (options.review) { updateProgress(output, true); }
             if (failure) { reject(new Error(`${failure.message}\n${stderrTail}`)); }
