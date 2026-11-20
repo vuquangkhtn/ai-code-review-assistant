@@ -1,0 +1,8 @@
+{
+  "issue": 24,
+  "reason": "Trigger semantic-release for the comparison and CLI-review batch",
+  "featurePullRequest": 16,
+  "featureCommit": "a581a25d314e03e4c042c4fb256bd45b0f7a67e3",
+  "mergeSubject": "feat: release comparison and CLI-review batch",
+  "note": "Release record only; semantic-release owns versions and CHANGELOG.md."
+}
