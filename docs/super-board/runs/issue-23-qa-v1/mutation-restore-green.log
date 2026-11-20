@@ -1,0 +1,35 @@
+TAP version 13
+# Subtest: silent CLI fails fast with a stall error instead of the full timeout
+ok 1 - silent CLI fails fast with a stall error instead of the full timeout
+  ---
+  duration_ms: 717.620042
+  ...
+# Subtest: a CLI that is producing stdout is not killed: first output disarms the watchdog
+ok 2 - a CLI that is producing stdout is not killed: first output disarms the watchdog
+  ---
+  duration_ms: 1138.510125
+  ...
+# Subtest: stderr output also disarms the watchdog (conservative liveness)
+ok 3 - stderr output also disarms the watchdog (conservative liveness)
+  ---
+  duration_ms: 1022.22475
+  ...
+# Subtest: spawn failure is classified as failed to start
+ok 4 - spawn failure is classified as failed to start
+  ---
+  duration_ms: 1.9255
+  ...
+# Subtest: cancelling a silent run still reports cancelled, not stalled
+ok 5 - cancelling a silent run still reports cancelled, not stalled
+  ---
+  duration_ms: 154.620375
+  ...
+1..5
+# tests 5
+# suites 0
+# pass 5
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3063.629541

@@ -1,0 +1,51 @@
+TAP version 13
+# Subtest: silent CLI fails fast with a stall error instead of the full timeout
+ok 1 - silent CLI fails fast with a stall error instead of the full timeout
+  ---
+  duration_ms: 720.129
+  ...
+# Subtest: a CLI that is producing stdout is not killed: first output disarms the watchdog
+ok 2 - a CLI that is producing stdout is not killed: first output disarms the watchdog
+  ---
+  duration_ms: 1150.660458
+  ...
+# Subtest: stderr output also disarms the watchdog (conservative liveness)
+not ok 3 - stderr output also disarms the watchdog (conservative liveness)
+  ---
+  duration_ms: 610.285209
+  location: '/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-23-qa/src/test/node/cliStall.cjs:56:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    CLI review stalled: no output within 600 ms (aiCodeReview.cli.stallTimeoutMs). The CLI may be waiting for authentication or a network connection.
+    thinking
+    thinking
+    thinking
+    thinking
+    thinking
+    
+  code: 'ERR_TEST_FAILURE'
+  stack: |-
+    ChildProcess.<anonymous> (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-23-qa/out/ai/CLIReview.js:165:24)
+    ChildProcess.emit (node:events:524:28)
+    maybeClose (node:internal/child_process:1104:16)
+    ChildProcess._handle.onexit (node:internal/child_process:304:5)
+  ...
+# Subtest: spawn failure is classified as failed to start
+ok 4 - spawn failure is classified as failed to start
+  ---
+  duration_ms: 4.7965
+  ...
+# Subtest: cancelling a silent run still reports cancelled, not stalled
+ok 5 - cancelling a silent run still reports cancelled, not stalled
+  ---
+  duration_ms: 158.93
+  ...
+1..5
+# tests 5
+# suites 0
+# pass 4
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2677.974541
