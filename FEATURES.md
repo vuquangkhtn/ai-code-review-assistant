@@ -50,14 +50,14 @@
 
 ### Primary Commands
 
-#### `AI Code Review: Copy AI Prompt`
+#### `AI Code Review: Manual Review`
 **Command ID:** `aiCodeReview.copyPrompt`  
 **Shortcut:** `Cmd+K Cmd+G` (Mac) / `Ctrl+K Ctrl+G` (Windows/Linux)  
 **Usage:** Main command to generate and copy AI review prompts
 
 **How to use:**
 1. Open Command Palette (`Cmd+Shift+P`)
-2. Type "Copy AI Prompt" or use the keyboard shortcut
+2. Type "Manual Review" or use the keyboard shortcut
 3. Select review type when prompted
 4. Prompt is automatically copied to clipboard
 5. Choose **Paste to AI Chat…** on the completion alert for the existing manual-paste instructions, or **Open Changes** to inspect the changes file. Both local and branch-comparison prompts offer these actions.
@@ -277,7 +277,7 @@
 
 ### Primary Shortcut
 **`Cmd+K Cmd+G`** (Mac) / **`Ctrl+K Ctrl+G`** (Windows/Linux)
-- Triggers main "Copy AI Prompt" command
+- Triggers the main "Manual Review" command
 - Most frequently used shortcut
 - Works from any file in the workspace
 
@@ -317,9 +317,9 @@ You can add custom keybindings in VS Code settings:
 - Check the [Workflow Guide Panel](command:aiCodeReview.openWorkflowGuide)
 - Visit our [GitHub Repository](https://github.com/vuquangkhtn/ai-code-review-assistant)
 - Open [Extension Settings](command:aiCodeReview.openSettings)
-### Run AI Review with CLI
+### CLI Review
 
-Optionally set `aiCodeReview.cli.customCommand` to a shell command, then run **AI Code Review: Run AI Review with CLI** in a trusted workspace. With Local Changes selected, the command receives the local-changes prompt on stdin. With Compare Branches selected, it asks for source and target branches using the manual-review picker, checks out the target, and receives the branch-comparison prompt on stdin. Dismissing either branch picker leaves the working tree unchanged and returns the run to idle. The command runs in the workspace folder, and must print a JSON object containing an `issues` array. The configured CLI may send code to its provider.
+Optionally set `aiCodeReview.cli.customCommand` to a shell command, then run **AI Code Review: CLI Review** in a trusted workspace. With Local Changes selected, the command receives the local-changes prompt on stdin. With Compare Branches selected, it asks for source and target branches using the manual-review picker, checks out the target, and receives the branch-comparison prompt on stdin. Dismissing either branch picker leaves the working tree unchanged and returns to idle. The command runs in the workspace folder, and must print a JSON object containing an `issues` array. The configured CLI may send code to its provider.
 
 The extension extracts JSON from stdout, including banner-wrapped output, and writes it to `.ai-code-review/results/` for the existing watcher. The clipboard is unchanged. Nonzero exit or invalid JSON creates no result. Output is limited to 4 MiB and execution to five minutes. Manual copy-paste prompts retain their existing instructions.
 
@@ -333,11 +333,14 @@ is removed, detection runs again. A custom command overrides all presets.
 Codex and Claude receive stdin; Copilot receives a literal prompt argument.
 On Windows, `.exe`, `.com`, `.cmd` and `.bat` providers are detected. Providers use their own authentication and backend;
 no code is sent until you explicitly trigger the CLI review command.
-Use **Run Review with CLI** in the review tree to start the same custom command. A status node
-shows running, done, or failed. Click the running node or its stop icon to cancel; the status
-clears after the process stops. Stdout streams into **AI Code Review CLI** in the Output panel.
-Click a finished status to reopen that channel. Failed runs show the last 4096 stderr characters
-in the error toast, status tooltip, and output channel.
+Use **CLI Review** in the review tree to start the same custom command. The single row reflects
+the run: a spinner with reviewed/total progress in its description while running, a check when
+done, and the failure message on failure. Clicking the row while it runs — or **Cancel CLI
+Review** in the Command Palette — asks "Stop the running review?" and aborts only on consent;
+extension shutdown still aborts without asking. There is no separate status row. Stdout streams
+into **AI Code Review CLI** in the Output panel; failed runs show the last 4096 stderr characters
+in the error toast, row description, and output channel. **Open Workflow Guide** and **Paste
+Prompt to AI Chat** are Command Palette commands, not tree rows.
 
 ### Severity policy
 

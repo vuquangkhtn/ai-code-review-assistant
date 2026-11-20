@@ -204,7 +204,14 @@ export function activate(context: vscode.ExtensionContext) {
             }
         }),
 
-        vscode.commands.registerCommand('aiCodeReview.cancelCLIReview', () => cliRun?.abort()),
+        // Confirm-to-stop: the palette command and the CLI Review row click both land here.
+        // Extension shutdown keeps its own direct abort path (no dialog).
+        vscode.commands.registerCommand('aiCodeReview.cancelCLIReview', async () => {
+            const run = cliRun;
+            if (!run) { return; }
+            const choice = await vscode.window.showWarningMessage('Stop the running review?', { modal: true }, 'Stop');
+            if (choice === 'Stop') { run.abort(); }
+        }),
         vscode.commands.registerCommand('aiCodeReview.showCLIOutput', () => cliOutput.show(true)),
         ...['aiCodeReview.runCLIReview', 'aiCodeReview.compareCLIReviews'].map(commandId =>
         vscode.commands.registerCommand(commandId, async () => {
