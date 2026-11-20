@@ -1,0 +1,52 @@
+TAP version 13
+# Subtest: issue \#29 AC1: every tracked symlink is relative, resolvable and stays inside the repo
+not ok 1 - issue \#29 AC1: every tracked symlink is relative, resolvable and stays inside the repo
+  ---
+  duration_ms: 826.820375
+  location: '/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-29-qa/src/test/node/repoPackaging.cjs:34:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    dangling/absolute/out-of-repo tracked symlinks:
+    .zcode/skills/__qa_probe_a__ -> absolute target /Users/evil/.claude/skills/probe
+    .zcode/skills/__qa_probe_d__ -> dangling target ../../.claude/skills/__no_such_skill__
+    .zcode/skills/__qa_probe_e__ -> dangling target ../../../../tmp/escape-probe
+    + actual - expected
+    
+    + [
+    +   '.zcode/skills/__qa_probe_a__ -> absolute target /Users/evil/.claude/skills/probe',
+    +   '.zcode/skills/__qa_probe_d__ -> dangling target ../../.claude/skills/__no_such_skill__',
+    +   '.zcode/skills/__qa_probe_e__ -> dangling target ../../../../tmp/escape-probe'
+    + ]
+    - []
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual:
+    0: '.zcode/skills/__qa_probe_a__ -> absolute target /Users/evil/.claude/skills/probe'
+    1: '.zcode/skills/__qa_probe_d__ -> dangling target ../../.claude/skills/__no_such_skill__'
+    2: '.zcode/skills/__qa_probe_e__ -> dangling target ../../../../tmp/escape-probe'
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-29-qa/src/test/node/repoPackaging.cjs:63:12)
+    Test.runInAsyncScope (node:async_hooks:206:9)
+    Test.run (node:internal/test_runner/test:796:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:526:18)
+    node:internal/test_runner/harness:255:12
+    node:internal/process/task_queues:140:7
+    AsyncResource.runInAsyncScope (node:async_hooks:206:9)
+    AsyncResource.runMicrotask (node:internal/process/task_queues:137:8)
+  ...
+# Subtest: issue \#29 AC2: .vscodeignore excludes the agent dev trees from the vsix
+ok 2 - issue \#29 AC2: .vscodeignore excludes the agent dev trees from the vsix
+  ---
+  duration_ms: 0.123125
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 1
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 851.625791

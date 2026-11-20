@@ -1,0 +1,4 @@
+repo-wide tracked symlinks: 243
+by dir: {'.claude/skills': 117, '.zcode/skills': 126}
+violations: 0
+SCAN PASS

@@ -1,0 +1,36 @@
+TAP version 13
+# Subtest: issue \#29 AC1: every tracked symlink is relative, resolvable and stays inside the repo
+ok 1 - issue \#29 AC1: every tracked symlink is relative, resolvable and stays inside the repo
+  ---
+  duration_ms: 807.911583
+  ...
+# Subtest: issue \#29 AC2: .vscodeignore excludes the agent dev trees from the vsix
+not ok 2 - issue \#29 AC2: .vscodeignore excludes the agent dev trees from the vsix
+  ---
+  duration_ms: 0.306417
+  location: '/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-29-qa/src/test/node/repoPackaging.cjs:70:1'
+  failureType: 'testCodeFailure'
+  error: ".vscodeignore is missing '.agents/**' — the dev tree would ship in the vsix (735 files leaked without it)"
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-29-qa/src/test/node/repoPackaging.cjs:76:16)
+    Test.runInAsyncScope (node:async_hooks:206:9)
+    Test.run (node:internal/test_runner/test:796:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:526:18)
+    Test.postRun (node:internal/test_runner/test:889:19)
+    Test.run (node:internal/test_runner/test:835:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:526:7)
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 1
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 832.615291
