@@ -18,3 +18,6 @@ git worktree add --detach /tmp/sb38qa-main c152c52
 cd /tmp/sb38qa-main && npm ci && npx tsc
 CLI_REVIEW_TEST=1 node /tmp/sb38qa-runner/run-main-baseline.cjs
 #   -> 5 passing (33s) / 9 failing; failing set identical to the branch (same tests, same file:line)
+# plain runTest.ts invocation (no scratch runner needed from a short checkout) — confirmed:
+CLI_REVIEW_TEST=1 node ./out/test/runTest.js
+#   -> 9 passing (33s) / 9 failing (same pre-existing set); all 4 new tests green
