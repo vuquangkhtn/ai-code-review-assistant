@@ -1,0 +1,35 @@
+issue-39 release-detection simulation — workflow snippet replay
+simroot: /var/folders/rl/dqkc_c0j01567h1rttvfw7yh0000gn/T//issue39-relsim.V2g9w5
+────────────────────────────────────────────────────────
+case: new-tag-after-v0.10.0
+  outputs: new_version=0.11.0 tag_name=v0.11.0 release_created=true 
+  stdout : ✅ Released version 0.11.0 with tag v0.11.0 
+  RESULT: PASS (release_created=true as expected)
+────────────────────────────────────────────────────────
+case: no-new-tag
+  outputs: release_created=false 
+  stdout : ℹ️ No release created — semantic-release found no relevant changes (publish stages are skipped) 
+  RESULT: PASS (release_created=false as expected)
+────────────────────────────────────────────────────────
+case: first-release-empty-before
+  outputs: new_version=1.0.0 tag_name=v1.0.0 release_created=true 
+  stdout : ✅ Released version 1.0.0 with tag v1.0.0 
+  RESULT: PASS (release_created=true as expected)
+────────────────────────────────────────────────────────
+case: race-foreign-tag
+  outputs: new_version=0.12.0 tag_name=v0.12.0 release_created=true 
+  stdout : ✅ Released version 0.12.0 with tag v0.12.0 
+  RESULT: PASS (release_created=true as expected)
+────────────────────────────────────────────────────────
+case: multiple-new-tags
+  outputs: new_version=0.11.0 tag_name=v0.11.0 release_created=true 
+  stdout : ✅ Released version 0.11.0 with tag v0.11.0 
+  RESULT: PASS (release_created=true as expected)
+────────────────────────────────────────────────────────
+case: non-v-tag-ignored
+  outputs: release_created=false 
+  stdout : ℹ️ No release created — semantic-release found no relevant changes (publish stages are skipped) 
+  RESULT: PASS (release_created=false as expected)
+────────────────────────────────────────────────────────
+summary: PASS=6 FAIL=0
+case 4 documents a known MEDIUM race limitation (see REPORT.md test-gap ledger) — outcome recorded, not a regression gate.
