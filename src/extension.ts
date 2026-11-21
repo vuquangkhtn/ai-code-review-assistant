@@ -208,7 +208,14 @@ export function activate(context: vscode.ExtensionContext) {
         // Extension shutdown keeps its own direct abort path (no dialog).
         vscode.commands.registerCommand('aiCodeReview.cancelCLIReview', async () => {
             const run = cliRun;
-            if (!run) { return; }
+            if (!run) {
+                // Self-heal: a stale `running` row with no active run is a dead button.
+                // Reset it so the row offers re-run again instead of silently no-oping.
+                if (codeReviewTreeProvider.getCLIStatus().kind === 'running') {
+                    codeReviewTreeProvider.setCLIStatus({ kind: 'idle' });
+                }
+                return;
+            }
             const choice = await vscode.window.showWarningMessage('Stop the running review?', { modal: true }, 'Stop');
             if (choice === 'Stop') { run.abort(); }
         }),
@@ -294,7 +301,11 @@ export function activate(context: vscode.ExtensionContext) {
                 if (!controller.signal.aborted) {
                     const message = error instanceof Error ? error.message : String(error);
                     let recovery: FailureRecovery | undefined;
-                    if (cliAttempted) {
+                    // Recovery guidance also applies to provider-selection failures: when the
+                    // configured provider is missing from PATH no CLI process has run yet
+                    // (cliAttempted is false), but the attempted provider is known and the
+                    // dialog must still offer switching or settings instead of a raw error.
+                    if (cliAttempted || attemptedProvider) {
                         try {
                             recovery = suggestFailureRecovery({
                                 failedProvider: attemptedProvider,
@@ -319,7 +330,12 @@ export function activate(context: vscode.ExtensionContext) {
                     throw error;
                 }
             } finally {
-                if (controller.signal.aborted) { codeReviewTreeProvider.setCLIStatus({ kind: 'idle' }); }
+                // Terminal-status guard (issue #38): the run command sets failed/done/idle on
+                // its known exits; if any path ever leaves the row `running`, force the
+                // neutral terminal state here so the row can never stay stuck.
+                if (controller.signal.aborted || codeReviewTreeProvider.getCLIStatus().kind === 'running') {
+                    codeReviewTreeProvider.setCLIStatus({ kind: 'idle' });
+                }
                 cliRun = undefined;
             }
         })),
