@@ -1,0 +1,421 @@
+
+> ai-code-review-assistant@0.10.0 test:cli
+> tsc && node --test src/test/node/*.cjs
+
+TAP version 13
+# AI Code Review Assistant is now active!
+# Result file watcher setup complete for: undefined
+# AI Code Review Assistant is now active!
+# Result file watcher setup complete for: undefined
+# Subtest: registered CLI command selects branch changes
+ok 1 - registered CLI command selects branch changes
+  ---
+  duration_ms: 153.971166
+  ...
+# AI Code Review Assistant is now active!
+# Result file watcher setup complete for: undefined
+# Subtest: registered CLI command selects local changes
+ok 2 - registered CLI command selects local changes
+  ---
+  duration_ms: 102.935709
+  ...
+# AI Code Review Assistant is now active!
+# Result file watcher setup complete for: undefined
+# Subtest: registered CLI command selects cancel-base changes
+ok 3 - registered CLI command selects cancel-base changes
+  ---
+  duration_ms: 116.311292
+  ...
+# AI Code Review Assistant is now active!
+# Result file watcher setup complete for: undefined
+# Subtest: registered CLI command selects cancel-target changes
+ok 4 - registered CLI command selects cancel-target changes
+  ---
+  duration_ms: 102.370875
+  ...
+# Subtest: registered CLI command selects checkout-fail changes
+ok 5 - registered CLI command selects checkout-fail changes
+  ---
+  duration_ms: 110.675291
+  ...
+# Subtest: stdout arrives before exit; cancel kills the fixture and writes no result
+ok 6 - stdout arrives before exit; cancel kills the fixture and writes no result
+  ---
+  duration_ms: 136.01225
+  ...
+# Subtest: failure includes the bounded stderr tail
+ok 7 - failure includes the bounded stderr tail
+  ---
+  duration_ms: 22.480167
+  ...
+# Subtest: preset registry is data-driven and pins every documented invocation
+ok 8 - preset registry is data-driven and pins every documented invocation
+  ---
+  duration_ms: 1.87025
+  ...
+# Subtest: one PATH codex runs silently with documented flags
+ok 9 - one PATH codex runs silently with documented flags
+  ---
+  duration_ms: 381.964708
+  ...
+# Subtest: one PATH claude runs silently with documented flags
+ok 10 - one PATH claude runs silently with documented flags
+  ---
+  duration_ms: 544.280708
+  ...
+# Subtest: one PATH copilot runs silently with documented flags
+ok 11 - one PATH copilot runs silently with documented flags
+  ---
+  duration_ms: 254.172792
+  ...
+# Subtest: one PATH zcode runs silently with documented flags
+ok 12 - one PATH zcode runs silently with documented flags
+  ---
+  duration_ms: 253.144583
+  ...
+# Subtest: multiple providers ask once and reuse persisted choice in a fresh selection
+ok 13 - multiple providers ask once and reuse persisted choice in a fresh selection
+  ---
+  duration_ms: 1.835334
+  ...
+# Subtest: custom command overrides presets and stored preference without asking
+ok 14 - custom command overrides presets and stored preference without asking
+  ---
+  duration_ms: 0.415709
+  ...
+# Subtest: cancel does not save or run; missing executables give an actionable error
+ok 15 - cancel does not save or run; missing executables give an actionable error
+  ---
+  duration_ms: 1.169583
+  ...
+# Subtest: Windows cmd shims run with literal arguments from a PATH containing spaces
+ok 16 - Windows cmd shims run with literal arguments from a PATH containing spaces # SKIP
+  ---
+  duration_ms: 0.107833
+  ...
+# Subtest: defaultProvider setting overrides a stale persisted pick; auto keeps it
+ok 17 - defaultProvider setting overrides a stale persisted pick; auto keeps it
+  ---
+  duration_ms: 1.484542
+  ...
+# Subtest: switcher persists the picked provider and the next run uses it silently
+ok 18 - switcher persists the picked provider and the next run uses it silently
+  ---
+  duration_ms: 1.022584
+  ...
+# Subtest: switcher reflects a concrete setting, rewrites it on switch, lists a not-found forced provider
+ok 19 - switcher reflects a concrete setting, rewrites it on switch, lists a not-found forced provider
+  ---
+  duration_ms: 0.685917
+  ...
+# Subtest: switcher lists the configured custom command and marks it current
+ok 20 - switcher lists the configured custom command and marks it current
+  ---
+  duration_ms: 1.000542
+  ...
+# Subtest: switcher cancel changes nothing; empty PATH gives the actionable error
+ok 21 - switcher cancel changes nothing; empty PATH gives the actionable error
+  ---
+  duration_ms: 0.797833
+  ...
+# Subtest: failure recovery offers the switch action when another provider is detected
+ok 22 - failure recovery offers the switch action when another provider is detected
+  ---
+  duration_ms: 0.094458
+  ...
+# Subtest: failure recovery points at the output channel and CLI settings with no alternative
+ok 23 - failure recovery points at the output channel and CLI settings with no alternative
+  ---
+  duration_ms: 0.166833
+  ...
+# Subtest: custom command failures suggest every detected preset as an alternative
+ok 24 - custom command failures suggest every detected preset as an alternative
+  ---
+  duration_ms: 0.045416
+  ...
+# Subtest: stall watchdog setting is declared with a numeric default
+ok 25 - stall watchdog setting is declared with a numeric default
+  ---
+  duration_ms: 0.20975
+  ...
+# Subtest: live progress counts split paths once and ignores ambiguous basenames
+ok 26 - live progress counts split paths once and ignores ambiguous basenames
+  ---
+  duration_ms: 183.575584
+  ...
+# Subtest: each provider starts at zero; duplicate paths and final tokens count once
+ok 27 - each provider starts at zero; duplicate paths and final tokens count once
+  ---
+  duration_ms: 44.547709
+  ...
+# Subtest: real CLI receives stdin and handles clean output
+ok 28 - real CLI receives stdin and handles clean output
+  ---
+  duration_ms: 35.418625
+  ...
+# Subtest: real CLI receives stdin and handles noisy output
+ok 29 - real CLI receives stdin and handles noisy output
+  ---
+  duration_ms: 25.3645
+  ...
+# Subtest: real CLI receives stdin and handles fail output
+ok 30 - real CLI receives stdin and handles fail output
+  ---
+  duration_ms: 23.680208
+  ...
+# Subtest: real CLI receives stdin and handles invalid output
+ok 31 - real CLI receives stdin and handles invalid output
+  ---
+  duration_ms: 25.39125
+  ...
+# Subtest: preset rejects failed or oversized output: process.exit(7)
+ok 32 - preset rejects failed or oversized output: process.exit(7)
+  ---
+  duration_ms: 17.260042
+  ...
+# Subtest: preset rejects failed or oversized output: process.stdout.write('x'.repeat(4*1024*1024+1))
+ok 33 - preset rejects failed or oversized output: process.stdout.write('x'.repeat(4*1024*1024+1))
+  ---
+  duration_ms: 25.660792
+  ...
+# Subtest: preset rejects failed or oversized output: process.stderr.write('x'.repeat(4*1024*1024+1))
+ok 34 - preset rejects failed or oversized output: process.stderr.write('x'.repeat(4*1024*1024+1))
+  ---
+  duration_ms: 28.244625
+  ...
+# Subtest: silent CLI fails fast with a stall error instead of the full timeout
+ok 35 - silent CLI fails fast with a stall error instead of the full timeout
+  ---
+  duration_ms: 710.128416
+  ...
+# Subtest: a CLI that is producing stdout is not killed: first output disarms the watchdog
+ok 36 - a CLI that is producing stdout is not killed: first output disarms the watchdog
+  ---
+  duration_ms: 1124.579458
+  ...
+# Subtest: stderr output also disarms the watchdog (conservative liveness)
+ok 37 - stderr output also disarms the watchdog (conservative liveness)
+  ---
+  duration_ms: 1024.515875
+  ...
+# Subtest: spawn failure is classified as failed to start
+ok 38 - spawn failure is classified as failed to start
+  ---
+  duration_ms: 1.96825
+  ...
+# Subtest: cancelling a silent run still reports cancelled, not stalled
+ok 39 - cancelling a silent run still reports cancelled, not stalled
+  ---
+  duration_ms: 154.394125
+  ...
+# AI Code Review Assistant is now active!
+# Result file watcher setup complete for: undefined
+# Subtest: tree rows: renames, order and pruned duplicate rows
+ok 40 - tree rows: renames, order and pruned duplicate rows
+  ---
+  duration_ms: 3.281083
+  ...
+# Subtest: CLI Review row transitions: idle → running with progress → done/failed → idle
+ok 41 - CLI Review row transitions: idle → running with progress → done/failed → idle
+  ---
+  duration_ms: 0.416042
+  ...
+# Subtest: no status row is ever added next to the CLI Review row
+ok 42 - no status row is ever added next to the CLI Review row
+  ---
+  duration_ms: 0.213334
+  ...
+# Subtest: manifest: removed actions stay palette commands; inline stop menu is gone; titles follow renames
+ok 43 - manifest: removed actions stay palette commands; inline stop menu is gone; titles follow renames
+  ---
+  duration_ms: 2.248209
+  ...
+# Subtest: cancel asks for confirmation; dispose still aborts without a dialog
+ok 44 - cancel asks for confirmation; dispose still aborts without a dialog
+  ---
+  duration_ms: 305.586417
+  ...
+# Subtest: groups by file/line, matches normalized titles, retains each provider evidence
+ok 45 - groups by file/line, matches normalized titles, retains each provider evidence
+  ---
+  duration_ms: 6.318291
+  ...
+# Subtest: different locations and different titles remain unique; empty reviews work
+ok 46 - different locations and different titles remain unique; empty reviews work
+  ---
+  duration_ms: 0.082708
+  ...
+# Subtest: tree distinguishes shared and unique findings and displays confidence/evidence as plain text
+ok 47 - tree distinguishes shared and unique findings and displays confidence/evidence as plain text
+  ---
+  duration_ms: 0.617708
+  ...
+# Subtest: empty setting with exactly two detected presets runs both without a picker, end to end
+ok 48 - empty setting with exactly two detected presets runs both without a picker, end to end
+  ---
+  duration_ms: 1041.321792
+  ...
+# Subtest: empty setting with more than two detected presets asks a picker for exactly two
+ok 49 - empty setting with more than two detected presets asks a picker for exactly two
+  ---
+  duration_ms: 1.28025
+  ...
+# Subtest: picking one or cancelling the detected picker errors or cancels cleanly
+ok 50 - picking one or cancelling the detected picker errors or cancels cleanly
+  ---
+  duration_ms: 1.514666
+  ...
+# Subtest: named entries override detection and keep their labels and commands
+ok 51 - named entries override detection and keep their labels and commands
+  ---
+  duration_ms: 0.651417
+  ...
+# Subtest: more than two named entries pick exactly two; one named entry stays an explicit error
+ok 52 - more than two named entries pick exactly two; one named entry stays an explicit error
+  ---
+  duration_ms: 0.148958
+  ...
+# Subtest: fewer than two detected providers and no setting give the actionable error
+ok 53 - fewer than two detected providers and no setting give the actionable error
+  ---
+  duration_ms: 0.735625
+  ...
+# Subtest: named entries override detection end to end and their labels reach the comparison output
+ok 54 - named entries override detection end to end and their labels reach the comparison output
+  ---
+  duration_ms: 501.216
+  ...
+# Subtest: cancelling the named-entries picker cancels cleanly
+ok 55 - cancelling the named-entries picker cancels cleanly
+  ---
+  duration_ms: 0.168125
+  ...
+# Cleaned up 1 files from previous AI review sessions
+# Cleaned up 1 files from previous AI review sessions
+# Cleaned up 1 files from previous AI review sessions
+# Cleaned up 1 files from previous AI review sessions
+# Cleaned up 1 files from previous AI review sessions
+# Subtest: local completion offers guidance and handles Paste to AI Chat…
+ok 56 - local completion offers guidance and handles Paste to AI Chat…
+  ---
+  duration_ms: 1.919541
+  ...
+# Subtest: local completion offers guidance and handles Open Changes
+ok 57 - local completion offers guidance and handles Open Changes
+  ---
+  duration_ms: 0.932625
+  ...
+# Subtest: local completion offers guidance and handles dismissal
+ok 58 - local completion offers guidance and handles dismissal
+  ---
+  duration_ms: 0.342
+  ...
+# Subtest: branch completion offers guidance and handles Paste to AI Chat…
+ok 59 - branch completion offers guidance and handles Paste to AI Chat…
+  ---
+  duration_ms: 0.406042
+  ...
+# Subtest: branch completion offers guidance and handles Open Changes
+ok 60 - branch completion offers guidance and handles Open Changes
+  ---
+  duration_ms: 0.305042
+  ...
+# Subtest: branch completion offers guidance and handles dismissal
+ok 61 - branch completion offers guidance and handles dismissal
+  ---
+  duration_ms: 0.280041
+  ...
+# Subtest: issue \#29 AC1: every tracked symlink is relative, resolvable and stays inside the repo
+ok 62 - issue \#29 AC1: every tracked symlink is relative, resolvable and stays inside the repo
+  ---
+  duration_ms: 1084.907292
+  ...
+# Subtest: issue \#29 AC2: .vscodeignore excludes the agent dev trees from the vsix
+ok 63 - issue \#29 AC2: .vscodeignore excludes the agent dev trees from the vsix
+  ---
+  duration_ms: 0.340542
+  ...
+# Subtest: parser round-trips high confidence and evidence through saved JSON
+ok 64 - parser round-trips high confidence and evidence through saved JSON
+  ---
+  duration_ms: 1.52675
+  ...
+# Subtest: parser round-trips medium confidence and evidence through saved JSON
+ok 65 - parser round-trips medium confidence and evidence through saved JSON
+  ---
+  duration_ms: 0.1385
+  ...
+# Subtest: parser round-trips low confidence and evidence through saved JSON
+ok 66 - parser round-trips low confidence and evidence through saved JSON
+  ---
+  duration_ms: 0.064708
+  ...
+# Subtest: legacy results keep optional fields absent and retain existing content
+ok 67 - legacy results keep optional fields absent and retain existing content
+  ---
+  duration_ms: 0.0725
+  ...
+# Subtest: malformed optional fields do not discard a valid finding or reach renderers
+ok 68 - malformed optional fields do not discard a valid finding or reach renderers
+  ---
+  duration_ms: 0.22325
+  ...
+# Subtest: tree shows optional confidence without changing the legacy description
+ok 69 - tree shows optional confidence without changing the legacy description
+  ---
+  duration_ms: 0.47975
+  ...
+# Subtest: panel renders confidence only when supplied and escapes imported text
+ok 70 - panel renders confidence only when supplied and escapes imported text
+  ---
+  duration_ms: 1.102834
+  ...
+# Subtest: manual and CLI prompt contracts request confidence and evidence
+ok 71 - manual and CLI prompt contracts request confidence and evidence
+  ---
+  duration_ms: 1.673
+  ...
+# Subtest: tree flags only policy findings and adds a policy summary
+ok 72 - tree flags only policy findings and adds a policy summary
+  ---
+  duration_ms: 0.245917
+  ...
+# Subtest: panel flags threshold findings, preserves filtering, and clears policy when disabled
+ok 73 - panel flags threshold findings, preserves filtering, and clears policy when disabled
+  ---
+  duration_ms: 0.52975
+  ...
+# Subtest: policy thresholds include their boundary and leave lower severities alone
+ok 74 - policy thresholds include their boundary and leave lower severities alone
+  ---
+  duration_ms: 0.7735
+  ...
+# Subtest: invalid configuration defaults off and summaries include zero findings
+ok 75 - invalid configuration defaults off and summaries include zero findings
+  ---
+  duration_ms: 0.090875
+  ...
+# Subtest: resolves Code without changing the signed bundle
+ok 76 - resolves Code without changing the signed bundle
+  ---
+  duration_ms: 2.067834
+  ...
+# Subtest: resolves Electron without changing the signed bundle
+ok 77 - resolves Electron without changing the signed bundle
+  ---
+  duration_ms: 0.731584
+  ...
+# Subtest: preserves non-macOS executable paths
+ok 78 - preserves non-macOS executable paths
+  ---
+  duration_ms: 0.049375
+  ...
+1..78
+# tests 78
+# suites 0
+# pass 77
+# fail 0
+# cancelled 0
+# skipped 1
+# todo 0
+# duration_ms 3073.997667

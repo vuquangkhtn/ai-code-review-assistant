@@ -342,14 +342,22 @@ suite('CLI review status', () => {
             // Attach immediately so the intentional failure cannot become unhandled.
             const outcome = running.then(() => undefined, error => error);
             try {
+                // The fixture writes the marker with one writeFileSync, but the test can
+                // observe the file between its create and its write completing — a
+                // descheduled fixture process leaves an empty/partial read that flaked the
+                // Changes File match below (reviewer rerun hit it 1-in-5). Poll the content
+                // for the marker instead of trusting file existence; the deadline keeps a
+                // prompt that never arrives a hard failure.
+                const changesPattern = /Changes File:\*\* `([^`]+)`/;
                 const deadline = Date.now() + 10000;
-                while (!fs.existsSync(marker) && Date.now() < deadline) {
+                let prompt = '';
+                while (Date.now() < deadline) {
+                    prompt = fs.existsSync(marker) ? fs.readFileSync(marker, 'utf8') : '';
+                    if (changesPattern.test(prompt)) { break; }
                     await new Promise(resolve => setTimeout(resolve, 50));
                 }
-                assert.ok(fs.existsSync(marker), 'slow fixture has received its prompt');
-                const prompt = fs.readFileSync(marker, 'utf8');
-                const changes = prompt.match(/Changes File:\*\* `([^`]+)`/);
-                assert.ok(changes);
+                const changes = prompt.match(changesPattern);
+                assert.ok(changes, `fixture received the full prompt with its Changes File marker (read ${prompt.length} bytes)`);
                 const changesPath = path.join(workspace.uri.fsPath, changes[1]);
                 const contents = fs.readFileSync(changesPath, 'utf8');
                 for (const command of ['runCLIReview', 'copyPromptLocalChanges', 'copyPromptAllFiles',

@@ -1,0 +1,18 @@
+# Commands run — QA v2 (issue #41)
+git worktree add /tmp/sb41qa2 issue-41-integration-baseline && npm ci
+npx tsc
+
+## Reproduction attempts (before fix, scoped integration lane CLI_REVIEW_TEST=1 node ./out/test/runTest.js)
+runs 1-6: normal load — 6x 18 passing / 0 failing
+runs 7-12: under 8-way CPU busy-loop load — 6x 18 passing / 0 failing
+micro-experiment: 4000 parent/child existsSync-vs-writeFileSync polls — 0 races observed
+
+## Fix applied
+src/test/suite/cliStatus.test.ts — lock tests poll marker CONTENT for the Changes File pattern (same 10s deadline) instead of reading on first existsSync
+
+## Verification
+for i in 1..10: CLI_REVIEW_TEST=1 node ./out/test/runTest.js (logs scoped-run<i>.log) — 10x 18 passing / 0 failing, exit 0
+npm run test:cli — 77 pass / 0 fail / 1 skip (unit-run.log)
+npm run compile — exit 0 (compile.log)
+npm run lint — exit 0, 0 errors, 71 pre-existing warnings (lint.log)
+long path: npm ci + npx tsc + CLI_REVIEW_TEST=1 node ./out/test/runTest.js from .claude/worktrees/issue-41-qa2 (77-char path) — 18 passing / 0 failing
