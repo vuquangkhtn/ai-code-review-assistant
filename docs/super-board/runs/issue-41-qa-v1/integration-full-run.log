@@ -1,0 +1,856 @@
+- Resolving version...
+✔ Validated version: 1.147.0
+✔ Found existing install in /Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/.vscode-test/vscode-darwin-arm64-1.147.0
+[90m[main 2026-11-21T17:49:36.126Z][0m [node-compile-cache] main: packaged cache enabled (status: enabled, configured: /Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/.vscode-test/vscode-darwin-arm64-1.147.0/Visual Studio Code.app/Contents/Resources/app/node-compile-cache/main, active: /Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/.vscode-test/vscode-darwin-arm64-1.147.0/Visual Studio Code.app/Contents/Resources/app/node-compile-cache/main/v24.22.1-arm64-d4bb394e)
+[90m[main 2026-11-21T17:49:36.145Z][0m StorageMainService: creating application shared storage
+[90m[main 2026-11-21T17:49:36.204Z][0m [shared storage] Creating shared storage database at ':memory:' (wasCreated: true)
+[90m[main 2026-11-21T17:49:36.205Z][0m [shared storage] Initializing fallback application storage (path: in-memory)
+[90m[main 2026-11-21T17:49:36.223Z][0m [shared storage] Fallback application storage initialized with 3 items
+[90m[main 2026-11-21T17:49:36.223Z][0m update#setState disabled
+[90m[main 2026-11-21T17:49:36.223Z][0m update#ctor - updates are disabled by the environment
+Via 'product.json#extensionEnabledApiProposals' extension 'ms-vscode.remote-repositories' wants API proposal 'timeline' but that proposal DOES NOT EXIST. Likely, the proposal has been finalized (check 'vscode.d.ts') or was abandoned.
+Via 'product.json#extensionEnabledApiProposals' extension 'github.vscode-pull-request-github' wants API proposal 'agentsWindowActivation' but that proposal DOES NOT EXIST. Likely, the proposal has been finalized (check 'vscode.d.ts') or was abandoned.
+Via 'product.json#extensionEnabledApiProposals' extension 'github.remotehub' wants API proposal 'timeline' but that proposal DOES NOT EXIST. Likely, the proposal has been finalized (check 'vscode.d.ts') or was abandoned.
+[RemoteAgentHost] Reconciling: desired=[], current=[]
+[AgentHost:renderer] Acquiring MessagePort to agent host...
+[90m[main 2026-11-21T17:49:36.663Z][0m AgentHostProcessManager: agent host started
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey=undefined conversationKey=undefined modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+[AgentHost:renderer] MessagePort acquired, creating client...
+Started local extension host with pid 2295.
+[RemoteAgentHostProtocol] Sending initialize: address=local clientId=1a88d51d-19e7-468c-8ea0-9dd837d2483c requestId=1
+[RemoteAgentHostProtocol] Initialized: address=local clientId=1a88d51d-19e7-468c-8ea0-9dd837d2483c durationMs=204
+[AgentHost:renderer] Protocol connection established; clientId=1a88d51d-19e7-468c-8ea0-9dd837d2483c
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey=undefined conversationKey=undefined modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+Loading development extension at /Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa
+Extension 'github.copilot-chat' appears in product.json but enables LESS API proposals than the extension wants.
+package.json (LOSES): agentSessionsWorkspace
+speech
+structuralDiff
+agentsWindowConfiguration
+chatDebug
+chatHooks
+envIsConnectionMetered
+extensionsAny
+newSymbolNamesProvider
+interactive
+codeActionAI
+activeComment
+commentReveal
+contribCommentThreadAdditionalMenu
+contribCommentsViewThreadMenus
+contribChatEditorInlineGutterMenu
+documentFiltersExclusive
+embeddings
+findTextInFiles
+findTextInFiles2
+languageModelToolSupportsModel
+findFiles2
+textSearchProvider
+terminalDataWriteEvent
+terminalExecuteCommandEvent
+terminalSelection
+terminalQuickFixProvider
+mappedEditsProvider
+aiRelatedInformation
+aiSettingsSearch
+chatParticipantAdditions
+defaultChatParticipant
+contribSourceControlInputBoxMenu
+authLearnMore
+authIssuers
+testObserver
+aiTextSearchProvider
+chatParticipantPrivate
+chatProvider
+contribDebugCreateConfiguration
+chatReferenceDiagnostic
+textSearchProvider2
+chatReferenceBinaryData
+languageModelSystem
+languageModelCapabilities
+languageModelPricing
+languageModelRateLimit
+inlineCompletionsAdditions
+chatStatusItem
+chatInputNotification
+taskProblemMatcherStatus
+contribLanguageModelToolSets
+textDocumentChangeReason
+resolvers
+taskExecutionTerminal
+dataChannels
+languageModelThinkingPart
+chatSessionsProvider
+devDeviceId
+contribEditorContentMenu
+chatPromptFiles
+mcpServerDefinitions
+tabInputMultiDiff
+workspaceTrust
+environmentPower
+terminalTitle
+toolInvocationApproveCombination
+chatSessionCustomizationProvider
+product.json (WINS): agentSessionsWorkspace
+agentsWindowConfiguration
+interactive
+terminalDataWriteEvent
+terminalExecuteCommandEvent
+terminalSelection
+terminalQuickFixProvider
+chatParticipantAdditions
+defaultChatParticipant
+embeddings
+chatProvider
+mappedEditsProvider
+aiRelatedInformation
+aiSettingsSearch
+codeActionAI
+findTextInFiles
+findTextInFiles2
+textSearchProvider
+textSearchProvider2
+activeComment
+commentReveal
+contribSourceControlInputBoxMenu
+contribCommentEditorActionsMenu
+contribCommentThreadAdditionalMenu
+contribCommentsViewThreadMenus
+contribChatEditorInlineGutterMenu
+extensionAffinity
+newSymbolNamesProvider
+findFiles2
+chatReferenceDiagnostic
+extensionsAny
+authLearnMore
+authIssuers
+testObserver
+aiTextSearchProvider
+documentFiltersExclusive
+chatParticipantPrivate
+contribDebugCreateConfiguration
+inlineCompletionsAdditions
+chatReferenceBinaryData
+languageModelSystem
+languageModelCapabilities
+languageModelThinkingPart
+languageModelToolSupportsModel
+chatStatusItem
+taskProblemMatcherStatus
+contribLanguageModelToolSets
+textDocumentChangeReason
+resolvers
+taskExecutionTerminal
+dataChannels
+chatSessionsProvider
+chatSessionCustomizationProvider
+devDeviceId
+contribEditorContentMenu
+tokenInformation
+toolInvocationApproveCombination
+chatPromptFiles
+mcpServerDefinitions
+tabInputMultiDiff
+workspaceTrust
+chatHooks
+chatDebug
+envIsConnectionMetered
+environmentPower
+terminalTitle
+languageModelPricing
+languageModelRateLimit
+chatInputNotification
+speech
+DELTA: structuralDiff
+Proceeding with EXTRA proposals (structuralDiff) because extension is in development mode. Still, this EXTENSION WILL BE BROKEN unless product.json is updated.
+[AccountPolicyGate] apply: state=inactive, reason=undefined, isRestricted=false
+(node:2295) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+(Use `Code Helper (Plugin) --trace-deprecation ...` to show where the warning was created)
+[0m[0m
+[0m  CLI review failure recovery (issue #38)[0m
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="agent-host-copilotcli" conversationKey="agent-host-copilotcli:/untitled-cb5a2c39-fab5-45be-b564-dc2fc45c9d0d" modelTarget="agent-host-copilotcli" storageKey="chat.currentLanguageModel.panel.agent-host-copilotcli" widgetViewKind="view"
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+AI Code Review Assistant is now active!
+  [31m  1) provider not on PATH: dialog offers switching, routes to the switcher, row settles[0m
+  [31m  2) no CLI on PATH: dialog offers opening settings, row settles[0m
+  [31m  3) cancelCLIReview heals a stale running row; live runs still confirm before stopping[0m
+  [31m  4) row settles even when the failure render itself fails (terminal-status guard)[0m
+[0m  CLI review status[0m
+  [32m  ✔[0m[90m one CLI Review row reflects the run: order, renames, no separate status row[0m
+  [31m  5) custom command can be cancelled from the registered tree command[0m
+  [31m  6) single-run lock refuses generation and releases after finish[0m
+  [31m  7) single-run lock refuses generation and releases after cancel[0m
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+  [31m  8) single-run lock refuses generation and releases after fail[0m
+[0m  CLI review tracer[0m
+  [31m  9) manual prompt including its tail matches the pre-feature baseline[0m
+  [31m  10) CLI review uses selected changes: branch[0m
+  [31m  11) CLI review uses selected changes: local[0m
+  [31m  12) CLI review uses selected changes: cancel-base[0m
+  [31m  13) CLI review uses selected changes: cancel-target[0m
+  [31m  14) palette command delivers stdin and displays clean results via watcher[0m
+  [31m  15) palette command delivers stdin and displays noisy results via watcher[0m
+  [31m  16) palette command delivers stdin and displays preset results via watcher[0m
+[0m  Two-provider comparison[0m
+  [31m  17) registered command runs two fixture CLIs on one prompt and groups their saved results[0m
+[0m  UI Components Test Suite[0m
+[0m    CodeReviewPanel Tests[0m
+    [32m  ✔[0m[90m Should create panel with createOrShow[0m
+    [32m  ✔[0m[90m Should return same instance when called multiple times[0m
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+    [32m  ✔[0m[90m Should have required methods[0m
+    [32m  ✔[0m[90m Should handle issues update[0m
+    [32m  ✔[0m[90m Should handle review history[0m
+    [32m  ✔[0m[90m Should clear issues[0m
+[0m    CodeReviewTreeProvider Tests[0m
+    [32m  ✔[0m[90m Should create tree provider instance[0m
+    [32m  ✔[0m[90m Should have required methods[0m
+    [32m  ✔[0m[90m Should return tree items[0m
+    [32m  ✔[0m[90m Should refresh tree view[0m
+    [32m  ✔[0m[90m Should handle tree item creation[0m
+[0m    InlineAnnotationsProvider Tests[0m
+    [32m  ✔[0m[90m Should create annotations provider instance[0m
+    [32m  ✔[0m[90m Should have required methods[0m
+    [32m  ✔[0m[90m Should handle issues update[0m
+    [32m  ✔[0m[90m Should clear issues[0m
+    [32m  ✔[0m[90m Should handle empty issues array[0m
+    [32m  ✔[0m[90m Should dispose properly[0m
+[0m    IssuesPanelProvider Tests[0m
+    [32m  ✔[0m[90m Should create issues provider instance[0m
+    [32m  ✔[0m[90m Should have required methods[0m
+    [32m  ✔[0m[90m Should return tree items for issues[0m
+    [32m  ✔[0m[90m Should handle issues update[0m
+    [32m  ✔[0m[90m Should handle tree item creation[0m
+    [32m  ✔[0m[90m Should refresh tree view[0m
+[0m    ReviewHistoryProvider Tests[0m
+    [32m  ✔[0m[90m Should create history provider instance[0m
+    [32m  ✔[0m[90m Should have required methods[0m
+    [32m  ✔[0m[90m Should add review to history[0m
+    [32m  ✔[0m[90m Should return history items[0m
+    [32m  ✔[0m[90m Should clear history[0m
+[0m    UI Integration Tests[0m
+    [32m  ✔[0m[90m Should handle VS Code commands[0m
+    [32m  ✔[0m[90m Should handle configuration changes[0m
+[0m  Test Examples Integration Test Suite[0m
+No workspace folder found for test-examples integration tests
+[0m    Test Examples File Validation[0m
+Skipping test - test-examples path not initialized
+    [32m  ✔[0m[90m Should find all test-examples files[0m
+Skipping test - test-examples path not initialized
+    [32m  ✔[0m[90m Should contain intentional code issues[0m
+[0m    Extension Commands with Test Examples[0m
+Skipping test - workspace not initialized
+    [32m  ✔[0m[90m Should execute copyPromptAllFiles with test-examples in workspace[0m
+Skipping test - change detector or test-examples path not initialized
+    [32m  ✔[0m[90m Should handle All Files case with comprehensive file analysis[0m
+Skipping test - test-examples path not initialized
+    [32m  ✔[0m[90m Should open test-examples files in editor[0m
+Skipping test - test-examples path not initialized
+    [32m  ✔[0m[90m Should execute copyPromptLocalChanges after opening test file[0m
+[0m    ChangeDetector with Test Examples[0m
+Skipping test - change detector not initialized
+    [32m  ✔[0m[90m Should detect test-examples files in workspace[0m
+Skipping test - workspace or test-examples path not initialized
+    [32m  ✔[0m[90m Should handle test-examples directory in file filtering[0m
+[0m    AI Manager with Test Examples[0m
+Skipping test - AI manager or test-examples path not initialized
+    [32m  ✔[0m[90m Should generate prompts that include test-examples content[0m
+Skipping test - workspace or test-examples path not initialized
+    [32m  ✔[0m[90m Should handle test-examples file paths correctly[0m
+[0m    Workflow Integration with Test Examples[0m
+Skipping test - workspace or test-examples path not initialized
+    [32m  ✔[0m[90m Should complete full workflow with test-examples file[0m
+Skipping test - test-examples path not initialized
+    [32m  ✔[0m[90m Should handle multiple test-examples files in batch[0m
+Cleanup completed with minor issues (acceptable)
+[0m  Extension Integration Test Suite[0m
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="agent-host-copilotcli" conversationKey="agent-host-copilotcli:/untitled-cb5a2c39-fab5-45be-b564-dc2fc45c9d0d" modelTarget="agent-host-copilotcli" storageKey="chat.currentLanguageModel.panel.agent-host-copilotcli" widgetViewKind="view"
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHostCustomizationMarketplace] Unable to load session-bound SDK installation receipts { name: 'Error' }
+[AgentHostCustomizationMarketplace] Unable to load session-bound SDK installation receipts { name: 'Error' }
+[AgentHostCustomizationMarketplace] Unable to load session-bound SDK installation receipts { name: 'Error' }
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHostCustomizationMarketplace] Unable to load session-bound SDK installation receipts { name: 'Error' }
+[AgentHostCustomizationMarketplace] Unable to load session-bound SDK installation receipts { name: 'Error' }
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[RemoteAgentHost] Reconciling: desired=[], current=[]
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+Settings Sync: Account status changed from uninitialized to unavailable
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[0m    Command Registration Tests[0m
+Found 19 AI commands: aiCodeReview.copyPrompt, aiCodeReview.cancelCLIReview, aiCodeReview.showCLIOutput, aiCodeReview.runCLIReview, aiCodeReview.compareCLIReviews, aiCodeReview.selectCLIProvider, aiCodeReview.copyPromptLocalChanges, aiCodeReview.copyPromptAllFiles, aiCodeReview.copyPromptCompareBranches, aiCodeReview.checkReviewResult, aiCodeReview.openPromptFile, aiCodeReview.openChangeFile, aiCodeReview.openSettings, aiCodeReview.setDefaultChangeType, aiCodeReview.openWorkflowGuide, aiCodeReview.pastePrompt, aiCodeReview.openIssuesFilter, aiCodeReview.markIssueResolved, aiCodeReview.markIssueUnresolved
+    [32m  ✔[0m[90m Should register all extension commands[0m
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+AI commands found: 19
+    [32m  ✔[0m[90m Should have proper command categories[0m
+[0m    Copy Prompt Commands Tests[0m
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="agent-host-copilotcli" conversationKey="agent-host-copilotcli:/untitled-cb5a2c39-fab5-45be-b564-dc2fc45c9d0d" modelTarget="agent-host-copilotcli" storageKey="chat.currentLanguageModel.panel.agent-host-copilotcli" widgetViewKind="view"
+    [32m  ✔[0m[90m Should execute copyPromptLocalChanges command[0m
+    [32m  ✔[0m[90m Should execute copyPromptAllFiles command[0m
+    [32m  ✔[0m[90m Should execute copyPromptCompareBranches command[0m
+SettingsEditor2: Settings not included in settingsLayout.ts: onboarding.developerMode, onboarding.developerModeVariations, onboarding.enabled, extensions.requestTimeout, github.copilot.chat.agent.terminal.allowList, github.copilot.chat.agent.terminal.denyList, terminal.integrated.developer.devMode, terminal.integrated.developer.ptyHost.latency, terminal.integrated.developer.ptyHost.startupDelay, terminal.integrated.enableKittyKeyboardProtocol, terminal.integrated.enableWin32InputMode, terminal.integrated.fontRendering, terminal.integrated.windowsReparentConsoleWindow, chat.defaultToCopilotHarness, chat.agentHost.agentOrchestrationLimits, chat.agentHost.ahpJsonlLoggingEnabled, chat.agentHost.browserUse.enabled, chat.agentHost.byokModels.enabled, chat.agentHost.claudeAgent.enabled, chat.agentHost.codexAgent.enabled, chat.agentHost.computerUse.enabled, chat.agentHost.experimental.autoAttachPullRequests, chat.agentHost.experimental.markdownPlanRichLinks, chat.agentHost.experimental.mcpToolRouting, chat.agentHost.experimental.overlapProviderPreparation, chat.agentHost.experimental.prewarmSessions, chat.agentHost.experimental.titleGeneration, chat.agentHost.githubMcpServer.enabled, chat.agentHost.mcpSkills.enabled, chat.agentHost.moveChats.enabled, chat.agentHost.multipleChatProviders.enabled, chat.agentHost.otel.captureContent, chat.agentHost.otel.dbSpanExporter.enabled, chat.agentHost.otel.enabled, chat.agentHost.otel.exporterType, chat.agentHost.otel.otlpEndpoint, chat.agentHost.otel.outfile, chat.agentHost.systemProxy.enabled, chat.agentMerge.addressReviews, chat.agentMerge.enabled, chat.agentMerge.fixCI, chat.agentMerge.mergeMethod, chat.agentMerge.mergePullRequest, chat.agentMerge.replyAttribution, chat.agentMerge.resolveConflicts, chat.artifactIntegrations.enabled, chat.artifactIntegrations.githubPullRequests.autoMarkReadyIgnoredChecks, chat.artifactTools.enabled, chat.canvases.enabled, chat.experimental.workspaceSnapshot, chat.agentHost.copilot.m365.enabled, chat.agentSessions.autoDeleteMarkedAsDoneMergedSessionsAfterDays, chat.agentSessions.autoMarkAsDoneMergedSessionsAfterDays, chat.stickyScroll.enabled, sessions.chat.experimental.agentsPickerInAttachContextMenu, chat.resources.enabled, sessions.chatTimeline.display, chat.agentHost.agentDebugLog.enabled, chat.agentHost.agentDebugLog.maxEventsInMemory, chat.agentHost.copilot.executionSubagent.enabled, chat.agentHost.copilot.executionSubagent.model, chat.agentHost.copilot.includeCoAuthoredBy, chat.agentHost.copilot.modelCapabilityOverrides, chat.agentHost.copilot.policyHelper, chat.agentHost.copilot.progressUpdatesPrompt.enabled, chat.agentHost.copilot.shellAuthentication.enabled, chat.agentHost.copilotSdk.logLevel, chat.agentHost.customTerminalTool.enabled, chat.agentHost.debugLogs.defaultExportLocation, chat.agentHost.opus48Prompt.enabled, chat.agentHost.shellTool.initScript.enabled, chat.agentSessions.openInEditor, chat.agentSessions.showExternal, chat.agentsHandoffTip.delaySeconds, chat.agentsHandoffTip.mode, chat.agentsParallelWorkBanner.enabled, chat.agentsWindowBanner.developerMode, chat.agentsWindowBanner.enabled, chat.agentsWindowBanner.revealCurrentSession, chat.appWindowScreenshots.enabled, chat.artifacts.enabled, chat.artifacts.rules.byFilePath, chat.artifacts.rules.byMemoryFilePath, chat.artifacts.rules.byMimeType, chat.automateTip.enabled, chat.autopilot.advanced.enabled, chat.autoReply, chat.btwTip.enabled, chat.byokUtilityModelDefault, chat.closedPromoNotification, chat.contextUsage.enabled, chat.copilot.claudeAdvisor.enabled, chat.copilot.exploreAgent.enabled, chat.copilot.imageGeneration.enabled, chat.copilot.imageGeneration.model, chat.copilot.imageGeneration.watermark, chat.copilot.localModel.enabled, chat.copilot.localModel.llamaServerPath, chat.copilot.localModel.useInAuto, chat.copilot.memory.local.enabled, chat.copilot.memory.mode, chat.copilot.searchSubagent.enabled, chat.copilot.searchSubagent.grepNudge.enabled, chat.copilot.searchSubagent.model, chat.copilot.skillCharBudget, chat.copilot.stabilityOrderedPrompt.enabled, chat.copilotCliCommand.enabled, chat.copilotHarnessIntroduction.mode, chat.customizations.copilotConnectors.enabled, chat.customizations.location, chat.customizations.locationsMigration.enabled, chat.customizations.marketplace.enabled, chat.customizations.marketplace.sources.publicFeed.enabled, chat.customizations.mcpServerMigration.enabled, chat.customizations.migration.enabled, chat.customizations.promptMigration.enabled, chat.customizations.structuredPreview.enabled, chat.customizations.userDataMigration.enabled, chat.defaultConfiguration, chat.defaultModel, chat.editing.openChangedFileInDiffEditor, chat.editing.revealNextChangeOnResolve, chat.experimental.collectInstructionsInExtension, chat.experimental.incrementalRendering.animationStyle, chat.experimental.incrementalRendering.buffering, chat.experimental.incrementalRendering.enabled, chat.experimental.openInAgentsWindow.transferDraft, chat.experimental.richLinks.enabled, chat.experimental.sessionArchiveActionWording, chat.experimental.sessionStateIndicator.enabled, chat.experimental.stickyScroll.enabled, chat.experimentalModePermissionsPicker, chat.experimentalSessionsWindowOverride, chat.exploreAgent.defaultModel, chat.growthNotification.enabled, chat.harnessSwitchFeedbackSurvey.enabled, chat.htmlPreview.enabled, chat.inlineAttachments.enabled, chat.inlineChat.agentHost.enabled, chat.microsoftAuthentication.enabled, chat.nativeComponents.enabled, chat.newSession.defaultMode, chat.pasteAsAttachmentThreshold, chat.permissions.assisted.instructions, chat.permissions.default, chat.persistentProgress, chat.persistentProgressVerbosity, chat.pluginLocations, chat.plugins.enabled, chat.plugins.enabledPlugins, chat.plugins.marketplaces, chat.progressBorder.enabled, chat.saveBeforeSend, chat.sendInBackgroundTip.enabled, chat.sessionSync.enabled, chat.sessionSync.excludeRepositories, chat.subagents.allowInvocationsFromSubagents, chat.subagents.showCreditUsage, chat.terminal.agentHost.enabled, chat.titleBar.openInAgentsWindow.enabled, chat.titleBar.openInAgentsWindow.richHover, chat.titleBar.openInAgentsWindow.richHoverOnClick, chat.titleBar.signIn.enabled, chat.tools.riskAssessment.model, chat.upvoteAnimation, chat.useClaudeHooks, chat.useCustomizationsInParentRepositories, chat.utilityModel, chat.utilitySmallModel, chat.verbose, chat.welcomePage.agentsWindowGraphic, chat.welcomePage.agentsWindowSectionStyle, chat.welcomePage.signIn.enabled, dictation.enabled, dictation.experimental.llmCleanup, dictation.experimental.llmCleanupModel, dictation.model, dictation.showButton, dictation.showTranscript, github.copilot.chat.autoModeTierOverride, chat.agentHost.remoteConnections, chat.remoteAgentHostsEnabled, chat.workspaceRemoteAgentHosts, chat.agentHost.githubEnvironments.enabled, chat.agentHost.defaultCloneDirectory, chat.agentHost.experimentalMissionControl.useLocalCredentials, chat.agentHost.cloudSandbox.enabled, chat.agentHost.cloudSandbox.autoConnectOnOpen, chat.agentHost.cloudSandbox.earlyPreparation, chat.agentHost.cloudSandbox.sessionFeed.enabled, agents.voice.agentProgress, agents.voice.enabled, agents.voice.handsFree, agents.voice.language, agents.voice.liveTranscript, agents.voice.sessionAwareness, agents.voice.showButton, agents.voice.showTranscript, agents.voice.speakResponses, agents.voice.turn.silenceMs, agents.voice.turn.stopPhrases, agents.voice.useBYOKVoiceModel, agents.voice.voice, imageCarousel.chat.enabled, imageCarousel.explorerContextMenu.enabled, mediaPreview.video.autoPlay, mediaPreview.video.loop, accessibility.signals.chatResponseReceived, accessibility.signals.chatUserActionRequired, issueReporter.additionalRepositories, issueReporter.wizard.enabled, issueReporter.wizard.fullWorkspaceScan, issueReporter.wizard.layout, issueReporter.wizard.openLocation
+    [32m  ✔[0m[90m Should execute openSettings command[0m
+    [32m  ✔[0m[90m Should execute main copyPrompt command using default configuration[0m
+    [32m  ✔[0m[90m Should fallback to quick pick with invalid configuration[0m
+[0m    File Management Commands Tests[0m
+    [32m  ✔[0m[90m Should execute openPromptFile command[0m
+    [32m  ✔[0m[90m Should execute openChangeFile command[0m
+    [32m  ✔[0m[90m Should handle missing files gracefully[0m
+[0m    Review Result Processing Tests[0m
+    [32m  ✔[0m[90m Should execute checkReviewResult command[0m
+[0m    Workflow Integration Tests[0m
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+The editor could not be opened because the file was not found.: Error: The editor could not be opened because the file was not found.
+    at Cde.handleSetInputError (vscode-file://vscode-app/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/.vscode-test/vscode-darwin-arm64-1.147.0/Visual%20Studio%20Code.app/Contents/Resources/app/out/vs/workbench/workbench.desktop.main.js:4212:97698)
+    at async Cde.setInput (vscode-file://vscode-app/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/.vscode-test/vscode-darwin-arm64-1.147.0/Visual%20Studio%20Code.app/Contents/Resources/app/out/vs/workbench/workbench.desktop.main.js:4212:96707)
+    at async aYe.doSetInput (vscode-file://vscode-app/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/.vscode-test/vscode-darwin-arm64-1.147.0/Visual%20Studio%20Code.app/Contents/Resources/app/out/vs/workbench/workbench.desktop.main.js:1268:109937)
+    at async aYe.doOpenEditor (vscode-file://vscode-app/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/.vscode-test/vscode-darwin-arm64-1.147.0/Visual%20Studio%20Code.app/Contents/Resources/app/out/vs/workbench/workbench.desktop.main.js:1268:107722)
+    at async aYe.openEditor (vscode-file://vscode-app/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/.vscode-test/vscode-darwin-arm64-1.147.0/Visual%20Studio%20Code.app/Contents/Resources/app/out/vs/workbench/workbench.desktop.main.js:1268:106668)
+    at async vscode-file://vscode-app/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/.vscode-test/vscode-darwin-arm64-1.147.0/Visual%20Studio%20Code.app/Contents/Resources/app/out/vs/workbench/workbench.desktop.main.js:1381:80392
+    at async Aw.withEditorActionsPending (vscode-file://vscode-app/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/.vscode-test/vscode-darwin-arm64-1.147.0/Visual%20Studio%20Code.app/Contents/Resources/app/out/vs/workbench/workbench.desktop.main.js:1381:80155)
+    at async wWt.doOpenCodeEditor (vscode-file://vscode-app/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/.vscode-test/vscode-darwin-arm64-1.147.0/Visual%20Studio%20Code.app/Contents/Resources/app/out/vs/workbench/workbench.desktop.main.js:1983:38909)
+    at async wWt.openCodeEditor (vscode-file://vscode-app/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/.vscode-test/vscode-darwin-arm64-1.147.0/Visual%20Studio%20Code.app/Contents/Resources/app/out/vs/workbench/workbench.desktop.main.js:1983:27816)
+    at async ZBt.open (vscode-file://vscode-app/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/.vscode-test/vscode-darwin-arm64-1.147.0/Visual%20Studio%20Code.app/Contents/Resources/app/out/vs/workbench/workbench.desktop.main.js:2101:635)
+    at async OXe.open (vscode-file://vscode-app/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/.vscode-test/vscode-darwin-arm64-1.147.0/Visual%20Studio%20Code.app/Contents/Resources/app/out/vs/workbench/workbench.desktop.main.js:2101:2322)
+    at async vscode-file://vscode-app/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/.vscode-test/vscode-darwin-arm64-1.147.0/Visual%20Studio%20Code.app/Contents/Resources/app/out/vs/workbench/workbench.desktop.main.js:1262:1327
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+    [32m  ✔[0m[90m Should complete local changes review workflow[0m[31m (187ms)[0m
+    [32m  ✔[0m[90m Should complete all files review workflow[0m
+    [32m  ✔[0m[90m Should complete branch comparison workflow[0m
+[0m    Error Handling Tests[0m
+    [32m  ✔[0m[90m Should handle commands with invalid parameters gracefully[0m
+    [32m  ✔[0m[90m Should handle workspace-dependent commands without workspace[0m
+[0m    Extension Lifecycle Tests[0m
+    [32m  ✔[0m[90m Should handle extension activation[0m
+    [32m  ✔[0m[90m Should handle component interactions[0m
+[0m  ExternalAIManager Test Suite[0m
+[0m    Singleton Pattern Tests[0m
+    [32m  ✔[0m[90m Should return same instance[0m
+    [32m  ✔[0m[90m Should have required methods[0m
+[0m    Prompt Generation Tests[0m
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="agent-host-copilotcli" conversationKey="agent-host-copilotcli:/untitled-cb5a2c39-fab5-45be-b564-dc2fc45c9d0d" modelTarget="agent-host-copilotcli" storageKey="chat.currentLanguageModel.panel.agent-host-copilotcli" widgetViewKind="view"
+    [32m  ✔[0m[90m Should handle copyPromptToClipboard without ChangeDetector[0m[31m (79ms)[0m
+    [32m  ✔[0m[90m Should set ChangeDetector[0m
+[0m    Response Processing Tests[0m
+    [32m  ✔[0m[90m Should process AI response[0m
+    [32m  ✔[0m[90m Should handle invalid JSON response[0m
+[0m    File Management Tests[0m
+    [32m  ✔[0m[90m Should get last prompt file path[0m
+    [32m  ✔[0m[90m Should get last change file path[0m
+    [32m  ✔[0m[90m Should check review result from file[0m
+[0m  CleanupManager Test Suite[0m
+[0m    Static Methods Tests[0m
+    [32m  ✔[0m[90m Should have required static methods[0m
+    [32m  ✔[0m[90m Should get file count[0m
+[0m    Cleanup Functionality Tests[0m
+Error cleaning up AI review directories: Error: No workspace folder found
+	at CleanupManager.cleanupSelectiveDirectories (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/out/utils/CleanupManager.js:40:23)
+	at Context.<anonymous> (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/out/test/suite/CleanupManager.test.js:67:55)
+	at callFn (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runnable.js:366:21)
+	at Runnable.run (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runnable.js:354:5)
+	at Runner.runTest (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runner.js:715:10)
+	at /Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runner.js:838:12
+	at next (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runner.js:630:14)
+	at /Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runner.js:640:7
+	at next (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runner.js:523:14)
+	at Immediate._onImmediate (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runner.js:608:5)
+	at process.processImmediate (node:internal/timers:574:21)
+    [32m  ✔[0m[90m Should handle selective directory cleanup[0m
+    [32m  ✔[0m[90m Should handle complete directory cleanup[0m
+Error cleaning up AI review directories: Error: No workspace folder found
+	at CleanupManager.cleanupSelectiveDirectories (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/out/utils/CleanupManager.js:40:23)
+	at CleanupManager.cleanupAIReviewDirectory (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/out/utils/CleanupManager.js:92:21)
+	at Context.<anonymous> (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/out/test/suite/CleanupManager.test.js:87:55)
+	at callFn (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runnable.js:366:21)
+	at Runnable.run (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runnable.js:354:5)
+	at Runner.runTest (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runner.js:715:10)
+	at /Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runner.js:838:12
+	at next (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runner.js:630:14)
+	at /Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runner.js:640:7
+	at next (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runner.js:523:14)
+	at Immediate._onImmediate (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runner.js:608:5)
+	at process.processImmediate (node:internal/timers:574:21)
+Error cleaning up AI review directories: Error: No workspace folder found
+	at CleanupManager.cleanupSelectiveDirectories (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/out/utils/CleanupManager.js:40:23)
+	at Context.<anonymous> (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/out/test/suite/CleanupManager.test.js:107:59)
+	at callFn (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runnable.js:366:21)
+	at Runnable.run (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runnable.js:354:5)
+	at Runner.runTest (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runner.js:715:10)
+	at /Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runner.js:838:12
+	at next (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runner.js:630:14)
+	at /Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runner.js:640:7
+	at next (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runner.js:523:14)
+	at Immediate._onImmediate (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runner.js:608:5)
+	at process.processImmediate (node:internal/timers:574:21)
+    [32m  ✔[0m[90m Should handle AI review directory cleanup[0m
+Error cleaning up AI review directories: Error: No workspace folder found
+	at CleanupManager.cleanupSelectiveDirectories (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/out/utils/CleanupManager.js:40:23)
+	at Context.<anonymous> (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/out/test/suite/CleanupManager.test.js:107:59)
+Error cleaning up AI review directories: Error: No workspace folder found
+	at CleanupManager.cleanupSelectiveDirectories (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/out/utils/CleanupManager.js:40:23)
+	at Context.<anonymous> (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/out/test/suite/CleanupManager.test.js:107:59)
+Error cleaning up AI review directories: Error: No workspace folder found
+	at CleanupManager.cleanupSelectiveDirectories (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/out/utils/CleanupManager.js:40:23)
+	at Context.<anonymous> (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/out/test/suite/CleanupManager.test.js:107:59)
+Error cleaning up AI review directories: Error: No workspace folder found
+	at CleanupManager.cleanupSelectiveDirectories (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/out/utils/CleanupManager.js:40:23)
+	at Context.<anonymous> (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/out/test/suite/CleanupManager.test.js:107:59)
+Error cleaning up AI review directories: Error: No workspace folder found
+	at CleanupManager.cleanupSelectiveDirectories (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/out/utils/CleanupManager.js:40:23)
+	at Context.<anonymous> (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/out/test/suite/CleanupManager.test.js:107:59)
+Error cleaning up AI review directories: Error: No workspace folder found
+	at CleanupManager.cleanupSelectiveDirectories (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/out/utils/CleanupManager.js:40:23)
+	at Context.<anonymous> (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/out/test/suite/CleanupManager.test.js:107:59)
+    [32m  ✔[0m[90m Should handle cleanup with different folder combinations[0m
+[0m    File Count Tests[0m
+    [32m  ✔[0m[90m Should return consistent file counts[0m
+    [32m  ✔[0m[90m Should calculate total correctly[0m
+    [32m  ✔[0m[90m Should handle non-negative counts[0m
+[0m    Error Handling Tests[0m
+Error cleaning up AI review directories: Error: No workspace folder found
+	at CleanupManager.cleanupSelectiveDirectories (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/out/utils/CleanupManager.js:40:23)
+	at Context.<anonymous> (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/out/test/suite/CleanupManager.test.js:147:55)
+	at callFn (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runnable.js:366:21)
+	at Runnable.run (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runnable.js:354:5)
+	at Runner.runTest (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runner.js:715:10)
+	at /Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runner.js:838:12
+	at next (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runner.js:630:14)
+	at /Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runner.js:640:7
+	at next (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runner.js:523:14)
+	at Immediate._onImmediate (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runner.js:608:5)
+	at process.processImmediate (node:internal/timers:574:21)
+Error cleaning up AI review directories: Error: No workspace folder found
+	at CleanupManager.cleanupSelectiveDirectories (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/out/utils/CleanupManager.js:40:23)
+	at Context.<anonymous> (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/out/test/suite/CleanupManager.test.js:164:49)
+	at callFn (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runnable.js:366:21)
+	at Runnable.run (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runnable.js:354:5)
+	at Runner.runTest (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runner.js:715:10)
+	at /Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runner.js:838:12
+	at next (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runner.js:630:14)
+	at /Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runner.js:640:7
+	at next (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runner.js:523:14)
+	at Immediate._onImmediate (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runner.js:608:5)
+	at process.processImmediate (node:internal/timers:574:21)
+Error cleaning up AI review directories: Error: No workspace folder found
+	at CleanupManager.cleanupSelectiveDirectories (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/out/utils/CleanupManager.js:40:23)
+	at Context.<anonymous> (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/out/test/suite/CleanupManager.test.js:165:49)
+	at callFn (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runnable.js:366:21)
+	at Runnable.run (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runnable.js:354:5)
+	at Runner.runTest (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runner.js:715:10)
+	at /Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runner.js:838:12
+	at next (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runner.js:630:14)
+	at /Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runner.js:640:7
+	at next (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runner.js:523:14)
+	at Immediate._onImmediate (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runner.js:608:5)
+	at process.processImmediate (node:internal/timers:574:21)
+    [32m  ✔[0m[90m Should handle workspace not found errors[0m
+Error cleaning up AI review directories: Error: No workspace folder found
+	at CleanupManager.cleanupSelectiveDirectories (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/out/utils/CleanupManager.js:40:23)
+	at Context.<anonymous> (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/out/test/suite/CleanupManager.test.js:166:49)
+	at callFn (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runnable.js:366:21)
+	at Runnable.run (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runnable.js:354:5)
+	at Runner.runTest (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runner.js:715:10)
+	at /Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runner.js:838:12
+	at next (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runner.js:630:14)
+	at /Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runner.js:640:7
+	at next (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runner.js:523:14)
+	at Immediate._onImmediate (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runner.js:608:5)
+	at process.processImmediate (node:internal/timers:574:21)
+    [32m  ✔[0m[90m Should handle concurrent cleanup operations[0m
+Error cleaning up AI review directories: Error: No workspace folder found
+	at CleanupManager.cleanupSelectiveDirectories (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/out/utils/CleanupManager.js:40:23)
+	at Context.<anonymous> (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/out/test/suite/CleanupManager.test.js:180:59)
+	at callFn (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runnable.js:366:21)
+	at Runnable.run (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runnable.js:354:5)
+	at Runner.runTest (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runner.js:715:10)
+	at /Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runner.js:838:12
+	at next (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runner.js:630:14)
+	at /Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runner.js:640:7
+	at next (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runner.js:523:14)
+	at Immediate._onImmediate (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/runner.js:608:5)
+	at process.processImmediate (node:internal/timers:574:21)
+Error cleaning up AI review directories: Error: No workspace folder found
+	at CleanupManager.cleanupSelectiveDirectories (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/out/utils/CleanupManager.js:40:23)
+	at Context.<anonymous> (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/out/test/suite/CleanupManager.test.js:180:59)
+Error cleaning up AI review directories: Error: No workspace folder found
+	at CleanupManager.cleanupSelectiveDirectories (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/out/utils/CleanupManager.js:40:23)
+	at Context.<anonymous> (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/out/test/suite/CleanupManager.test.js:180:59)
+Error cleaning up AI review directories: Error: No workspace folder found
+	at CleanupManager.cleanupSelectiveDirectories (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/out/utils/CleanupManager.js:40:23)
+	at Context.<anonymous> (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/out/test/suite/CleanupManager.test.js:180:59)
+    [32m  ✔[0m[90m Should handle invalid folder names[0m
+[0m  ChangeDetector Test Suite[0m
+[0m    File Filtering Tests[0m
+    [32m  ✔[0m[90m Should skip image files[0m
+    [32m  ✔[0m[90m Should skip font files[0m
+    [32m  ✔[0m[90m Should skip binary and archive files[0m
+    [32m  ✔[0m[90m Should skip generated and minified files[0m
+    [32m  ✔[0m[90m Should not skip valid source code files[0m
+    [32m  ✔[0m[90m Should skip common directories[0m
+    [32m  ✔[0m[90m Should not skip valid source directories[0m
+[0m    Change Detection Tests[0m
+    [32m  ✔[0m[90m Should detect local changes[0m[33m (40ms)[0m
+    [32m  ✔[0m[90m Should handle commit comparison[0m
+    [32m  ✔[0m[90m Should get all repository files[0m
+[0m    Branch Operations Tests[0m
+    [32m  ✔[0m[90m Should get default source branch[0m
+    [32m  ✔[0m[90m Should list available branches[0m
+[AgentHostCustomizationMarketplace] Unable to load session-bound SDK installation receipts { name: 'Error' }
+[AgentHostCustomizationMarketplace] Unable to load session-bound SDK installation receipts { name: 'Error' }
+    [32m  ✔[0m[90m Should handle branch comparison[0m[31m (114ms)[0m
+[0m    Error Handling Tests[0m
+    [32m  ✔[0m[90m Should handle invalid commit hash[0m
+    [32m  ✔[0m[90m Should handle invalid branch names[0m
+[0m    Diff Parsing Tests[0m
+    [32m  ✔[0m[90m Should parse diff output correctly[0m
+    [32m  ✔[0m[90m Should handle empty diff output[0m
+[0m    Workspace Integration Tests[0m
+    [32m  ✔[0m[90m Should handle workspace without git[0m
+    [32m  ✔[0m[90m Should handle workspace initialization[0m
+[92m [0m[32m 102 passing[0m[90m (906ms)[0m
+[31m  17 failing[0m
+[0m  1) CLI review failure recovery (issue #38)
+       provider not on PATH: dialog offers switching, routes to the switcher, row settles:
+[0m[31m     AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+  assert.ok(workspace && node)
+[0m[90m
+  	at activateWithWorkspace (out/test/suite/cliStatus.test.js:63:16)
+  	at async Context.<anonymous> (out/test/suite/cliStatus.test.js:81:32)
+[0m
+[0m  2) CLI review failure recovery (issue #38)
+       no CLI on PATH: dialog offers opening settings, row settles:
+[0m[31m     AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+  assert.ok(workspace && node)
+[0m[90m
+  	at activateWithWorkspace (out/test/suite/cliStatus.test.js:63:16)
+  	at async Context.<anonymous> (out/test/suite/cliStatus.test.js:129:26)
+[0m
+[0m  3) CLI review failure recovery (issue #38)
+       cancelCLIReview heals a stale running row; live runs still confirm before stopping:
+[0m[31m     AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+  assert.ok(workspace && node)
+[0m[90m
+  	at activateWithWorkspace (out/test/suite/cliStatus.test.js:63:16)
+  	at async Context.<anonymous> (out/test/suite/cliStatus.test.js:164:43)
+[0m
+[0m  4) CLI review failure recovery (issue #38)
+       row settles even when the failure render itself fails (terminal-status guard):
+[0m[31m     AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+  assert.ok(workspace && node)
+[0m[90m
+  	at activateWithWorkspace (out/test/suite/cliStatus.test.js:63:16)
+  	at async Context.<anonymous> (out/test/suite/cliStatus.test.js:206:32)
+[0m
+[0m  5) CLI review status
+       custom command can be cancelled from the registered tree command:
+[0m[31m     AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+  assert.ok(workspace && node)
+[0m[90m
+  	at Context.<anonymous> (out/test/suite/cliStatus.test.js:276:16)
+[0m
+[0m  6) CLI review status
+       single-run lock refuses generation and releases after finish:
+[0m[31m     AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+  assert.ok(workspace && node)
+[0m[90m
+  	at Context.<anonymous> (out/test/suite/cliStatus.test.js:320:20)
+[0m
+[0m  7) CLI review status
+       single-run lock refuses generation and releases after cancel:
+[0m[31m     AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+  assert.ok(workspace && node)
+[0m[90m
+  	at Context.<anonymous> (out/test/suite/cliStatus.test.js:320:20)
+[0m
+[0m  8) CLI review status
+       single-run lock refuses generation and releases after fail:
+[0m[31m     AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+  assert.ok(workspace && node)
+[0m[90m
+  	at Context.<anonymous> (out/test/suite/cliStatus.test.js:320:20)
+[0m
+[0m  9) CLI review tracer
+       manual prompt including its tail matches the pre-feature baseline:
+[0m[31m     AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+  assert.ok(result.filePath)
+[0m[90m
+  	at Context.<anonymous> (out/test/suite/cliReview.test.js:38:16)
+  	at process.processImmediate (node:internal/timers:574:21)
+[0m
+[0m  10) CLI review tracer
+       CLI review uses selected changes: branch:
+[0m[31m     AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+  assert.ok(workspace && node)
+[0m[90m
+  	at Context.<anonymous> (out/test/suite/cliReview.test.js:58:20)
+[0m
+[0m  11) CLI review tracer
+       CLI review uses selected changes: local:
+[0m[31m     AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+  assert.ok(workspace && node)
+[0m[90m
+  	at Context.<anonymous> (out/test/suite/cliReview.test.js:58:20)
+[0m
+[0m  12) CLI review tracer
+       CLI review uses selected changes: cancel-base:
+[0m[31m     AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+  assert.ok(workspace && node)
+[0m[90m
+  	at Context.<anonymous> (out/test/suite/cliReview.test.js:58:20)
+[0m
+[0m  13) CLI review tracer
+       CLI review uses selected changes: cancel-target:
+[0m[31m     AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+  assert.ok(workspace && node)
+[0m[90m
+  	at Context.<anonymous> (out/test/suite/cliReview.test.js:58:20)
+[0m
+[0m  14) CLI review tracer
+       palette command delivers stdin and displays clean results via watcher:
+[0m[31m     AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+  assert.ok(workspace)
+[0m[90m
+  	at Context.<anonymous> (out/test/suite/cliReview.test.js:138:20)
+[0m
+[0m  15) CLI review tracer
+       palette command delivers stdin and displays noisy results via watcher:
+[0m[31m     AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+  assert.ok(workspace)
+[0m[90m
+  	at Context.<anonymous> (out/test/suite/cliReview.test.js:138:20)
+[0m
+[0m  16) CLI review tracer
+       palette command delivers stdin and displays preset results via watcher:
+[0m[31m     AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+  assert.ok(workspace)
+[0m[90m
+  	at Context.<anonymous> (out/test/suite/cliReview.test.js:138:20)
+[0m
+[0m  17) Two-provider comparison
+       registered command runs two fixture CLIs on one prompt and groups their saved results:
+[0m[31m     AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+  assert.ok(workspace && node)
+[0m[90m
+  	at Context.<anonymous> (out/test/suite/cliComparison.test.js:42:16)
+[0m
+Error: 17 tests failed.
+	at /Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/out/test/suite/index.js:48:32
+	at done (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/mocha/lib/mocha.js:1030:7)
+[90m[main 2026-11-21T17:49:38.226Z][0m Extension host with pid 2295 exited with code: 0, signal: unknown.
+[91m[main 2026-11-21T17:49:38.871Z][0m [AgentHost:stderr] (node:2292) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+(Use `Code Helper --trace-deprecation ...` to show where the warning was created)
+
+[91m[main 2026-11-21T17:49:39.229Z][0m AgentHostStarter: cannot create window connection: Agent Host process manager is shutting down.
+[91m[main 2026-11-21T17:49:40.235Z][0m AgentHostStarter: cannot create window connection: Agent Host process manager is shutting down.
+Exit code:   1
+Failed to run tests TestRunFailedError: Test run failed with code 1
+    at ChildProcess.onProcessClosed (/Users/gauwan/Codespaces/prompt-ai-code-review/.claude/worktrees/issue-41-qa/node_modules/@vscode/test-electron/out/runTest.js:110:24)
+    at ChildProcess.emit (node:events:524:28)
+    at ChildProcess._handle.onexit (node:internal/child_process:293:12) {
+  code: 1,
+  signal: undefined
+}
