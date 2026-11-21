@@ -1,0 +1,20 @@
+# QA command log — issue #38 v1 · 2026-11-21 · branch issue-38-cli-review-stuck-running @ 374a84e
+# Worktree: /tmp/sb38qa (short path; default worktree path overflows the 103-char IPC socket
+# limit and the VS Code test host dies with listen EINVAL)
+git worktree add /tmp/sb38qa issue-38-cli-review-stuck-running
+cd /tmp/sb38qa && npm ci
+npm run compile            # tsc --noEmit 0 errors + esbuild ok
+npm run lint               # 0 errors, 71 pre-existing warnings
+npm run test:cli           # node lane: # tests 78, # pass 77, # fail 0, # skipped 1
+npx tsc                    # emit out/ for the VS Code integration lane
+CLI_REVIEW_TEST=1 node /tmp/sb38qa-runner/run-qa.cjs
+#   -> 9 passing (33s) / 9 failing; all 4 new tests green:
+#   ✔ provider not on PATH: dialog offers switching, routes to the switcher, row settles
+#   ✔ no CLI on PATH: dialog offers opening settings, row settles
+#   ✔ cancelCLIReview heals a stale running row; live runs still confirm before stopping
+#   ✔ row settles even when the failure render itself fails (terminal-status guard)
+# main baseline (c152c52), identical invocation:
+git worktree add --detach /tmp/sb38qa-main c152c52
+cd /tmp/sb38qa-main && npm ci && npx tsc
+CLI_REVIEW_TEST=1 node /tmp/sb38qa-runner/run-main-baseline.cjs
+#   -> 5 passing (33s) / 9 failing; failing set identical to the branch (same tests, same file:line)
