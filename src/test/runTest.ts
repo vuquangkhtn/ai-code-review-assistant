@@ -13,6 +13,17 @@ export function resolveVSCodeExecutable(downloaded: string): string {
     return downloaded;
 }
 
+// The test host derives its IPC socket path from the user-data dir, and macOS rejects
+// AF_UNIX socket paths over 103 chars (issue #41). The default dir (<cwd>/.vscode-test/
+// user-data) overflows from any worktree path, failing the launch with `listen EINVAL`.
+// Pin a short, CWD-independent dir under os.tmpdir() instead, wiped before each run so
+// every run starts from a clean profile.
+function resolveUserDataDir(): string {
+    const userDataDir = path.join(os.tmpdir(), 'ai-code-review-test-host');
+    try { fs.rmSync(userDataDir, { recursive: true, force: true }); } catch { /* reuse prior dir */ }
+    return userDataDir;
+}
+
 async function main() {
     const fixtureWorkspace = process.env.CLI_REVIEW_TEST ? fs.mkdtempSync(path.join(os.tmpdir(), 'cli-review-')) : undefined;
     try {
@@ -38,7 +49,7 @@ async function main() {
                 || resolveVSCodeExecutable(await downloadAndUnzipVSCode()),
             extensionTestsEnv: { CLI_TEST_NODE: process.execPath },
             extensionTestsPath,
-            launchArgs: [workspacePath, '--skip-welcome', '--disable-workspace-trust'] // Open test-examples as workspace
+            launchArgs: [workspacePath, `--user-data-dir=${resolveUserDataDir()}`, '--skip-welcome', '--disable-workspace-trust'] // Open test-examples as workspace
         });
     } catch (err) {
         console.error('Failed to run tests', err);

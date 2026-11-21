@@ -18,10 +18,10 @@ const originalRegisterTree = vscode.window.registerTreeDataProvider.bind(vscode.
     return originalRegisterTree(viewId, provider);
 };
 
-// The recovery suite is declared first: mocha runs suites in declaration order, and the
-// `single-run lock ... after fail` test below leaves a hung run behind on current VS Code
-// test hosts (its failure dialog is never dismissed), which would refuse every later run
-// command via the single-run lock. Recovery scenarios need a clean run state.
+// The recovery suite is declared first: mocha runs suites in declaration order, and
+// recovery scenarios need a clean single-run lock. Before the lock test below stubbed its
+// failure dialog (issue #41), a failed ending left the dialog unanswered in the test host,
+// the run promise never settled, and the lock refused every later run command.
 suite('CLI review failure recovery (issue #38)', () => {
     const assertTerminalRow = async (tree: CodeReviewTreeProvider, expectedIcon: string) => {
         const row = (await tree.getChildren())[0];
@@ -328,6 +328,16 @@ suite('CLI review status', () => {
                 messages.push(message);
                 return Promise.resolve(undefined);
             };
+            // The failed ending renders the real failure dialog (the catch block in
+            // extension.ts); unstubbed its promise never settles in the test host, the run
+            // command never rethrows, and the single-run lock wedges every later suite
+            // (issue #41). Auto-dismiss while recording, so the dialog stays asserted.
+            const failureDialogs: { message: string; actions: string[] }[] = [];
+            const originalError = vscode.window.showErrorMessage;
+            (vscode.window as any).showErrorMessage = async (message: string, ...actions: string[]) => {
+                failureDialogs.push({ message, actions });
+                return undefined;
+            };
             const running = Promise.resolve(vscode.commands.executeCommand('aiCodeReview.runCLIReview'));
             // Attach immediately so the intentional failure cannot become unhandled.
             const outcome = running.then(() => undefined, error => error);
@@ -354,8 +364,14 @@ suite('CLI review status', () => {
                     fs.writeFileSync(release, 'release');
                 }
                 const error = await outcome;
-                if (ending === 'fail') { assert.match(String(error), /exit 7/); }
-                else { assert.strictEqual(error, undefined); }
+                if (ending === 'fail') {
+                    assert.match(String(error), /exit 7/);
+                    assert.strictEqual(failureDialogs.length, 1, 'failure dialog shown once');
+                    assert.match(failureDialogs[0].message, /CLI review failed: .*exit 7/, 'dialog names the failed run');
+                } else {
+                    assert.strictEqual(error, undefined);
+                    assert.deepStrictEqual(failureDialogs, [], 'no failure dialog on a clean ending');
+                }
                 await vscode.commands.executeCommand('aiCodeReview.copyPromptLocalChanges');
                 assert.strictEqual(messages.length, 0, 'copy-paste generation works again');
                 // Copy-paste generation works again: with changed files present the prompt is
@@ -375,6 +391,7 @@ suite('CLI review status', () => {
                 await vscode.commands.executeCommand('aiCodeReview.cancelCLIReview');
                 await outcome;
                 vscode.window.showWarningMessage = originalWarning;
+                (vscode.window as any).showErrorMessage = originalError;
                 await config.update('cli.customCommand', previous, vscode.ConfigurationTarget.Global);
                 for (const file of [fixture, marker, release]) { fs.rmSync(file, { force: true }); }
             }
