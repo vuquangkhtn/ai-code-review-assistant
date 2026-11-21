@@ -1,0 +1,164 @@
+## Code cross-check greps (AC1) — each README claim vs shipped src/
+
+### Presets: codex/claude/copilot/zcode + Windows wrappers
+$ src/ai/CLIPresets.ts:10-15 + 24
+export const cliPresets = [
+    { id: 'codex', args: ['--ask-for-approval', 'never', 'exec', '--sandbox', 'read-only', '-'], promptArgument: false },
+    { id: 'claude', args: ['-p', '--output-format', 'text'], promptArgument: false },
+    { id: 'copilot', args: ['--silent', '--allow-tool=read', '-p'], promptArgument: true },
+    { id: 'zcode', args: ['-p'], promptArgument: true }
+];
+            for (const extension of process.platform === 'win32' ? ['.exe', '.com', '.cmd', '.bat'] : ['']) {
+
+### Pick-once persistence / silent single provider / customCommand override
+$ src/ai/CLIPresets.ts:46,57-64
+    if (options.customCommand.trim()) { return options.customCommand.trim(); }
+    if (!selected) { selected = available.find(provider => provider.id === options.savedProvider); }
+    if (!selected) {
+        const id = available.length === 1 ? available[0].id : await options.choose(available.map(provider => provider.id));
+        if (!id) { return undefined; }
+        selected = available.find(provider => provider.id === id);
+        if (!selected) { throw new Error('Selected CLI is no longer available.'); }
+        await options.save(selected.id);
+    }
+
+### Stall fail-fast watchdog
+$ src/ai/CLIReview.ts:82-90
+        // Startup watchdog: a silent CLI (auth prompt, network stall, bad invocation) must
+        // fail fast instead of burning the full timeout. The first output on any stream
+        // proves the CLI is alive and disarms the watchdog; only the full timeout then
+        // applies, so long-but-alive reviews are never killed early.
+        const stallWindow = options.stallTimeoutMs ?? 120000;
+        let sawOutput = false;
+        const stallTimer = stallWindow > 0 ? setTimeout(() => {
+            stop(new Error(`CLI review stalled: no output within ${stallWindow} ms (aiCodeReview.cli.stallTimeoutMs). The CLI may be waiting for authentication or a network connection.`));
+        }, stallWindow) : undefined;
+
+### Tree row live per-file progress + stop-confirm title
+$ src/ui/CodeReviewTreeProvider.ts:11-15
+    if (status.kind === 'running') {
+        const progress = status.progress ? `${status.progress.reviewed}/${status.progress.total} files` : 'Running…';
+        return { label: 'CLI Review', description: progress, icon: 'loading~spin',
+            commandId: 'aiCodeReview.cancelCLIReview', commandTitle: 'Stop the running review?',
+            contextValue: 'cliReviewRunning', tooltip: 'Click to stop the running review (asks for confirmation)' };
+
+### Confirm-to-stop dialog
+$ src/extension.ts:209-214
+        vscode.commands.registerCommand('aiCodeReview.cancelCLIReview', async () => {
+            const run = cliRun;
+            if (!run) { return; }
+            const choice = await vscode.window.showWarningMessage('Stop the running review?', { modal: true }, 'Stop');
+            if (choice === 'Stop') { run.abort(); }
+        }),
+
+### Trusted workspace gate
+$ src/extension.ts:227-230
+                const workspace = vscode.workspace.workspaceFolders?.[0];
+                if (!workspace || !vscode.workspace.isTrusted) {
+                    throw new Error('CLI review requires a trusted workspace.');
+                }
+
+### Failure recovery: names alternatives + Switch CLI Provider action
+$ src/extension.ts:305-313 and src/ai/CLIPresets.ts:171-173
+                    const failed = recovery ? `${message}\n${recovery.message}` : message;
+                    cliOutput.appendLine(`\nCLI review failed: ${failed}`);
+                    codeReviewTreeProvider.setCLIStatus({ kind: 'failed', message: failed });
+                    const actions = recovery
+                        ? (recovery.alternatives.length ? ['Switch CLI Provider', 'Show Output'] : ['Show Output', 'Open Settings'])
+                        : [];
+                    const picked = await vscode.window.showErrorMessage(`CLI review failed: ${message}`, ...actions);
+                    if (picked === 'Switch CLI Provider') {
+                        await vscode.commands.executeCommand('aiCodeReview.selectCLIProvider');
+        return {
+            alternatives,
+            message: `Switch provider: run "AI Code Review: Select CLI Provider" and pick ${alternatives.join(' or ')}.`
+
+### Branch comparison wired into CLI mode
+$ src/extension.ts:151-161
+    const collectCLIChanges = async (controller: AbortController) => {
+        const changeType = vscode.workspace.getConfiguration('aiCodeReview').get<string>('defaultChangeType', 'local');
+        if (changeType !== 'branch' && changeType !== 'commit') {
+            controller.signal.throwIfAborted();
+            return changeDetector.detectAndStoreLocalChanges();
+        }
+        const branches = await selectComparisonBranches(() => !controller.signal.aborted);
+        controller.signal.throwIfAborted();
+        if (!branches) { return; }
+        return changeDetector.detectAndStoreBranchChanges(branches.source, branches.target);
+    };
+
+### Paste to AI Chat… completion alert
+$ src/ai/ExternalAIManager.ts:97-107
+            const changeTypeLabel = this.getChangeTypeLabel(request.changeInfo.type);
+            vscode.window.showInformationMessage(
+                `Prompt For ${changeTypeLabel} copied to clipboard!`,
+                'Open Changes',
+                'Paste to AI Chat…'
+            ).then(selection => {
+                if (selection === 'Open Changes') {
+                    vscode.commands.executeCommand('aiCodeReview.openChangeFile');
+                } else if (selection === 'Paste to AI Chat…') {
+                    vscode.commands.executeCommand('aiCodeReview.pastePrompt');
+                }
+
+### Confidence / evidence fields + policy Blocking
+$ src/types/index.ts:9-10
+    confidence?: 'high' | 'medium' | 'low';
+    evidence?: string;
+$ src/ui/IssuesPanelProvider.ts:196-201
+        const blockOn = parseBlockOn(vscode.workspace.getConfiguration('aiCodeReview').get('policy.blockOn'));
+        return filteredIssues.map(issue => {
+            const isResolved = this.isIssueResolved(issue.id);
+            const iconName = isResolved ? 'check' : this.getSeverityIcon(issue.severity);
+            const blocked = isPolicyBlocked(issue.severity, blockOn);
+            const label = (blocked ? '⛔ Blocking · ' : '') + (isResolved ? `✓ ${issue.title}` : issue.title);
+
+### ChangeType enum (local, commit, branch) — 'commits' review type is real
+$ src/types/index.ts:92-97
+export enum ChangeType {
+    LOCAL = 'local',
+    COMMIT = 'commit',
+    BRANCH = 'branch',
+    ALL_FILES = 'all-files'
+}
+
+### Privacy code check: zero outbound AI calls in src/
+$ grep -rn "fetch(\|axios\|https\.request\|http\.request\|XMLHttpRequest" src --include=*.ts (excluding tests)
+outbound-call matches: 0
+
+## Stale-claim grep (AC1b)
+$ grep -n "All Files\|review entire codebase\|No API keys or additional setup" README.md
+no matches — stale wording gone
+
+## Privacy claim side-by-side (AC4)
+README.md:73:
+- **Privacy**: Manual copy-paste mode makes no outbound AI calls. CLI mode sends code through the CLI’s own backend only when you explicitly run **CLI Review**
+FEATURES.md:24:
+- Manual mode makes no outbound AI calls; explicitly triggered CLI reviews send code through the CLI’s own backend
+
+## Repo one-liner (AC3)
+chars: 164 (GitHub repo description limit: 350)
+identical to package.json description: True
+present in PR #37 author notes (repo-description: line): yes — read via gh pr view 37
+## JSON validity + metadata (AC2)
+package.json: valid JSON
+description: AI code reviews in VS Code: copy-paste structured prompts with any AI, or run one-click CLI reviews through Codex, Claude Code, Copilot CLI, or zcode — no API keys.
+keywords: ["code review", "ai", "cli", "codex", "claude", "copilot", "chatgpt", "zcode", "prompt", "amazon-q", "cursor-ai", "typescript", "javascript", "html"]
+version: 0.10.0
+
+## contributes: CLI + manual commands (AC1)
+aiCodeReview.cancelCLIReview                  | Cancel CLI Review
+aiCodeReview.selectCLIProvider                | Select CLI Provider
+aiCodeReview.runCLIReview                     | CLI Review
+aiCodeReview.copyPrompt                       | Manual Review
+aiCodeReview.copyPromptLocalChanges           | Local Changes - Only local changes (use git diff to check)
+aiCodeReview.copyPromptCompareBranches        | Compare Branches - Compare changes between two branches
+aiCodeReview.pastePrompt                      | Paste Prompt to AI Chat
+palette All Files entries: none (stale quick command absent)
+
+## configuration keys named by README (AC1)
+aiCodeReview.cli.comparisonCommands = {}
+aiCodeReview.cli.customCommand = ""
+aiCodeReview.cli.defaultProvider = "auto"
+aiCodeReview.cli.stallTimeoutMs = 120000
+aiCodeReview.policy.blockOn = "off"

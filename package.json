@@ -1,7 +1,7 @@
 {
   "name": "ai-code-review-assistant",
   "displayName": "AI Prompt Code Review",
-  "description": "Generating AI Code review Prompt. Work with any AI Providers",
+  "description": "AI code reviews in VS Code: copy-paste structured prompts with any AI, or run one-click CLI reviews through Codex, Claude Code, Copilot CLI, or zcode — no API keys.",
   "version": "0.10.0",
   "publisher": "vuquangkhtn",
   "license": "MIT",
@@ -25,11 +25,16 @@
   ],
   "keywords": [
     "code review",
-    "AI",
+    "ai",
+    "cli",
+    "codex",
+    "claude",
     "copilot",
+    "chatgpt",
+    "zcode",
+    "prompt",
     "amazon-q",
     "cursor-ai",
-    "chatgpt",
     "typescript",
     "javascript",
     "html"
