@@ -4,15 +4,16 @@
 
 **🌐 Homepage:** https://vuquangkhtn.github.io/ai-code-review-assistant/
 
-This VS Code extension generates structured prompts for AI code reviews that you can use with **any AI provider** of your choice (ChatGPT, Claude, Gemini, Copilot, etc.). Simply copy the generated prompt, paste it into your preferred AI tool, and get comprehensive code review feedback.
+This VS Code extension generates structured prompts for AI code reviews, with two ways to run the review: copy the generated prompt into **any AI provider** of your choice (ChatGPT, Claude, Gemini, Copilot, etc.), or run **CLI Review** through an AI CLI you already have installed (Codex, Claude Code, Copilot CLI, zcode) and get the structured feedback directly in VS Code.
 
 ## ✨ Key Features
 
-- 🔄 **No API Keys Required** - Works with any AI provider through copy-paste
+- 🔄 **No API Keys Required** - Manual copy-paste works with any AI provider; CLI mode uses the CLI's own login
+- 🤖 **One-Click CLI Review** - Detected presets for Codex, Claude Code, Copilot CLI and zcode, a provider switcher, and `aiCodeReview.cli.defaultProvider` to pin one up front
 - 🎯 **Smart Prompt Generation** - Creates detailed prompts with code context
-- 📊 **Structured Results** - Displays AI feedback in organized panels
-- 🔍 **Multiple Review Types** - Local changes, commits, or branch comparisons
-- 🎨 **Clean Interface** - Issues panel with severity indicators and navigation
+- 🔍 **Multiple Review Types** - Local changes, commits, or branch comparisons, in both manual and CLI mode
+- ⚡ **Live Progress & Fail-Fast** - Per-file progress while the CLI runs; a stuck CLI fails fast with a **Switch CLI Provider** recovery action
+- 📊 **Structured Results** - Issues panel with severity indicators and navigation, optional confidence and evidence on each finding, and policy-based `Blocking` flags (`aiCodeReview.policy.blockOn`)
 
 ## 🎬 Demo
 
@@ -23,28 +24,37 @@ This VS Code extension generates structured prompts for AI code reviews that you
 ## 🛠️ Installation
 
 1. Install the extension from the VS Code marketplace
-2. That's it! No API keys or additional setup required
+2. That's it! Manual copy-paste mode needs no API keys or additional setup
+3. Optional: for one-click **CLI Review**, have one provider CLI (`codex`, `claude`, `copilot`, or `zcode`) installed and authenticated on your PATH
 
 ## 🚀 Simple Usage
 
-### 3-Step Process
+### Manual mode: 3-step process
 1. **Generate Prompt**: Use `Cmd+K Cmd+G` or run the "Manual Review" command
-2. **Copy to AI**: Copy the generated prompt to your favorite AI (ChatGPT, Claude, etc.)
+2. **Copy to AI**: Use **Paste to AI Chat…** on the completion alert for paste instructions, and paste the prompt into your favorite AI (ChatGPT, Claude, etc.)
 3. **View Results**: Save the AI response as JSON and see organized feedback in VS Code
+
+### CLI mode: one-click review
+1. Run **AI Code Review: CLI Review** in a trusted workspace
+2. With no custom command configured, the extension detects Codex, Claude Code, Copilot CLI and zcode on PATH; one detected provider runs silently, or you pick once and the choice persists across sessions
+3. Watch live per-file progress on the review tree row; clicking the running row (or **Cancel CLI Review**) asks "Stop the running review?" before it aborts
+4. If the CLI stalls, the run fails fast instead of hanging; when another provider is detected, the failure message names the alternatives and offers a **Switch CLI Provider** action to recover immediately
+
+To fix the provider up front, set `aiCodeReview.cli.defaultProvider` (`auto` keeps the detect-once behavior), or run **AI Code Review: Select CLI Provider** to switch anytime. A custom command (`aiCodeReview.cli.customCommand`) always overrides the presets. The provider CLIs must already be installed and authenticated; on Windows, detection covers native executables and `.cmd`/`.bat` wrappers. Branch comparison works here too: select **Compare Branches** and the CLI receives the branch-diff prompt.
 
 ### Quick Commands
 - **`Cmd+K Cmd+G`** - Manual Review (most common)
+- **`AI Code Review: CLI Review`** - Run the review through your installed CLI
+- **`AI Code Review: Select CLI Provider`** - Switch CLI providers from the palette
 - **`AI Code Review: Local Changes`** - Review uncommitted changes
-- **`AI Code Review: All Files`** - Review entire codebase
 - **`AI Code Review: Compare Branches`** - Compare between branches
 
 📖 **For detailed usage instructions and all features, see our [Complete Features Guide](FEATURES.md)**
 
 ### How It Works
 1. **Choose what to review**: Local changes, specific commits, or branch comparisons
-2. **Get your prompt**: Extension generates a detailed prompt with your code context
-3. **Use any AI**: Copy-paste the prompt into ChatGPT, Claude, Gemini, or any AI tool
-4. **See organized results**: Save the AI response as JSON and get structured feedback in VS Code
+2. **Run the review**: copy the generated prompt into ChatGPT, Claude, Gemini, or any AI tool, or let CLI mode run it through your installed provider
+3. **See organized results**: Save the AI response as JSON and get structured feedback in VS Code
 
 ## 🤖 Works with Any AI Provider
 
@@ -103,13 +113,3 @@ Every star, review, and piece of feedback motivates us to keep building awesome 
 ---
 
 *Built with ❤️ for developers who want AI-powered code reviews without the complexity*
-### CLI provider defaults
-
-Run **AI Code Review: CLI Review** in a trusted workspace. With no
-`aiCodeReview.cli.customCommand`, the extension detects `codex`, `claude`,
-`copilot`, and `zcode` on PATH. One provider is selected silently; with several,
-pick once. The choice persists in VS Code across sessions. Set
-`aiCodeReview.cli.defaultProvider` to fix the provider up front (`auto` keeps the
-detect-once behavior), and run **AI Code Review: Select CLI Provider** to switch
-providers from the Command Palette. A custom command always overrides the preset.
-CLIs must already be installed and authenticated. Windows detection includes native executables and `.cmd`/`.bat` wrappers.
