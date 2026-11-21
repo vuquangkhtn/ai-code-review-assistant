@@ -391,3 +391,30 @@ Run **AI Code Review: Compare Two CLI Providers** and select exactly two entries
 When `aiCodeReview.cli.comparisonCommands` has no named commands, the comparison falls back to the same preset auto-detection as CLI Review (Codex, Claude Code, Copilot CLI on PATH): with exactly two detected both run directly; with more than two a picker selects the two to compare; with fewer than two the error names the setting and shows a two-entry example. Named entries remain the explicit override and keep their labels in the output headers.
 
 The **Provider Comparison** sidebar groups findings by file and line. Matching titles (ignoring case and surrounding whitespace) at the same location are marked **Shared**; others are **Unique**. Provider rows retain severity and optional confidence, with descriptions, suggestions and evidence in the tooltip. Shared means matching reports, not independent proof that a finding is correct.
+
+### Release automation
+
+Releases run on `main` through `semantic-release` (`.releaserc.json`), with
+`@semantic-release/commit-analyzer` as the sole bump authority. There are two
+working trigger paths:
+
+1. **Auto (push to `main`):** land bare conventional-commit titles — `feat: …`
+   bumps minor, `fix: …` bumps patch, `BREAKING CHANGE` bumps major. The
+   Complete CI/CD Pipeline then validates the build, publishes the GitHub
+   release and tag, and builds/publishes the VSIX to the marketplaces.
+2. **Manual (`workflow_dispatch` of the Complete CI/CD Pipeline):** only
+   *Skip marketplace publishing* is offered. It runs the same pipeline without
+   the marketplace publish jobs — it does **not** force a release or override
+   the bump type.
+
+Commit-analyzer reads the commit title's conventional type. Squash titles
+prefixed with emoji (the board's `✨ [feat] …` style) match no release rule and
+intentionally do not trigger a release — documented in issue #24. To release a
+batch whose merge was emoji-prefixed, land a follow-up bare `feat:`/`fix:` commit
+on `main` (an empty `git commit --allow-empty -m "feat: trigger release …"` is fine).
+
+`semantic-release` has no forced-release mode: with no qualifying commits since
+the last tag it reports "no relevant changes" and the pipeline stops before
+publishing. The former `version_type` and `force_release` dispatch inputs were
+removed for that reason (issue #39) — they never reached semantic-release, so
+they silently did nothing while the pipeline still reported success.
