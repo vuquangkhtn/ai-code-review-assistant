@@ -1,9 +1,228 @@
 import * as assert from 'assert';
 import * as vscode from 'vscode';
 import * as fs from 'fs';
+import * as os from 'os';
 import * as path from 'path';
 import { suite, test } from 'mocha';
 import { CodeReviewTreeProvider } from '../../ui/CodeReviewTreeProvider';
+import { CLIReviewStatus } from '../../types';
+
+// Capture the extension's registered CLI Review tree provider so the recovery tests can
+// read the row status the run command leaves behind. Test modules are all loaded before
+// the first test executes, so this wrapper is installed before any test activates the
+// extension. It only records the first registration; registration behavior is unchanged.
+const cliTree: { provider?: CodeReviewTreeProvider } = {};
+const originalRegisterTree = vscode.window.registerTreeDataProvider.bind(vscode.window);
+(vscode.window as any).registerTreeDataProvider = (viewId: string, provider: any) => {
+    if (viewId === 'aiCodeReviewPanel' && !cliTree.provider) { cliTree.provider = provider; }
+    return originalRegisterTree(viewId, provider);
+};
+
+// The recovery suite is declared first: mocha runs suites in declaration order, and the
+// `single-run lock ... after fail` test below leaves a hung run behind on current VS Code
+// test hosts (its failure dialog is never dismissed), which would refuse every later run
+// command via the single-run lock. Recovery scenarios need a clean run state.
+suite('CLI review failure recovery (issue #38)', () => {
+    const assertTerminalRow = async (tree: CodeReviewTreeProvider, expectedIcon: string) => {
+        const row = (await tree.getChildren())[0];
+        assert.notStrictEqual(row.contextValue, 'cliReviewRunning', 'row must not stay running');
+        assert.strictEqual(row.command?.command, 'aiCodeReview.runCLIReview', 'row must offer re-run');
+        assert.strictEqual((row.iconPath as vscode.ThemeIcon).id, expectedIcon);
+        return row;
+    };
+
+    const activateWithWorkspace = async () => {
+        const extension = vscode.extensions.getExtension('vuquangkhtn.ai-code-review-assistant');
+        assert.ok(extension);
+        await extension.activate();
+        const workspace = vscode.workspace.workspaceFolders?.[0];
+        const node = process.env.CLI_TEST_NODE;
+        assert.ok(workspace && node);
+        const tree = cliTree.provider;
+        assert.ok(tree, 'extension CLI Review tree provider was captured');
+        return { workspace, node, tree };
+    };
+
+    // Records every warning so tests can prove the run command was not refused by the
+    // single-run lock (a leftover active run would emit "A CLI review is running...").
+    const captureWarnings = () => {
+        const messages: string[] = [];
+        const original = vscode.window.showWarningMessage;
+        vscode.window.showWarningMessage = (message: string) => {
+            messages.push(message);
+            return Promise.resolve(/Stop the running review/.test(message) ? 'Stop' : undefined);
+        };
+        return { messages, restore: () => { vscode.window.showWarningMessage = original; } };
+    };
+
+    test('provider not on PATH: dialog offers switching, routes to the switcher, row settles', async function () {
+        this.timeout(30000);
+        const { node, tree } = await activateWithWorkspace();
+        const warnings = captureWarnings();
+        const config = vscode.workspace.getConfiguration('aiCodeReview');
+        const previousCommand = config.inspect<string>('cli.customCommand')?.globalValue;
+        const previousProvider = config.inspect<string>('cli.defaultProvider')?.globalValue;
+        const previousPATH = process.env.PATH;
+        const bin = fs.mkdtempSync(path.join(os.tmpdir(), 'cli-recovery-'));
+        // One other provider is detected, so recovery can offer switching to it.
+        fs.writeFileSync(path.join(bin, 'claude'), `#!${node}\nprocess.exit(1);`, { mode: 0o755 });
+        process.env.PATH = bin;
+        const dialogs: { message: string; actions: string[] }[] = [];
+        const originalError = vscode.window.showErrorMessage;
+        const originalPick = vscode.window.showQuickPick;
+        (vscode.window as any).showErrorMessage = async (message: string, ...actions: string[]) => {
+            dialogs.push({ message, actions });
+            return 'Switch CLI Provider';
+        };
+        let switcher: { placeholder?: string; items: string[] } | undefined;
+        Object.defineProperty(vscode.window, 'showQuickPick', { configurable: true, value: async (items: readonly vscode.QuickPickItem[], options: vscode.QuickPickOptions) => {
+            switcher = { placeholder: options?.placeHolder, items: items.map(item => (item as any).id ?? item.label) };
+            return undefined;
+        }});
+        try {
+            await config.update('cli.customCommand', '', vscode.ConfigurationTarget.Global);
+            await config.update('cli.defaultProvider', 'zcode', vscode.ConfigurationTarget.Global);
+            const outcome = await vscode.commands.executeCommand('aiCodeReview.runCLIReview')
+                .then(() => undefined, (error: unknown) => error);
+            assert.deepStrictEqual(warnings.messages, [], 'no leftover run refused the command');
+            assert.match(String(outcome), /zcode CLI was not found on PATH/, 'provider-not-found rejects the run');
+            assert.strictEqual(dialogs.length, 1, 'failure dialog was shown once');
+            assert.ok(dialogs[0].actions.includes('Switch CLI Provider'),
+                `dialog should offer switching, got: ${dialogs[0].actions.join(', ')}`);
+            assert.strictEqual(switcher?.placeholder, 'Select the CLI provider for AI reviews',
+                'switch action routes to the aiCodeReview.selectCLIProvider quickpick');
+            assert.ok(switcher?.items.includes('claude'), 'switcher lists the detected alternative');
+            const row = await assertTerminalRow(tree, 'error');
+            assert.match(String(row.tooltip), /zcode CLI was not found on PATH/, 'row carries the failure message');
+        } finally {
+            warnings.restore();
+            (vscode.window as any).showErrorMessage = originalError;
+            Object.defineProperty(vscode.window, 'showQuickPick', { configurable: true, value: originalPick });
+            process.env.PATH = previousPATH;
+            fs.rmSync(bin, { recursive: true, force: true });
+            await config.update('cli.customCommand', previousCommand, vscode.ConfigurationTarget.Global);
+            await config.update('cli.defaultProvider', previousProvider, vscode.ConfigurationTarget.Global);
+        }
+    });
+
+    test('no CLI on PATH: dialog offers opening settings, row settles', async function () {
+        this.timeout(30000);
+        const { tree } = await activateWithWorkspace();
+        const warnings = captureWarnings();
+        const config = vscode.workspace.getConfiguration('aiCodeReview');
+        const previousCommand = config.inspect<string>('cli.customCommand')?.globalValue;
+        const previousProvider = config.inspect<string>('cli.defaultProvider')?.globalValue;
+        const previousPATH = process.env.PATH;
+        const bin = fs.mkdtempSync(path.join(os.tmpdir(), 'cli-empty-'));
+        process.env.PATH = bin;
+        const dialogs: { message: string; actions: string[] }[] = [];
+        const originalError = vscode.window.showErrorMessage;
+        (vscode.window as any).showErrorMessage = async (message: string, ...actions: string[]) => {
+            dialogs.push({ message, actions });
+            return undefined;
+        };
+        try {
+            await config.update('cli.customCommand', '', vscode.ConfigurationTarget.Global);
+            await config.update('cli.defaultProvider', 'zcode', vscode.ConfigurationTarget.Global);
+            const outcome = await vscode.commands.executeCommand('aiCodeReview.runCLIReview')
+                .then(() => undefined, (error: unknown) => error);
+            assert.deepStrictEqual(warnings.messages, [], 'no leftover run refused the command');
+            assert.match(String(outcome), /No supported CLI found on PATH/, 'no-CLI failure rejects the run');
+            assert.deepStrictEqual(dialogs[0]?.actions, ['Show Output', 'Open Settings'],
+                'without alternatives the dialog offers opening the cli settings');
+            await assertTerminalRow(tree, 'error');
+        } finally {
+            warnings.restore();
+            (vscode.window as any).showErrorMessage = originalError;
+            process.env.PATH = previousPATH;
+            fs.rmSync(bin, { recursive: true, force: true });
+            await config.update('cli.customCommand', previousCommand, vscode.ConfigurationTarget.Global);
+            await config.update('cli.defaultProvider', previousProvider, vscode.ConfigurationTarget.Global);
+        }
+    });
+
+    test('cancelCLIReview heals a stale running row; live runs still confirm before stopping', async function () {
+        this.timeout(30000);
+        const { workspace, node, tree } = await activateWithWorkspace();
+        const warnings = captureWarnings();
+        const config = vscode.workspace.getConfiguration('aiCodeReview');
+        const previousCommand = config.inspect<string>('cli.customCommand')?.globalValue;
+        const fixture = path.join(workspace.uri.fsPath, 'heal-review.cjs');
+        const marker = path.join(workspace.uri.fsPath, 'heal-started.txt');
+        let running: Promise<unknown> | undefined;
+        try {
+            // Stale render: the row claims running while no run is active.
+            tree.setCLIStatus({ kind: 'running' });
+            await vscode.commands.executeCommand('aiCodeReview.cancelCLIReview');
+            assert.deepStrictEqual(warnings.messages, [], 'no stop confirmation for a stale row');
+            await assertTerminalRow(tree, 'play');
+
+            // A live run keeps confirm-to-stop and ends idle after the abort.
+            fs.writeFileSync(fixture, `require('fs').writeFileSync(${JSON.stringify(marker)}, String(process.pid));
+                process.stdin.resume(); setTimeout(() => {}, 30000);`);
+            await config.update('cli.customCommand', `"${node}" "${fixture}"`, vscode.ConfigurationTarget.Global);
+            running = Promise.resolve(vscode.commands.executeCommand('aiCodeReview.runCLIReview'));
+            const outcome = running.then(() => undefined, (error: unknown) => error);
+            const deadline = Date.now() + 10000;
+            while (!fs.existsSync(marker) && Date.now() < deadline) {
+                await new Promise(resolve => setTimeout(resolve, 50));
+            }
+            assert.ok(fs.existsSync(marker), 'fixture started');
+            await vscode.commands.executeCommand('aiCodeReview.cancelCLIReview');
+            assert.ok(warnings.messages.some(message => /Stop the running review/.test(message)),
+                'live run asks for confirmation');
+            await outcome;
+            await assertTerminalRow(tree, 'play');
+        } finally {
+            warnings.restore();
+            if (running) {
+                await vscode.commands.executeCommand('aiCodeReview.cancelCLIReview');
+                await running.catch(() => undefined);
+            }
+            await config.update('cli.customCommand', previousCommand, vscode.ConfigurationTarget.Global);
+            fs.rmSync(fixture, { force: true });
+            fs.rmSync(marker, { force: true });
+        }
+    });
+
+    test('row settles even when the failure render itself fails (terminal-status guard)', async function () {
+        this.timeout(30000);
+        const { node, tree } = await activateWithWorkspace();
+        const warnings = captureWarnings();
+        const config = vscode.workspace.getConfiguration('aiCodeReview');
+        const previousCommand = config.inspect<string>('cli.customCommand')?.globalValue;
+        const previousProvider = config.inspect<string>('cli.defaultProvider')?.globalValue;
+        const previousPATH = process.env.PATH;
+        const bin = fs.mkdtempSync(path.join(os.tmpdir(), 'cli-guard-'));
+        fs.writeFileSync(path.join(bin, 'claude'), `#!${node}\nprocess.exit(1);`, { mode: 0o755 });
+        process.env.PATH = bin;
+        // Break only the `failed` render: the run command must still force a terminal row.
+        const originalSetCLIStatus = tree.setCLIStatus.bind(tree);
+        let failedRenders = 0;
+        (tree as any).setCLIStatus = (status: CLIReviewStatus) => {
+            if (status.kind === 'failed') { failedRenders++; throw new Error('row render exploded'); }
+            return originalSetCLIStatus(status);
+        };
+        try {
+            await config.update('cli.customCommand', '', vscode.ConfigurationTarget.Global);
+            await config.update('cli.defaultProvider', 'zcode', vscode.ConfigurationTarget.Global);
+            const outcome = await vscode.commands.executeCommand('aiCodeReview.runCLIReview')
+                .then(() => undefined, (error: unknown) => error);
+            assert.deepStrictEqual(warnings.messages, [], 'no leftover run refused the command');
+            assert.match(String(outcome), /row render exploded/, 'the render failure surfaces');
+            assert.strictEqual(failedRenders, 1, 'the failed render was attempted once');
+            await assertTerminalRow(tree, 'play');
+        } finally {
+            warnings.restore();
+            (tree as any).setCLIStatus = originalSetCLIStatus;
+            process.env.PATH = previousPATH;
+            fs.rmSync(bin, { recursive: true, force: true });
+            await config.update('cli.customCommand', previousCommand, vscode.ConfigurationTarget.Global);
+            await config.update('cli.defaultProvider', previousProvider, vscode.ConfigurationTarget.Global);
+        }
+    });
+
+});
 
 suite('CLI review status', () => {
     test('one CLI Review row reflects the run: order, renames, no separate status row', async () => {

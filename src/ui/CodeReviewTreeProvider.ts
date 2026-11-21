@@ -40,6 +40,11 @@ export class CodeReviewTreeProvider implements vscode.TreeDataProvider<CodeRevie
         this.refresh();
     }
 
+    /** Current row status so commands can heal a stale `running` render (issue #38). */
+    getCLIStatus(): CLIReviewStatus {
+        return this.cliStatus;
+    }
+
     private currentDefaultChangeType: string = 'local';
 
     constructor() {
