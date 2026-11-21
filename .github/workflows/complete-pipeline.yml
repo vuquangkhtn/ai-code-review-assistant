@@ -10,20 +10,6 @@ on:
       - '.vscode/**'
   workflow_dispatch:
     inputs:
-      force_release:
-        description: 'Force a release even without significant changes'
-        required: false
-        default: false
-        type: boolean
-      version_type:
-        description: 'Override version bump type (leave empty for auto-detection)'
-        required: false
-        type: choice
-        options:
-          - auto
-          - patch
-          - minor
-          - major
       skip_publish:
         description: 'Skip marketplace publishing'
         required: false
@@ -49,7 +35,6 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       should_release: ${{ steps.check-changes.outputs.should_release }}
-      version_type: ${{ steps.check-changes.outputs.version_type }}
       vsix_name: ${{ steps.package.outputs.vsix_name }}
     steps:
       - name: Checkout code
@@ -102,35 +87,31 @@ jobs:
         run: |
           # Get the last release tag
           LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
-          
+
           if [ -z "$LAST_TAG" ]; then
             echo "No previous tags found, will create initial release"
             echo "should_release=true" >> $GITHUB_OUTPUT
-            echo "version_type=minor" >> $GITHUB_OUTPUT
             exit 0
           fi
-          
-          # Check commits since last tag for conventional commit types
+
+          # Check commits since last tag for conventional commit types.
+          # Bare feat/fix titles are the documented release trigger (#24 / PR #27);
+          # emoji-prefixed squash titles intentionally do not qualify.
           COMMITS_SINCE_TAG=$(git log $LAST_TAG..HEAD --oneline)
-          
+
           if [ -z "$COMMITS_SINCE_TAG" ]; then
             echo "No commits since last tag"
-            if [ "${{ github.event.inputs.force_release }}" = "true" ]; then
-              echo "Forcing release due to manual trigger"
-              echo "should_release=true" >> $GITHUB_OUTPUT
-              echo "version_type=patch" >> $GITHUB_OUTPUT
-            else
-              echo "should_release=false" >> $GITHUB_OUTPUT
-            fi
+            echo "should_release=false" >> $GITHUB_OUTPUT
             exit 0
           fi
-          
+
           # Analyze commit types for version bump
           HAS_BREAKING=$(echo "$COMMITS_SINCE_TAG" | grep -i "BREAKING CHANGE" || true)
           HAS_FEAT=$(echo "$COMMITS_SINCE_TAG" | grep -E "^[a-f0-9]+ feat" || true)
           HAS_FIX=$(echo "$COMMITS_SINCE_TAG" | grep -E "^[a-f0-9]+ fix" || true)
-          
-          # Determine version type
+
+          # Estimated bump type is informational only — semantic-release
+          # decides the final bump and whether a release happens at all
           if [ -n "$HAS_BREAKING" ]; then
             VERSION_TYPE="major"
           elif [ -n "$HAS_FEAT" ]; then
@@ -144,24 +125,13 @@ jobs:
               VERSION_TYPE="patch"
             else
               echo "No significant changes found for release"
-              if [ "${{ github.event.inputs.force_release }}" = "true" ]; then
-                echo "Forcing release due to manual trigger"
-                VERSION_TYPE="patch"
-              else
-                echo "should_release=false" >> $GITHUB_OUTPUT
-                exit 0
-              fi
+              echo "should_release=false" >> $GITHUB_OUTPUT
+              exit 0
             fi
           fi
-          
-          # Override with manual input if provided
-          if [ -n "${{ github.event.inputs.version_type }}" ] && [ "${{ github.event.inputs.version_type }}" != "auto" ]; then
-            VERSION_TYPE="${{ github.event.inputs.version_type }}"
-          fi
-          
+
           echo "should_release=true" >> $GITHUB_OUTPUT
-          echo "version_type=$VERSION_TYPE" >> $GITHUB_OUTPUT
-          echo "Will create $VERSION_TYPE release"
+          echo "Release-worthy changes detected (estimated bump: $VERSION_TYPE) — semantic-release decides the final bump"
 
       - name: Install publishing tools
         if: steps.check-changes.outputs.should_release == 'true'
@@ -258,21 +228,25 @@ jobs:
         run: |
           # Use semantic-release to create version, changelog, tag, and GitHub release
           echo "Creating release with semantic-release..."
+          BEFORE_TAGS=$(git tag -l 'v*' | sort -u)
           npx semantic-release
-          
-          # Get the new version and tag if release was created
-          if [ -f package.json ]; then
-            NEW_VERSION=$(node -p "require('./package.json').version")
-            TAG_NAME="v$NEW_VERSION"
-            
+
+          # A release exists only if semantic-release actually pushed a new tag:
+          # diff the tags before/after instead of trusting the step's success line.
+          git fetch --tags --force --quiet
+          AFTER_TAGS=$(git tag -l 'v*' | sort -u)
+          NEW_TAG=$(comm -13 <(printf '%s\n' "$BEFORE_TAGS") <(printf '%s\n' "$AFTER_TAGS") | head -1)
+
+          if [ -n "$NEW_TAG" ]; then
+            NEW_VERSION="${NEW_TAG#v}"
             echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
-            echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
+            echo "tag_name=$NEW_TAG" >> $GITHUB_OUTPUT
             echo "release_created=true" >> $GITHUB_OUTPUT
-            
-            echo "✅ Released version $NEW_VERSION with tag $TAG_NAME"
+
+            echo "✅ Released version $NEW_VERSION with tag $NEW_TAG"
           else
-            echo "No release created - no significant changes found"
             echo "release_created=false" >> $GITHUB_OUTPUT
+            echo "ℹ️ No release created — semantic-release found no relevant changes (publish stages are skipped)"
           fi
 
   # Stage 4: Prepare for Publishing (Simplified - VSIX will be built fresh in publish job)
@@ -477,4 +451,4 @@ jobs:
           echo "**Reason:** No significant changes detected since last release"
           echo "**Build & Test:** ${{ needs.build-and-test.result }}"
           echo ""
-          echo "To force a release, use the manual workflow trigger with 'force_release' enabled."
+          echo "Releases trigger from bare conventional commits (feat:/fix:) on main — see FEATURES.md."

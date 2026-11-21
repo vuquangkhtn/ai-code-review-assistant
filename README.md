@@ -80,6 +80,16 @@ This extension is designed to work with **any AI provider** you prefer:
 Works with all major programming languages:
 - JavaScript, TypeScript, Python, Java, C#, Go, Rust, PHP, Ruby, Swift, Kotlin, and more
 
+## 🚢 Releases
+
+Releases are automated by `semantic-release` on `main`:
+
+- Bare conventional-commit titles trigger a release — `feat: …` → minor, `fix: …` → patch, `BREAKING CHANGE` → major.
+- Emoji-prefixed squash titles (e.g. `✨ [feat] …`) intentionally do not trigger a release; land a bare `feat:`/`fix:` commit on `main` to ship pending changes.
+- The Complete CI/CD Pipeline's manual dispatch offers only *Skip marketplace publishing* — it cannot force a release or override the bump type.
+
+See [FEATURES.md → Release automation](FEATURES.md#release-automation) for details.
+
 ## 🤝 Contributing
 
 We welcome contributions! See our [Contributing Guidelines](CONTRIBUTING.md) for details.
