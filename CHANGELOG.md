@@ -1,3 +1,14 @@
+# [1.0.0](https://github.com/vuquangkhtn/ai-code-review-assistant/compare/v0.10.0...v1.0.0) (2026-11-22)
+
+
+* feat!: declare v1.0 stable ([c4b7c7f](https://github.com/vuquangkhtn/ai-code-review-assistant/commit/c4b7c7f1f6a74dbef88084d1af69f45b06c04a9d))
+
+
+### BREAKING CHANGES
+
+* version moves from 0.x to 1.0 (stability
+declaration, no behavioral break).
+
 # [0.10.0](https://github.com/vuquangkhtn/ai-code-review-assistant/compare/v0.9.0...v0.10.0) (2026-11-20)
 
 

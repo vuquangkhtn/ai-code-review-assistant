@@ -2,7 +2,7 @@
   "name": "ai-code-review-assistant",
   "displayName": "AI Prompt Code Review",
   "description": "AI code reviews in VS Code: copy-paste structured prompts with any AI, or run one-click CLI reviews through Codex, Claude Code, Copilot CLI, or zcode — no API keys.",
-  "version": "0.10.0",
+  "version": "1.0.0",
   "publisher": "vuquangkhtn",
   "license": "MIT",
   "icon": "resources/icon.png",
