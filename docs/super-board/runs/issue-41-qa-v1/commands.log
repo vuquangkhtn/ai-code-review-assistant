@@ -1,0 +1,33 @@
+# QA commands — issue #41 v1 · 2026-11-22 · head c948e75 · worktree .claude/worktrees/issue-41-qa (76-char path)
+
+# setup
+git -C /Users/gauwan/Codespaces/prompt-ai-code-review worktree add .claude/worktrees/issue-41-qa issue-41-integration-baseline
+#   → HEAD is now at c948e75 🐛 [fix] tests: stub lock-test dialog + CWD-independent data dir
+cd .claude/worktrees/issue-41-qa && npm ci
+
+# unit lane (run 1 — from the LONG worktree path)
+npm run test:cli
+#   → # tests 78 / # pass 77 / # fail 0 / # skipped 1 · exit 0
+
+# scoped integration lane, run 1 (from the LONG worktree path)
+CLI_REVIEW_TEST=1 node ./out/test/runTest.js > integration-scoped-run1.log
+#   → exit 0 · "18 passing (5s)" · all 3 single-run lock suites green
+
+# scoped integration lane, run 2 (consecutive — wipe/stale-lock check)
+CLI_REVIEW_TEST=1 node ./out/test/runTest.js > integration-scoped-run2.log
+#   → exit 0 · "18 passing (5s)"
+
+# full non-scoped lane (failure-set comparison)
+node ./out/test/runTest.js > integration-full-run.log
+#   → exit 1 · "102 passing (906ms)" / "17 failing"
+#   → all 17 failures: assert.ok(workspace && node) at activateWithWorkspace (out/test/suite/cliStatus.test.js:63)
+#   → test-examples/ is not tracked in git (git ls-files test-examples → empty) and absent on this machine
+
+# unit lane re-run (stability)
+npm run test:cli > unit-run2.log
+#   → exit 0 · 77 pass / 0 fail / 1 skip
+
+# diff review
+git diff a9c1535...c948e75 -- AGENTS.md src/test/runTest.ts src/test/suite/cliStatus.test.ts
+#   → AGENTS.md +1; runTest.ts +12/-1; cliStatus.test.ts +23/-6 (6 deleted lines = replaced comment + the
+#     two-line if/else re-added verbatim inside the new if/else with dialog assertions added)

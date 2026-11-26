@@ -8,6 +8,7 @@ VS Code extension ("AI Prompt Code Review", `ai-code-review-assistant`) that gen
 - `npm run check-types` — typecheck only
 - `npm run lint` — ESLint over `src` (ts files only)
 - `npm test` — integration tests via `@vscode/test-electron` (`pretest` runs compile + lint first); downloads VS Code, needs a display
+  - The test host's IPC socket lives in its user-data dir, and macOS rejects AF_UNIX paths over 103 chars. `src/test/runTest.ts` pins a short, CWD-independent `--user-data-dir` under `os.tmpdir()` (`ai-code-review-test-host`, wiped before each run); long repo/worktree paths would otherwise fail the launch with `listen EINVAL`.
 - `npm run watch` — parallel esbuild + tsc watch
 - `npm run package` — production bundle; `npm run package:vsix` — build `.vsix`
 - `npm run release:dry-run` — preview semantic-release
